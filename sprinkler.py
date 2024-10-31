@@ -65,42 +65,31 @@ def sprinkler(inputStr):
     'gv' :{'func':ur.getVer,     'parm': None,                         'menu':' Get     Version  '},
     }
 
-    while True:
+    inputWords = inputStr.split()
+    choice     = inputWords[0]
+    optArgsStr = inputWords[1:]
+    optArgs    = ur.verifyRelayArgs( optArgsStr )
 
-        inputWords = inputStr.split()
-        choice     = inputWords[0]
-        optArgsStr = inputWords[1:]
-        optArgs    = ur.verifyRelayArgs( optArgsStr )
+    if choice in strToFunctDict:
+        func   = strToFunctDict[choice]['func']
+        params = strToFunctDict[choice]['parm']
 
-        if choice in strToFunctDict:
-            func   = strToFunctDict[choice]['func']
-            params = strToFunctDict[choice]['parm']
+        if choice in ['or','cr','rr','cycr'] and len(optArgs) > 0:
+            params    = strToFunctDict[choice]['parm'][:]
+            params[2] = optArgs
 
-            if choice in ['or','cr','rr','cycr'] and len(optArgs) > 0:
-                params    = strToFunctDict[choice]['parm'][:]
-                params[2] = optArgs
+        if params is None:
+            rsp = func()       # rsp[0] = rspStr
+            return rsp[0]      # return to srvr for forwarding to clnt.
+        else:
+            rsp = func(params) # rsp[0] = rspStr 
+            return rsp[0]      # return to srvr for forwarding to clnt. 
 
-            if params is None:
-                rsp = func()       # rsp[0] = rspStr
-                return rsp[0]      # return to srvr for forwarding to clnt.
-            else:
-                rsp = func(params) # rsp[0] = rspStr 
-                return rsp[0]      # return to srvr for forwarding to clnt. 
-
-        elif choice == 'm':
-            rspStr = ''
-            for k,v in strToFunctDict.items():
-                print(' {:4} - {}'.format(k, v['menu'] ))
-                rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-            return rspStr     # return to server so it can forward to client. 
-
-        elif choice == 'q':
-            break
+    elif choice == 'm':
+        rspStr = ''
+        for k,v in strToFunctDict.items():
+            print(' {:4} - {}'.format(k, v['menu'] ))
+            rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
+        return rspStr     # return to server so it can forward to client. 
 
     #rtnVal = rr.openRelay([rlyObjLst,gpioDict,allRlys])
-
-    print('\n Exiting application. \n')
-
-if __name__ == '__main__':
-    sprinkler()
-
