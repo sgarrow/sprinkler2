@@ -24,7 +24,7 @@ if __name__ == '__main__':
         readyToRead, _, _ = select.select([client_socket], [], [], 1)
         if readyToRead:
             response = client_socket.recv(1024)
-            print('1 Response from server:\n{}'.format(response.decode()))
+            print('{}'.format(response.decode()))
 
         if message == 'close':
             break

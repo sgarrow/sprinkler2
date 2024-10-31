@@ -1,11 +1,12 @@
 import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
 import time
+import sprinkler as sp
 #############################################################################
 
 def listThreads():
     while True:
-        time.sleep(3)
+        time.sleep(5)
         for thread in threading.enumerate():
             print(thread.name)
 #############################################################################
@@ -30,7 +31,6 @@ def handleClient(clientSocket, clientAddress):
         print('Received from: {} {}'.format(clientAddress, data.decode()))
 
         # Process data and send response back to the client
-        print('**********', data.decode())
         if data.decode() == 'close':
             response = 'Closing connection'
             clientSocket.send(response.encode())
@@ -38,7 +38,7 @@ def handleClient(clientSocket, clientAddress):
             time.sleep(1)
             break # Causes the handler to stop and the thread end. 
         else:
-            response = sprinkler(data.decode())
+            response = sp.sprinkler(data.decode())
             clientSocket.send(response.encode())
 
     clientSocket.close()
@@ -69,27 +69,6 @@ def startServer():
                                           clientAddress)
                                   )
         thread.start()
-#############################################################################
-
-def sprinkler(choice):
-    strToDict = { 'dm' :{ 'parm':[1], 'menu':' Disp Msg  '},
-                  'il' :{ 'parm':[2], 'menu':' Inf  Loop '}}
-    #strToDict = { 'dm' :{'func':dispMsg, 'parm':[1], 'menu':' Disp Msg  '},
-    #              'il' :{'func':infLoop, 'parm':[2], 'menu':' Inf  Loop '}}
-    
-    while True:
-
-        if choice == 'm':
-            rspStr = ''
-            for k,v in strToDict.items():
-                print(' {:4} - {}'.format(k, v['menu'] ))
-                rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-            return rspStr
-    
-        elif choice == 'q':
-            break
-    
-    print('\n Exiting sprinkler thread. \n')
 #############################################################################
 
 if __name__ == '__main__':

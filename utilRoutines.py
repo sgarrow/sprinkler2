@@ -1,5 +1,5 @@
 import os
-import gpiozero
+#import gpiozero
 
 VERSION  = ' Version:  1.9'
 RELEASED = ' Released: 28-Oct-2024'
@@ -7,28 +7,31 @@ RELEASED = ' Released: 28-Oct-2024'
 
 def getTemp(prnEn = True):
 
-    cpu = gpiozero.CPUTemperature()
+    #cpu = gpiozero.CPUTemperature()
 
     if prnEn:
-        print(' CPU  Temp = {}'.format( cpu.temperature ))
-        print(' Over Temp = {}'.format( cpu.is_active   ))
+    #    print(' CPU  Temp = {}'.format( cpu.temperature ))
+    #    print(' Over Temp = {}'.format( cpu.is_active   ))
+    #
+    #    print()
+    #    os.system('vcgencmd get_throttled')
+        rspStr  = '  0: under-voltage\n'
+        rspStr += '  1: arm frequency capped\n'
+        rspStr += '  2: currently throttled\n'
+        rspStr += ' 16: under-voltage has occurred\n'
+        rspStr += ' 17: arm frequency capped has occurred\n'
+        rspStr += ' 18: throttling has occurred'
+        print(rspStr)
 
-        print()
-        os.system('vcgencmd get_throttled')
-        print('  0: under-voltage')
-        print('  1: arm frequency capped')
-        print('  2: currently throttled ')
-        print(' 16: under-voltage has occurred')
-        print(' 17: arm frequency capped has occurred')
-        print(' 18: throttling has occurred')
-
-    return cpu
+    #return cpu
+    return [rspStr, 'cpu']
 #############################################################################
 
 def getVer():
-    print(VERSION)
-    print(RELEASED)
-    return VERSION, RELEASED
+    rspStr  = VERSION  + '\n'
+    rspStr += RELEASED
+    print(rspStr)
+    return [rspStr]
 #############################################################################
 
 def verifyRelayArgs( optArgsStr ):
@@ -52,6 +55,7 @@ def verifyRelayArgs( optArgsStr ):
     # Remove dups and nums out of range
     optArgsNoDups = list(set(optArgs2))
     optArgsNoGT8LE0  = [ x for x in optArgsNoDups if 0 < x < 9 ]
+    rspStr = ''
 
-    return sorted(optArgsNoGT8LE0)
+    return [rspStr, sorted(optArgsNoGT8LE0)]
 #############################################################################

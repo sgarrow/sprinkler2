@@ -28,16 +28,15 @@ def getTimeDate( prnEn = True ):
     dowStr = dowStrLst[dowNum]
 
     if prnEn:
-        print()
-        print('',now)
-        print()
-        print(' year   {:4}'.format( year   ), end = '')
-        print(' month  {:4}'.format( month  ), end = '')
-        print(' day    {:4}'.format( day    ))
-        print(' hour   {:4}'.format( hour   ), end = '')
-        print(' minute {:4}'.format( minute ), end = '')
-        print(' second {:4}'.format( second ))
-        print(' dow    {:4} ({})'.format( dowNum, dowStr ))
+        rspStr  = ' {}\n'.format(now)
+        rspStr += ' year   {:4}'.format(   year   )
+        rspStr += ' month  {:4}'.format(   month  )
+        rspStr += ' day    {:4}\n'.format( day    )
+        rspStr += ' hour   {:4}'.format(   hour   )
+        rspStr += ' minute {:4}'.format(   minute )
+        rspStr += ' second {:4}\n'.format( second )
+        rspStr += ' dow    {:4} ({})'.format( dowNum, dowStr )
+        print(rspStr)
 
     rtnDict = {'year':   year,   'month':  month,  'day':   day,
                'hour':   hour,   'minute': minute, 'second':second,
@@ -45,5 +44,5 @@ def getTimeDate( prnEn = True ):
                'now':    now}
 
 
-    return rtnDict
+    return [rspStr, rtnDict]
 #############################################################################
