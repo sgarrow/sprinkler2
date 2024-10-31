@@ -40,11 +40,11 @@ def sprinkler(inputStr):
             profDict = pickle.load(f)
     except FileNotFoundError:
         pass
-        #print('\n Could not open schedDict.pickle.')
-        #print(' Generating it now ...\n')
-        #pr.makeProf()
-        #with open('schedDict.pickle', 'rb') as f:
-        #    profDict = pickle.load(f)
+        print('\n Could not open schedDict.pickle.')
+        print(' Generating it now ...\n')
+        pr.makeProf()
+        with open('schedDict.pickle', 'rb') as f:
+            profDict = pickle.load(f)
 
     allRlys = [1,2,3,4,5,6,7,8]
     strToFunctDict = {
@@ -55,8 +55,8 @@ def sprinkler(inputStr):
     #'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
 
     'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
-    #'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
-    #'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
+    'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
+    'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
     #'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
     #'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':' Run Act Profile\n'},
 

@@ -69,21 +69,22 @@ def makeProf( ):
 #############################################################################
 
 def listProfs( pDict ):
-    print()
+    rspStr = ''
     for profile,sched in pDict.items():
-        print(' {}'.format(profile))
-        print('  About   {}'.format(sched['about']))
-        print('  Active  {}\n'.format(sched['active']))
+        rspStr += ' {}\n'.format(profile)
+        rspStr += '  About   {}\n'.format(sched['about'])
+        rspStr += '  Active  {}\n\n'.format(sched['active'])
 
         for theKey,data in sched.items():
 
             if theKey.startswith('relay'):
-                print('  {:<6}'.format(theKey), end = '')
-                print('  {}'.format(data['About']))
-                print('          Days: {}, Times: {}, Durations: {}\n'.\
-                    format(data['Days'], data['Times'], data['durations']))
+                rspStr += '  {:<6}'.format(theKey)
+                rspStr += '  {}\n'.format(data['About'])
+                rspStr += '          Days: {}, Times: {}, Durations: {}\n'.\
+                    format(data['Days'], data['Times'], data['durations'])
 
-        print()
+    print(rspStr)
+    return [rspStr]
 #############################################################################
 
 def getActProf( pDict ):
@@ -99,9 +100,10 @@ def getActProf( pDict ):
         if ap is not None:
             break
 
-    print(' Active Profile = {}'.format(ap))
+    rspStr = ' Active Profile = {}'.format(ap)
+    print(rspStr)
 
-    return ap
+    return [rspStr]
 #############################################################################
 
 def setActProf( pDict ):
