@@ -43,7 +43,7 @@ import time
 import datetime      as dt
 import pprint        as pp
 import yaml
-import relayRoutines as rr
+#import relayRoutines as rr
 import timeRoutines  as tr
 import utilRoutines  as ur
 
@@ -62,9 +62,10 @@ def makeProf( ):
     with open('schedDict.pickle', 'rb') as handle:
         sd = pickle.load(handle)
 
-    pp.pprint(sd)
+    rspStr = pp.pformat(sd)
+    print(rspStr)
 
-    return 0
+    return [rspStr]
 #############################################################################
 
 def listProfs( pDict ):

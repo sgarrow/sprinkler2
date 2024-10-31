@@ -6,7 +6,7 @@ import sprinkler as sp
 
 def listThreads():
     while True:
-        time.sleep(5)
+        time.sleep(10)
         for thread in threading.enumerate():
             print(thread.name)
 #############################################################################
@@ -39,6 +39,7 @@ def handleClient(clientSocket, clientAddress):
             break # Causes the handler to stop and the thread end. 
         else:
             response = sp.sprinkler(data.decode())
+            print('response len = ', len(response.encode()))
             clientSocket.send(response.encode())
 
     clientSocket.close()
@@ -57,6 +58,13 @@ def startServer():
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((host, port))
     serverSocket.listen(5)
+
+    sndBufSize = serverSocket.getsockopt(\
+        socket.SOL_SOCKET, socket.SO_SNDBUF)
+    rcvBufSize = serverSocket.getsockopt(\
+        socket.SOL_SOCKET, socket.SO_RCVBUF)
+    print('sndBufSize',sndBufSize) # 64K
+    print('rcvBufSize',rcvBufSize) # 64K 
 
     print('Server listening on: {} {}'.format(host, port))
 

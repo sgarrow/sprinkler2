@@ -24,7 +24,7 @@ import pickle
 #import initRoutines    as ir
 import timeRoutines    as tr
 #import relayRoutines   as rr
-#import profileRoutines as pr
+import profileRoutines as pr
 import utilRoutines    as ur
 #############################################################################
 
@@ -54,7 +54,7 @@ def sprinkler(inputStr):
     #'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':' Read    Relay    '},
     #'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
 
-    #'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
+    'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
     #'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
     #'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
     #'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
@@ -90,6 +90,11 @@ def sprinkler(inputStr):
         for k,v in strToFunctDict.items():
             print(' {:4} - {}'.format(k, v['menu'] ))
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-        return rspStr     # return to server so it can forward to client. 
+        return rspStr          # return to server so it can forward to client. 
+
+    else:
+        rspStr = 'Invalid command'
+        print(rspStr)
+        return rspStr          # return to server so it can forward to client. 
 
     #rtnVal = rr.openRelay([rlyObjLst,gpioDict,allRlys])
