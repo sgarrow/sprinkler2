@@ -69,6 +69,7 @@ def makeProf( ):
 #############################################################################
 
 def listProfs( pDict ):
+    pp.pprint(pDict)
     rspStr = ''
     for profile,sched in pDict.items():
         rspStr += ' {}\n'.format(profile)
@@ -105,34 +106,48 @@ def getActProf( pDict ):
 
     return [rspStr]
 #############################################################################
-
 def setActProf( pDict ):
 
-    # Print a menu of available profiles.
-    idxs = []
-    ks   = []
-    for ii,profileKey in enumerate(pDict):
-        print(' {} - {}'.format(ii,profileKey))
-        idxs.append(ii)
-        ks.append(profileKey)
-    print()
 
-    # Get the index of the desired profle from user (with error traping).
-    idx = None
-    while idx not in range(len(pDict)):
-        try:
-            idxStr = input(' Enter number of desired Active Profile (or \'q\') -> ')
-            idx = int(idxStr)
-        except ValueError:
-            if idxStr == 'q':
-                return -1
-            print(' Invalid entry. Must be an integer. Try again.')
-        else: # There was no exception.
-            if idx > len(pDict):
-                idx = None
-                print(' Invalid entry. Integer out of range. Try again.')
+    with open('sapState.pickle', 'rb') as handle:
+        state = pickle.load(handle)
+    print('incoming state = ', state)
+
+    if state == 0:
+        # Print a menu of available profiles.
+        idxs = []
+        ks   = []
+        rspStr = ''
+        for ii,profileKey in enumerate(pDict):
+            rspStr += ' {} - {}\n'.format(ii,profileKey)
+            ks.append(profileKey)
+        makeSapState(1)
+        print(rspStr)
+        return [rspStr]
+
+    if state == 1:
+        rspStr = ' Enter number of desired Active Profile (or \'q\') -> '
+        makeSapState(2)
+        print(rspStr)
+        return [rspStr]
+
+    if state == 2:
+        # Get the index of the desired profle from user (with error traping).
+        idx = None
+        while idx not in range(len(pDict)):
+            try:
+                idxStr = input(' Enter number of desired Active Profile (or \'q\') -> ')
+                idx = int(idxStr)
+            except ValueError:
+                if idxStr == 'q':
+                    return -1
+                print(' Invalid entry. Must be an integer. Try again.')
+            else: # There was no exception.
+                if idx > len(pDict):
+                    idx = None
+                    print(' Invalid entry. Integer out of range. Try again.')
+
     ap = ks[idx] # Name of the profile to set active.
-
     # Set all profiles to inactive, except selected profile is set to active.
     for profileKey,profileValue in pDict.items():
         for profKey in profileValue:
@@ -249,6 +264,13 @@ def runActProf( parmLst ):
     except KeyboardInterrupt:
         return rtnVal
 #############################################################################
+def makeSapState(state):
+    sapState = state
+    with open('sapState.pickle', 'wb') as handle:
+        pickle.dump(sapState, handle)
+#############################################################################
 
 if __name__ == '__main__':
-    makeProf( )
+    makeProf()
+    makeSapState(0)
+

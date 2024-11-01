@@ -21,6 +21,7 @@ After reading the doc-strings perusing the comments will also be helpful.
 import pickle
 
 # Import other source files that are in the same directory as this file.
+import pprint as pp
 #import initRoutines    as ir
 import timeRoutines    as tr
 #import relayRoutines   as rr
@@ -28,10 +29,7 @@ import profileRoutines as pr
 import utilRoutines    as ur
 #############################################################################
 
-def sprinkler(inputStr):
-
-    #print()
-    #ur.getVer()
+def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     #gpioDict, rlyObjLst = ir.init()
 
@@ -46,7 +44,8 @@ def sprinkler(inputStr):
         with open('schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
 
-    allRlys = [1,2,3,4,5,6,7,8]
+    allRlys  = [1,2,3,4,5,6,7,8]
+    sapState = 0
     strToFunctDict = {
     #'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Open    Relay    '},
     #'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Close   Relay    '},
@@ -57,7 +56,7 @@ def sprinkler(inputStr):
     'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
     'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
     'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
-    #'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
+    'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
     #'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':' Run Act Profile\n'},
 
     'gdt':{'func':tr.getTimeDate,'parm': None,                         'menu':' Get     Date/Time'},
@@ -82,7 +81,7 @@ def sprinkler(inputStr):
             rsp = func()       # rsp[0] = rspStr
             return rsp[0]      # return to srvr for forwarding to clnt.
         else:
-            rsp = func(params) # rsp[0] = rspStr 
+            rsp = func(params) # rsp[0] = rspStr
             return rsp[0]      # return to srvr for forwarding to clnt. 
 
     elif choice == 'm':

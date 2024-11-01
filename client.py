@@ -3,7 +3,6 @@ import time
 import select
 #############################################################################
 
-
 if __name__ == '__main__':
 
     # Each client will connect to the server with a new address.
@@ -23,12 +22,12 @@ if __name__ == '__main__':
         time.sleep(.1)
 
         try:
-            message = input("Enter something: ")
+            message = input( '\n ***** Choice (m=menu, q=quit) -> '  )
             clientSocket.send(message.encode())
         except BlockingIOError:
             pass
 
-        readyToRead, _, _ = select.select([clientSocket], [], [], 1)
+        readyToRead, _, _ = select.select([clientSocket], [], [], .5)
         if readyToRead:
             rspStr = ''
             while readyToRead:

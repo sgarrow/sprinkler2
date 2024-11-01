@@ -1,7 +1,7 @@
 import os
 #import gpiozero
 
-VERSION  = ' Version:  0.2'
+VERSION  = ' Version:  0.3'
 RELEASED = ' Released: 31-Oct-2024'
 #############################################################################
 
