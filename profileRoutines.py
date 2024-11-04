@@ -52,6 +52,11 @@ RED = '[31m'
 TERMINATE = '[0m'
 #############################################################################
 
+def makeProfSap(sapProdDict):
+    with open('schedDict.pickle', 'wb') as handle:
+        pickle.dump(sapProdDict, handle)
+#############################################################################
+
 def makeProf( ):
     with open('config.yml', 'r',encoding='utf-8') as file:
         schedDict = yaml.safe_load(file)
@@ -108,56 +113,85 @@ def getActProf( pDict ):
 #############################################################################
 def setActProf( pDict ):
 
+    # Read sapState info.
+    with open('sapStateMachineInfo.pickle', 'rb') as handle:
+        stateMachInfo = pickle.load(handle)
+    sapState    = stateMachInfo[ 'sapState'    ]
+    dsrdProfIdx = stateMachInfo[ 'dsrdProfIdx' ]
+    profNames   = stateMachInfo[ 'profNames' ]
+    print( ' in state     = ', sapState    )
+    print( ' in idx       = ', dsrdProfIdx )
+    print( ' in profNames = ', profNames   )
+    ########################################
 
-    with open('sapState.pickle', 'rb') as handle:
-        state = pickle.load(handle)
-    print('incoming state = ', state)
-
-    if state == 0:
-        # Print a menu of available profiles.
+    # Print a menu of available profiles.
+    if sapState == 0:
         idxs = []
         ks   = []
         rspStr = ''
         for ii,profileKey in enumerate(pDict):
             rspStr += ' {} - {}\n'.format(ii,profileKey)
             ks.append(profileKey)
-        makeSapState(1)
-        print(rspStr)
-        return [rspStr]
+        makeSapStateMachineInfo(1,0,ks)
+    ########################################
 
-    if state == 1:
+    # Get idx of desired profile to make active.
+    if sapState == 1:
         rspStr = ' Enter number of desired Active Profile (or \'q\') -> '
-        makeSapState(2)
-        print(rspStr)
-        return [rspStr]
+        makeSapStateMachineInfo(2,1,profNames)
+    ########################################
 
-    if state == 2:
+    # Error check idx of desired active profile to make active
+    if sapState == 2:
         # Get the index of the desired profle from user (with error traping).
-        idx = None
-        while idx not in range(len(pDict)):
-            try:
-                idxStr = input(' Enter number of desired Active Profile (or \'q\') -> ')
-                idx = int(idxStr)
-            except ValueError:
-                if idxStr == 'q':
-                    return -1
-                print(' Invalid entry. Must be an integer. Try again.')
-            else: # There was no exception.
-                if idx > len(pDict):
-                    idx = None
-                    print(' Invalid entry. Integer out of range. Try again.')
+        idxStr = dsrdProfIdx # TODO - FIXME
+        try:
+            idx = int(idxStr)
+        except ValueError:
+            if idxStr == 'q':
+                rspStr = ' Quiting sap. Resetting sapStateMachine.'
+                makeSapStateMachineInfo(0,0,[])
+            else:
+                rspStr = ' Invalid entry. Must be an integer. Try again.'
+                makeSapStateMachineInfo(1,0,profNames)
+        else: # There was no exception.
+            if idx > len(pDict):
+                rspStr = ' Invalid entry. Integer out of range. Try again.'
+                makeSapStateMachineInfo(1,0,profNames)
+            else:
+                rspStr = ' valid idx entry.'
+                makeSapStateMachineInfo(3,idx,profNames)
+    ########################################
 
-    ap = ks[idx] # Name of the profile to set active.
+    # Set active profile.
     # Set all profiles to inactive, except selected profile is set to active.
-    for profileKey,profileValue in pDict.items():
-        for profKey in profileValue:
-            if profKey == 'active':
-                if profileKey == ap:
-                    pDict[profileKey]['active'] = True
-                else:
-                    pDict[profileKey]['active'] = False
+    if sapState == 3:
+        ap = profNames[dsrdProfIdx] # Name of the profile to set active.
+        print('*************')
+        print(profNames)
+        print(dsrdProfIdx)
+        print(ap)
+        pp.pprint(pDict)
+        print('*************')
+        for profileKey,profileValue in pDict.items():
+            for profKey in profileValue:
+                if profKey == 'active':
+                    if profileKey == ap:
+                        pDict[profileKey]['active'] = True
+                    else:
+                        pDict[profileKey]['active'] = False
+        makeProfSap(pDict)
+        rspStr = ' active profile set.'
+        makeSapStateMachineInfo(0,0,[])
+    ########################################
+    
+    if 0 > sapState > 3:
+        rspStr = ' Invalid sapState. Resetting sapStateMachine.'
+        makeSapStateMachineInfo(0,0,[])
+    ########################################
 
-    return pDict
+    print(rspStr)
+    return [rspStr,pDict]
 #############################################################################
 
 def checkDayMatch( rlyData, currDT ):
@@ -264,13 +298,16 @@ def runActProf( parmLst ):
     except KeyboardInterrupt:
         return rtnVal
 #############################################################################
-def makeSapState(state):
-    sapState = state
-    with open('sapState.pickle', 'wb') as handle:
-        pickle.dump(sapState, handle)
+def makeSapStateMachineInfo(sapState,dsrdProfIdx,profNames):
+    sapStateMachineInfo = { 'sapState'   : sapState, 
+                            'dsrdProfIdx': dsrdProfIdx,
+                            'profNames'  : profNames} 
+
+    with open('sapStateMachineInfo.pickle', 'wb') as handle:
+        pickle.dump(sapStateMachineInfo, handle)
 #############################################################################
 
 if __name__ == '__main__':
     makeProf()
-    makeSapState(0)
+    makeSapStateMachineInfo(0,0,[])
 

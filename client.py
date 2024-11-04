@@ -1,6 +1,7 @@
 import socket
 import time
 import select
+import pickle
 #############################################################################
 
 if __name__ == '__main__':
@@ -17,12 +18,15 @@ if __name__ == '__main__':
     print('sndBufSize',sndBufSize) # 64K
     print('rcvBufSize',rcvBufSize) # 64K 
 
+    mainPrompt   = '\n Choice (m=menu, q=quit) -> '  
+    sap_1_prompt = '\n Enter number of desired Active Profile (or \'q\') -> '  
+    prompt = mainPrompt
     while True:
 
         time.sleep(.1)
 
         try:
-            message = input( '\n ***** Choice (m=menu, q=quit) -> '  )
+            message = input( prompt )
             clientSocket.send(message.encode())
         except BlockingIOError:
             pass
@@ -35,6 +39,16 @@ if __name__ == '__main__':
                 rspStr += response.decode()
                 readyToRead, _, _ = select.select([clientSocket],[],[], .25)
             print('{}'.format(rspStr))
+
+        if message == 'sap':
+            with open('sapStateMachineInfo.pickle', 'rb') as handle:
+                stateMachInfo = pickle.load(handle)
+            sapState    = stateMachInfo[ 'sapState'    ]
+            dsrdProfIdx = stateMachInfo[ 'dsrdProfIdx' ]
+            if sapState == 1:
+                prompt = sap_1_prompt
+        else:
+            prompt = mainPrompt
 
         if message == 'close':
             break
