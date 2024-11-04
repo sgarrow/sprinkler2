@@ -19,7 +19,7 @@ if __name__ == '__main__':
     print('rcvBufSize',rcvBufSize) # 64K 
 
     mainPrompt   = '\n Choice (m=menu, q=quit) -> '  
-    sap_1_prompt = '\n Enter number of desired Active Profile (or \'q\') -> '  
+    sap_1_prompt = ' Enter number of desired Active Profile (or \'q\') -> '
     prompt = mainPrompt
     while True:
 

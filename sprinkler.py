@@ -21,7 +21,6 @@ After reading the doc-strings perusing the comments will also be helpful.
 import pickle
 
 # Import other source files that are in the same directory as this file.
-import pprint as pp
 #import initRoutines    as ir
 import timeRoutines    as tr
 #import relayRoutines   as rr
@@ -87,13 +86,11 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     elif choice == 'm':
         rspStr = ''
         for k,v in strToFunctDict.items():
-            print(' {:4} - {}'.format(k, v['menu'] ))
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
         return rspStr          # return to server so it can forward to client. 
 
     else:
         rspStr = 'Invalid command'
-        print(rspStr)
         return rspStr          # return to server so it can forward to client. 
 
     #rtnVal = rr.openRelay([rlyObjLst,gpioDict,allRlys])

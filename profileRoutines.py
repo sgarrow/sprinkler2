@@ -68,13 +68,12 @@ def makeProf( ):
         sd = pickle.load(handle)
 
     rspStr = pp.pformat(sd)
-    print(rspStr)
 
+    print(rspStr)
     return [rspStr]
 #############################################################################
 
 def listProfs( pDict ):
-    pp.pprint(pDict)
     rspStr = ''
     for profile,sched in pDict.items():
         rspStr += ' {}\n'.format(profile)
@@ -94,9 +93,7 @@ def listProfs( pDict ):
 #############################################################################
 
 def getActProf( pDict ):
-
     ap = None
-
     for profileKey,profileValue in pDict.items():
         for profKey,profValue in profileValue.items():
             if profKey == 'active':
@@ -108,7 +105,6 @@ def getActProf( pDict ):
 
     rspStr = ' Active Profile = {}'.format(ap)
     print(rspStr)
-
     return [rspStr]
 #############################################################################
 def setActProf( pDict ):
@@ -119,9 +115,8 @@ def setActProf( pDict ):
     sapState    = stateMachInfo[ 'sapState'    ]
     dsrdProfIdx = stateMachInfo[ 'dsrdProfIdx' ]
     profNames   = stateMachInfo[ 'profNames' ]
-    print( ' in state     = ', sapState    )
-    print( ' in idx       = ', dsrdProfIdx )
-    print( ' in profNames = ', profNames   )
+    print(' Enter mach data:')
+    pp.pprint(stateMachInfo)
     ########################################
 
     # Print a menu of available profiles.
@@ -167,12 +162,6 @@ def setActProf( pDict ):
     # Set all profiles to inactive, except selected profile is set to active.
     if sapState == 3:
         ap = profNames[dsrdProfIdx] # Name of the profile to set active.
-        print('*************')
-        print(profNames)
-        print(dsrdProfIdx)
-        print(ap)
-        pp.pprint(pDict)
-        print('*************')
         for profileKey,profileValue in pDict.items():
             for profKey in profileValue:
                 if profKey == 'active':
@@ -190,6 +179,8 @@ def setActProf( pDict ):
         makeSapStateMachineInfo(0,0,[])
     ########################################
 
+    print(' Exit mach data:')
+    pp.pprint(stateMachInfo)
     print(rspStr)
     return [rspStr,pDict]
 #############################################################################
@@ -256,7 +247,6 @@ def runActProf( parmLst ):
     rtnVal = 0
     apName = getActProf( pDict )
     apDict = pDict[apName]
-    print(' Running Profile')
 
     try:
         while 1:

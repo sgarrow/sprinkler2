@@ -6,7 +6,7 @@ import sprinkler as sp
 
 def listThreads():
     while True:
-        time.sleep(30)
+        time.sleep(60)
         for thread in threading.enumerate():
             print(thread.name)
 #############################################################################
