@@ -4,6 +4,13 @@ import select
 import pickle
 #############################################################################
 
+def makeSapStateMachineInfo(inDict, idx):
+    inDict['dsrdProfIdx'] = idx
+    with open('sapStateMachineInfo.pickle', 'wb') as handle:
+        pickle.dump(inDict, handle)
+    return 0
+#############################################################################
+
 if __name__ == '__main__':
 
     # Each client will connect to the server with a new address.
@@ -21,34 +28,33 @@ if __name__ == '__main__':
     mainPrompt   = '\n Choice (m=menu, q=quit) -> '  
     sap_1_prompt = ' Enter number of desired Active Profile (or \'q\') -> '
     prompt = mainPrompt
+
     while True:
 
-        time.sleep(.1)
+        prompt = mainPrompt
+        with open('sapStateMachineInfo.pickle', 'rb') as handle:
+            stateMachInfo = pickle.load(handle)
+        if stateMachInfo['sapState'] == 1:
+            prompt = sap_1_prompt
 
         try:
             message = input( prompt )
+            if stateMachInfo['sapState'] == 1:
+                makeSapStateMachineInfo(stateMachInfo, message)
+                message = 'sap'
             clientSocket.send(message.encode())
         except BlockingIOError:
             pass
 
-        readyToRead, _, _ = select.select([clientSocket], [], [], .5)
+        readyToRead, _, _ = select.select([clientSocket], [], [], .6)
         if readyToRead:
             rspStr = ''
             while readyToRead:
                 response = clientSocket.recv(1024)
                 rspStr += response.decode()
                 readyToRead, _, _ = select.select([clientSocket],[],[], .25)
-            print('{}'.format(rspStr))
-
-        if message == 'sap':
-            with open('sapStateMachineInfo.pickle', 'rb') as handle:
-                stateMachInfo = pickle.load(handle)
-            sapState    = stateMachInfo[ 'sapState'    ]
-            dsrdProfIdx = stateMachInfo[ 'dsrdProfIdx' ]
-            if sapState == 1:
-                prompt = sap_1_prompt
-        else:
-            prompt = mainPrompt
+            if stateMachInfo['sapState'] != 1:
+                print('{}'.format(rspStr))
 
         if message == 'close':
             break

@@ -33,13 +33,12 @@ def handleClient(clientSocket, clientAddress):
         # Process data and send response back to the client
         if data.decode() == 'close':
             response = 'Closing connection'
-            clientSocket.send(response.encode())
+            clientSocket.send(response.encode()) # sends all even if >1024.
             print('Closing: {}'.format(clientAddress))
             time.sleep(1)
             break # Causes the handler to stop and the thread end. 
         else:
             response = sp.sprinkler(data.decode())
-            print('response len = ', len(response.encode()))
             clientSocket.send(response.encode())
 
     clientSocket.close()

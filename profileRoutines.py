@@ -127,35 +127,36 @@ def setActProf( pDict ):
         for ii,profileKey in enumerate(pDict):
             rspStr += ' {} - {}\n'.format(ii,profileKey)
             ks.append(profileKey)
-        makeSapStateMachineInfo(1,0,ks)
+        stateMachInfo = makeSapStateMachineInfo(1,0,ks)
     ########################################
 
     # Get idx of desired profile to make active.
     if sapState == 1:
         rspStr = ' Enter number of desired Active Profile (or \'q\') -> '
-        makeSapStateMachineInfo(2,1,profNames)
+        stateMachInfo = makeSapStateMachineInfo(2,dsrdProfIdx,profNames)
     ########################################
 
     # Error check idx of desired active profile to make active
     if sapState == 2:
         # Get the index of the desired profle from user (with error traping).
         idxStr = dsrdProfIdx # TODO - FIXME
+        print('idxStr', idxStr)
         try:
             idx = int(idxStr)
         except ValueError:
             if idxStr == 'q':
                 rspStr = ' Quiting sap. Resetting sapStateMachine.'
-                makeSapStateMachineInfo(0,0,[])
+                stateMachInfo = makeSapStateMachineInfo(0,0,[])
             else:
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
-                makeSapStateMachineInfo(1,0,profNames)
+                stateMachInfo = makeSapStateMachineInfo(1,0,profNames)
         else: # There was no exception.
             if idx > len(pDict):
                 rspStr = ' Invalid entry. Integer out of range. Try again.'
                 makeSapStateMachineInfo(1,0,profNames)
             else:
                 rspStr = ' valid idx entry.'
-                makeSapStateMachineInfo(3,idx,profNames)
+                stateMachInfo = makeSapStateMachineInfo(3,idx,profNames)
     ########################################
 
     # Set active profile.
@@ -171,12 +172,12 @@ def setActProf( pDict ):
                         pDict[profileKey]['active'] = False
         makeProfSap(pDict)
         rspStr = ' active profile set.'
-        makeSapStateMachineInfo(0,0,[])
+        stateMachInfo = makeSapStateMachineInfo(0,0,[])
     ########################################
     
     if 0 > sapState > 3:
         rspStr = ' Invalid sapState. Resetting sapStateMachine.'
-        makeSapStateMachineInfo(0,0,[])
+        stateMachInfo = makeSapStateMachineInfo(0,0,[])
     ########################################
 
     print(' Exit mach data:')
@@ -295,6 +296,7 @@ def makeSapStateMachineInfo(sapState,dsrdProfIdx,profNames):
 
     with open('sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)
+    return sapStateMachineInfo
 #############################################################################
 
 if __name__ == '__main__':
