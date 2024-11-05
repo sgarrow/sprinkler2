@@ -2,13 +2,40 @@ import socket
 import time
 import select
 import pickle
+import threading
+import queue
+#############################################################################
+
+def printSocketInfo(cSocket):
+    sndBufSize = cSocket.getsockopt( socket.SOL_SOCKET, socket.SO_SNDBUF )
+    rcvBufSize = cSocket.getsockopt( socket.SOL_SOCKET, socket.SO_RCVBUF )
+    print( ' sndBufSize', sndBufSize ) # 64K
+    print( ' rcvBufSize', rcvBufSize ) # 64K 
 #############################################################################
 
 def makeSapStateMachineInfo(inDict, idx):
     inDict['dsrdProfIdx'] = idx
     with open('sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(inDict, handle)
-    return 0
+    return inDict
+#############################################################################
+
+def getUserInput(q,l):
+    while True:
+
+        prompt = '\n Choice (m=menu, q=quit) -> '
+        with open('sapStateMachineInfo.pickle', 'rb') as handle:
+            stateMachInfo = pickle.load(handle)
+        if stateMachInfo['sapState'] == 1:
+            prompt = stateMachInfo['prompt']
+
+        l.acquire()
+        userInput = input( prompt )
+        q.put(userInput)
+        l.release()
+        time.sleep(.01)
+        if userInput == 'close':
+            break
 #############################################################################
 
 if __name__ == '__main__':
@@ -17,35 +44,22 @@ if __name__ == '__main__':
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Replace with the server's address if needed.
     clientSocket.connect(('localhost', 5000))
-
-    sndBufSize = clientSocket.getsockopt(\
-        socket.SOL_SOCKET, socket.SO_SNDBUF)
-    rcvBufSize = clientSocket.getsockopt(\
-        socket.SOL_SOCKET, socket.SO_RCVBUF)
-    print('sndBufSize',sndBufSize) # 64K
-    print('rcvBufSize',rcvBufSize) # 64K 
-
-    mainPrompt   = '\n Choice (m=menu, q=quit) -> '  
-    sap_1_prompt = ' Enter number of desired Active Profile (or \'q\') -> '
-    prompt = mainPrompt
+    printSocketInfo(clientSocket)
+    threadLock  = threading.Lock()
+    theQ        = queue.Queue()
+    inputThread = threading.Thread( target = getUserInput, args = (theQ,threadLock) )
+    inputThread.start()
 
     while True:
 
-        prompt = mainPrompt
-        with open('sapStateMachineInfo.pickle', 'rb') as handle:
-            stateMachInfo = pickle.load(handle)
-        if stateMachInfo['sapState'] == 1:
-            prompt = sap_1_prompt
-
         try:
-            message = input( prompt )
-            if stateMachInfo['sapState'] == 1:
-                makeSapStateMachineInfo(stateMachInfo, message)
-                message = 'sap'
-            clientSocket.send(message.encode())
-        except BlockingIOError:
+            message = theQ.get()
+        except queue.Empty:
             pass
+        else:
+            clientSocket.send(message.encode())
 
+        threadLock.acquire()
         readyToRead, _, _ = select.select([clientSocket], [], [], .6)
         if readyToRead:
             rspStr = ''
@@ -53,8 +67,8 @@ if __name__ == '__main__':
                 response = clientSocket.recv(1024)
                 rspStr += response.decode()
                 readyToRead, _, _ = select.select([clientSocket],[],[], .25)
-            if stateMachInfo['sapState'] != 1:
-                print('{}'.format(rspStr))
+            print('{}'.format(rspStr))
+        threadLock.release()
 
         if message == 'close':
             break
