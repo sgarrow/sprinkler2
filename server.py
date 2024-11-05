@@ -28,6 +28,7 @@ def handleClient(clientSocket, clientAddress):
         # Below if not needed.  clientSocket.recv blocks by default.
         #if not data: break
 
+        print('*********************************')
         print('Received from: {} {}'.format(clientAddress, data.decode()))
 
         # Process data and send response back to the client
