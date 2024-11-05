@@ -13,11 +13,11 @@ def printSocketInfo(cSocket):
     print( ' rcvBufSize', rcvBufSize ) # 64K 
 #############################################################################
 
-def makeSapStateMachineInfo(inDict, idx):
-    inDict['dsrdProfIdx'] = idx
+def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
+    sapStateMachineInfo.update(kwargs)
     with open('sapStateMachineInfo.pickle', 'wb') as handle:
-        pickle.dump(inDict, handle)
-    return inDict
+        pickle.dump(sapStateMachineInfo, handle)
+    return sapStateMachineInfo
 #############################################################################
 
 def getUserInput(q,l):
@@ -30,9 +30,20 @@ def getUserInput(q,l):
             prompt = stateMachInfo['prompt']
 
         l.acquire()
-        userInput = input( prompt )
-        q.put(userInput)
+
+        if stateMachInfo['sapState'] in [0,1]: 
+            userInput = input( prompt )
+
+        if stateMachInfo['sapState'] == 1: 
+            updateSapStateMachineInfo(stateMachInfo,profIdx=userInput)
+
+        if stateMachInfo['sapState'] != 0: 
+            q.put('sap')
+        else:
+            q.put(userInput)
+
         l.release()
+
         time.sleep(.01)
         if userInput == 'close':
             break
