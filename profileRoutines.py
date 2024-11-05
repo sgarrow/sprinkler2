@@ -115,9 +115,8 @@ def setActProf( pDict ):
     state     = stateMachInfo[ 'sapState'    ]
     profIdx   = stateMachInfo[ 'dsrdProfIdx' ]
     profNms   = stateMachInfo[ 'profNames'   ]
-    thePrompt = stateMachInfo[ 'prompt'      ]
     print(' sapStateMachineInfo on entry:')
-    pp.pprint(stateMachInfo)
+    print('',stateMachInfo,'\n')
     ########################################
 
     # Print a menu of available profiles.
@@ -129,9 +128,7 @@ def setActProf( pDict ):
             ks.append(profileKey)
 
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
-        sapState  = 1, profNames = ks,
-        prompt    = ' Enter number of desired Active Profile (or \'q\') -> ' )
-
+        sapState  = 1, profNames = ks)
         rspStr += ' Going from state 0 to state 1.'
     ########################################
 
@@ -146,7 +143,7 @@ def setActProf( pDict ):
     if state == 2:
         # Get the index of the desired profle from pickle.
         idxStr = profIdx
-        print('idxStr', idxStr)
+        print(' idxStr = ', idxStr)
         try:
             idx = int(idxStr)
         except ValueError:
@@ -158,7 +155,7 @@ def setActProf( pDict ):
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
         else: # There was no exception.
             if idx > len(pDict):
-                updateSapStateMachineInfo(stateMachInfo,state=1)
+                updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Integer out of range. Try again. Going from state 2 back to state 1'
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
@@ -171,7 +168,7 @@ def setActProf( pDict ):
     # Set active profile.
     # Set all profiles to inactive, except selected profile is set to active.
     if state == 3:
-        ap = profNms[profIdx] # Name of the profile to set active.
+        ap = profNms[int(profIdx)] # Name of the profile to set active.
         for profileKey,profileValue in pDict.items():
             for profKey in profileValue:
                 if profKey == 'active':
@@ -189,9 +186,10 @@ def setActProf( pDict ):
         stateMachInfo = initSapStateMachineInfo()
     ########################################
 
-    print(' sapStateMachineInfo on exit:')
-    pp.pprint(stateMachInfo)
+    print('\n sapStateMachineInfo on exit:')
+    print('',stateMachInfo)
     print(rspStr)
+    print('*********************************')
     return [rspStr,pDict]
 #############################################################################
 
@@ -303,9 +301,8 @@ def initSapStateMachineInfo():
     'sapState'   : 0,
     'dsrdProfIdx': 1,
     'profNames'  : [],
-    'prompt'     : '\n Choice (m=menu, q=quit) -> '  
+    'prompt'     : ' Enter num of dsrd Act Prof (or \'q\') -> '
     }
-    #' Enter number of desired Active Profile (or \'q\') -> '}
     with open('sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)
     return sapStateMachineInfo

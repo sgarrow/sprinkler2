@@ -23,11 +23,12 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
 def getUserInput(q,l):
     while True:
 
-        prompt = '\n Choice (m=menu, q=quit) -> '
         with open('sapStateMachineInfo.pickle', 'rb') as handle:
             stateMachInfo = pickle.load(handle)
         if stateMachInfo['sapState'] == 1:
             prompt = stateMachInfo['prompt']
+        else:
+            prompt = '\n Choice (m=menu, q=quit) -> '
 
         l.acquire()
 
@@ -35,7 +36,7 @@ def getUserInput(q,l):
             userInput = input( prompt )
 
         if stateMachInfo['sapState'] == 1: 
-            updateSapStateMachineInfo(stateMachInfo,profIdx=userInput)
+            updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
 
         if stateMachInfo['sapState'] != 0: 
             q.put('sap')

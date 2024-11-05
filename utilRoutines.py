@@ -1,8 +1,8 @@
 import os
 #import gpiozero
 
-VERSION  = ' Version:  0.7'
-RELEASED = ' Released: 4-Nov-2024'
+VERSION  = ' Version:  0.8'
+RELEASED = ' Released: 5-Nov-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
