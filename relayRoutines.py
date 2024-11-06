@@ -46,7 +46,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.off()
         if whoCalledMeFuncNameStr == 'closeRelay':
-            rspStr +=' Closing relay {} ({:6} on pin {})\n.'.format(relayNum, gpioStr, pinNum)
+            rspStr +=' Closing relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.on()
         if whoCalledMeFuncNameStr == 'toggleRelay':
             rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)

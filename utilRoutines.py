@@ -1,8 +1,8 @@
 import os
 import gpiozero
 
-VERSION  = ' Version:  1.0'
-RELEASED = ' Released: 5-Nov-2024'
+VERSION  = ' Version:  1.1'
+RELEASED = ' Released: 6-Nov-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -54,7 +54,6 @@ def verifyRelayArgs( optArgsStr ):
     # Remove dups and nums out of range
     optArgsNoDups = list(set(optArgs2))
     optArgsNoGT8LE0  = [ x for x in optArgsNoDups if 0 < x < 9 ]
-    rspStr = ''
 
-    return [rspStr, sorted(optArgsNoGT8LE0)]
+    return sorted(optArgsNoGT8LE0)
 #############################################################################

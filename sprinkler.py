@@ -28,9 +28,14 @@ import profileRoutines as pr
 import utilRoutines    as ur
 #############################################################################
 
+gpioDict  = None
+rlyObjLst = None
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
-    gpioDict, rlyObjLst = ir.init()
+    global gpioDict
+    global rlyObjLst
+    if gpioDict is None:
+        gpioDict, rlyObjLst = ir.init()
 
     try:
         with open('pickle/schedDict.pickle', 'rb') as f:
