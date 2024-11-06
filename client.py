@@ -15,7 +15,7 @@ def printSocketInfo(cSocket):
 
 def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
     sapStateMachineInfo.update(kwargs)
-    with open('sapStateMachineInfo.pickle', 'wb') as handle:
+    with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)
     return sapStateMachineInfo
 #############################################################################
@@ -23,7 +23,7 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
 def getUserInput(q,l):
     while True:
 
-        with open('sapStateMachineInfo.pickle', 'rb') as handle:
+        with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
             stateMachInfo = pickle.load(handle)
         if stateMachInfo['sapState'] == 1:
             prompt = stateMachInfo['prompt']

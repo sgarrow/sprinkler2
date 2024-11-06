@@ -33,14 +33,14 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     gpioDict, rlyObjLst = ir.init()
 
     try:
-        with open('schedDict.pickle', 'rb') as f:
+        with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
     except FileNotFoundError:
         pass
-        print('\n Could not open schedDict.pickle.')
+        print('\n Could not open pickle/schedDict.pickle.')
         print(' Generating it now ...\n')
         pr.makeProf()
-        with open('schedDict.pickle', 'rb') as f:
+        with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
 
     allRlys  = [1,2,3,4,5,6,7,8]

@@ -53,7 +53,7 @@ TERMINATE = '[0m'
 #############################################################################
 
 def makeProfSap(sapProdDict):
-    with open('schedDict.pickle', 'wb') as handle:
+    with open('pickle/schedDict.pickle', 'wb') as handle:
         pickle.dump(sapProdDict, handle)
 #############################################################################
 
@@ -61,10 +61,10 @@ def makeProf( ):
     with open('config.yml', 'r',encoding='utf-8') as file:
         schedDict = yaml.safe_load(file)
 
-    with open('schedDict.pickle', 'wb') as handle:
+    with open('pickle/schedDict.pickle', 'wb') as handle:
         pickle.dump(schedDict, handle)
 
-    with open('schedDict.pickle', 'rb') as handle:
+    with open('pickle/schedDict.pickle', 'rb') as handle:
         sd = pickle.load(handle)
 
     rspStr = pp.pformat(sd)
@@ -110,7 +110,7 @@ def getActProf( pDict ):
 def setActProf( pDict ):
 
     # Read sapState info.
-    with open('sapStateMachineInfo.pickle', 'rb') as handle:
+    with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
         stateMachInfo = pickle.load(handle)
     state     = stateMachInfo[ 'sapState'    ]
     profIdx   = stateMachInfo[ 'dsrdProfIdx' ]
@@ -312,14 +312,14 @@ def initSapStateMachineInfo():
     'profNames'  : [],
     'prompt'     : ' Enter num of dsrd Act Prof (or \'q\') -> '
     }
-    with open('sapStateMachineInfo.pickle', 'wb') as handle:
+    with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)
     return sapStateMachineInfo
 #############################################################################
 
 def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
     sapStateMachineInfo.update(kwargs)
-    with open('sapStateMachineInfo.pickle', 'wb') as handle:
+    with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)
     return sapStateMachineInfo
 #############################################################################
