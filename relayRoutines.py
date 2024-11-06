@@ -33,52 +33,53 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             relayStr = input(' relays -> ').split()
             relayObjIdxs = ur.verifyRelayArgs( relayStr )
 
-    relays = [ relayObjLst[el-1] for el in relayObjIdxs ]
-
+    relays = [ relayObjLst[el-1] for el in relayObjIdxs ] # -1 RE: Relay nums
+                                                          #start @ 1, lst @ 0
     whoCalledMeFuncNameStr = inspect.stack()[1][3]
+    rspStr = ''
     for relay in relays:
         gpioStr   = str(relay.pin)
         pinNum    = gpioDic[gpioStr]['pin']
         relayNum  = gpioDic[gpioStr]['relay']
 
         if whoCalledMeFuncNameStr == 'openRelay':
-            print(' Opening relay {} ({:6} on pin {}).'.format(relayNum, gpioStr, pinNum))
+            rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.off()
         if whoCalledMeFuncNameStr == 'closeRelay':
-            print(' Closing relay {} ({:6} on pin {}).'.format(relayNum, gpioStr, pinNum))
+            rspStr +=' Closing relay {} ({:6} on pin {})\n.'.format(relayNum, gpioStr, pinNum)
             relay.on()
         if whoCalledMeFuncNameStr == 'toggleRelay':
-            print(' Toggling relay {} ({:6} on pin {}).'.format(relayNum, gpioStr, pinNum))
+            rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.toggle()
         if whoCalledMeFuncNameStr == 'readRelay':
             rtnVal = 'open'
             rv = relay.value
             if rv == 1:
                 rtnVal = 'closed'
-            print(' Relay {} ({:6} on pin {}) is {}{}{}.'.\
-                format(relayNum, gpioStr, pinNum, ESC+RED ,rtnVal, ESC+TERMINATE))
+            rspStr += ' Relay {} ({:6} on pin {}) is {}{}{}.\n'.\
+                format(relayNum, gpioStr, pinNum, ESC+RED ,rtnVal, ESC+TERMINATE)
 
-    return rtnVal
+    return [rspStr,rtnVal]
 #############################################################################
 
 def openRelay( parmLst ):   # Wrapper function.
-    rtnVal = relayOCTR( parmLst )
-    return rtnVal
+    rtnLst = relayOCTR( parmLst )
+    return rtnLst
 #############################################################################
 
 def closeRelay( parmLst ):  # Wrapper function.
-    rtnVal = relayOCTR( parmLst )
-    return rtnVal
+    rtnLst = relayOCTR( parmLst )
+    return rtnLst
 #############################################################################
 
 def toggleRelay( parmLst ): # Wrapper function.
-    rtnVal = relayOCTR( parmLst )
-    return rtnVal
+    rtnLst = relayOCTR( parmLst )
+    return rtnLst
 #############################################################################
 
 def readRelay( parmLst ):   # Wrapper function.
-    rtnVal = relayOCTR( parmLst )
-    return rtnVal
+    rtnLst = relayOCTR( parmLst )
+    return rtnLst
 #############################################################################
 
 def cycleRelays( parmLst ):
@@ -95,5 +96,5 @@ def cycleRelays( parmLst ):
                 time.sleep(3)
     except KeyboardInterrupt:
         pass
-    return rtnVal
+    return [rtnVal]
 #############################################################################

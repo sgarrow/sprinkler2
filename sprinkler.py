@@ -21,16 +21,16 @@ After reading the doc-strings perusing the comments will also be helpful.
 import pickle
 
 # Import other source files that are in the same directory as this file.
-#import initRoutines    as ir
+import initRoutines    as ir
 import timeRoutines    as tr
-#import relayRoutines   as rr
+import relayRoutines   as rr
 import profileRoutines as pr
 import utilRoutines    as ur
 #############################################################################
 
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
-    #gpioDict, rlyObjLst = ir.init()
+    gpioDict, rlyObjLst = ir.init()
 
     try:
         with open('schedDict.pickle', 'rb') as f:
@@ -46,10 +46,10 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     allRlys  = [1,2,3,4,5,6,7,8]
     sapState = 0
     strToFunctDict = {
-    #'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Open    Relay    '},
-    #'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Close   Relay    '},
-    #'tr' :{'func':rr.toggleRelay,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Toggle  Relay    '},
-    #'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':' Read    Relay    '},
+    'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Open    Relay    '},
+    'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Close   Relay    '},
+    'tr' :{'func':rr.toggleRelay,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Toggle  Relay    '},
+    'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':' Read    Relay    '},
     #'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
 
     'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
@@ -72,7 +72,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         func   = strToFunctDict[choice]['func']
         params = strToFunctDict[choice]['parm']
 
-        if choice in ['or','cr','rr','cycr'] and len(optArgs) > 0:
+        if choice in ['or','cr'] and len(optArgs) > 0:
             params    = strToFunctDict[choice]['parm'][:]
             params[2] = optArgs
 
