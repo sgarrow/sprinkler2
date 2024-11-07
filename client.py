@@ -78,7 +78,7 @@ if __name__ == '__main__':
                     response = clientSocket.recv(1024)
                     rspStr += response.decode()
                     readyToRead, _, _ = select.select([clientSocket],[],[], .25)
-                print('{}'.format(rspStr))
+                print('\n{}'.format(rspStr))
 
         if message == 'close':
             break

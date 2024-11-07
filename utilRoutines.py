@@ -1,21 +1,23 @@
-import os
+import subprocess
 import gpiozero
 
-VERSION  = ' Version:  1.21'
+VERSION  = ' Version:  1.3'
 RELEASED = ' Released: 6-Nov-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
 
+    rspStr = ''
     cpu = gpiozero.CPUTemperature()
 
     if prnEn:
-        print(' CPU  Temp = {}'.format( cpu.temperature ))
-        print(' Over Temp = {}'.format( cpu.is_active   ))
+        rspStr += ' CPU  Temp = {} \n'.format(   cpu.temperature )
+        rspStr += ' Over Temp = {} \n\n'.format( cpu.is_active   )
 
-        print()
-        os.system('vcgencmd get_throttled')
-        rspStr  = '  0: under-voltage\n'
+        result  = subprocess.run(['vcgencmd', 'get_throttled'], stdout=subprocess.PIPE)
+        rspStr += ' {} \n'.format(result.stdout.decode('utf-8').strip())
+
+        rspStr += '  0: under-voltage\n'
         rspStr += '  1: arm frequency capped\n'
         rspStr += '  2: currently throttled\n'
         rspStr += ' 16: under-voltage has occurred\n'
