@@ -7,8 +7,8 @@ import sprinkler as sp
 def listThreads():
     while True:
         time.sleep(60)
-        for thread in threading.enumerate():
-            print(thread.name)
+        for t in threading.enumerate():
+            print(t.name)
 #############################################################################
 
 
@@ -37,7 +37,7 @@ def handleClient(clientSocket, clientAddress):
             clientSocket.send(response.encode()) # sends all even if >1024.
             print('Closing: {}'.format(clientAddress))
             time.sleep(1)
-            break # Causes the handler to stop and the thread end. 
+            break # Causes the handler to stop and the thread end.
         else:
             response = sp.sprinkler(data.decode())
             clientSocket.send(response.encode())
@@ -64,7 +64,7 @@ def startServer():
     rcvBufSize = serverSocket.getsockopt(\
         socket.SOL_SOCKET, socket.SO_RCVBUF)
     print('sndBufSize',sndBufSize) # 64K
-    print('rcvBufSize',rcvBufSize) # 64K 
+    print('rcvBufSize',rcvBufSize) # 64K
 
     print('Server listening on: {} {}'.format(host, port))
 
@@ -72,16 +72,14 @@ def startServer():
         clientSocket, clientAddress = serverSocket.accept()
         # Create a new thread to handle the client
         print('Starting a new client handler thread.')
-        thread = threading.Thread( target=handleClient,
-                                   args=( clientSocket,
-                                          clientAddress)
-                                  )
-        thread.start()
+        cThrd = threading.Thread( target=handleClient,
+                                  args=( clientSocket,
+                                         clientAddress)
+                                )
+        cThrd.start()
 #############################################################################
 
 if __name__ == '__main__':
     thread = threading.Thread(target=listThreads)
     thread.start()
-    #thread = threading.Thread(target=sprinkler)
-    #thread.start()
     startServer()

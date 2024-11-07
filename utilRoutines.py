@@ -1,7 +1,7 @@
 import os
 import gpiozero
 
-VERSION  = ' Version:  1.1'
+VERSION  = ' Version:  1.21'
 RELEASED = ' Released: 6-Nov-2024'
 #############################################################################
 
@@ -12,7 +12,7 @@ def getTemp(prnEn = True):
     if prnEn:
         print(' CPU  Temp = {}'.format( cpu.temperature ))
         print(' Over Temp = {}'.format( cpu.is_active   ))
-    
+
         print()
         os.system('vcgencmd get_throttled')
         rspStr  = '  0: under-voltage\n'

@@ -41,7 +41,6 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
     except FileNotFoundError:
-        pass
         print('\n Could not open pickle/schedDict.pickle.')
         print(' Generating it now ...\n')
         pr.makeProf()
@@ -49,19 +48,18 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             profDict = pickle.load(f)
 
     allRlys  = [1,2,3,4,5,6,7,8]
-    sapState = 0
     strToFunctDict = {
     'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Open    Relay    '},
     'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Close   Relay    '},
     'tr' :{'func':rr.toggleRelay,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Toggle  Relay    '},
     'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':' Read    Relay    '},
-    #'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
+    'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
 
     'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
     'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
     'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
     'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
-    #'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':' Run Act Profile\n'},
+    'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':' Run Act Profile\n'},
 
     'gdt':{'func':tr.getTimeDate,'parm': None,                         'menu':' Get     Date/Time'},
     'gt' :{'func':ur.getTemp,    'parm': None,                         'menu':' Get     CPU Temp '},
@@ -86,16 +84,14 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             return rsp[0]      # return to srvr for forwarding to clnt.
         else:
             rsp = func(params) # rsp[0] = rspStr
-            return rsp[0]      # return to srvr for forwarding to clnt. 
+            return rsp[0]      # return to srvr for forwarding to clnt.
 
     elif choice == 'm':
         rspStr = ''
         for k,v in strToFunctDict.items():
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-        return rspStr          # return to server so it can forward to client. 
+        return rspStr          # return to server so it can forward to client.
 
     else:
         rspStr = 'Invalid command'
-        return rspStr          # return to server so it can forward to client. 
-
-    #rtnVal = rr.openRelay([rlyObjLst,gpioDict,allRlys])
+        return rspStr          # return to server so it can forward to client.

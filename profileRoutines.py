@@ -189,7 +189,7 @@ def setActProf( pDict ):
         print(rspStr)
         print('   Resetting sapStateMachine.')
     ########################################
-    
+
     # Should never get here, but jusr in case ...
     if 0 > state > 3:
         stateMachInfo = initSapStateMachineInfo()
@@ -255,15 +255,14 @@ def checkTimeMatch( rlyData, currDT ):
     return timeMatch
 #############################################################################
 
-
 def runActProf( parmLst ):
 
     relayObjLst = parmLst[0] # For access to relay methods.
-    gpioDic      = parmLst[1] # For print Statements (pin, gpio, .. )
-    pDict        = parmLst[2] # profile dict
-    rtnVal = 0
-    apName = getActProf( pDict )
-    apDict = pDict[apName]
+    gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
+    pDict       = parmLst[2] # profile dict
+    rtnVal      = 0
+    apName      = getActProf( pDict )
+    apDict      = pDict[apName]
 
     try:
         while 1:
@@ -274,7 +273,8 @@ def runActProf( parmLst ):
                     continue
 
                 relayNum  = int(relayName[-1])
-                cpuInfo   = ur.getTemp(False)
+                rtnLst    = ur.getTemp(False)
+                cpuInfo   = rtnLst[1]
 
                 print(' {} {} {} {} ( Temp = {:.1f}{}C )'.\
                     format( relayName, relayData['Days'],
@@ -306,7 +306,7 @@ def runActProf( parmLst ):
         return rtnVal
 #############################################################################
 def initSapStateMachineInfo():
-    sapStateMachineInfo = { 
+    sapStateMachineInfo = {
     'sapState'   : 0,
     'dsrdProfIdx': 1,
     'profNames'  : [],
@@ -327,4 +327,3 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
 if __name__ == '__main__':
     makeProf()
     initSapStateMachineInfo()
-

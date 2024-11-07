@@ -10,7 +10,7 @@ def printSocketInfo(cSocket):
     sndBufSize = cSocket.getsockopt( socket.SOL_SOCKET, socket.SO_SNDBUF )
     rcvBufSize = cSocket.getsockopt( socket.SOL_SOCKET, socket.SO_RCVBUF )
     print( ' sndBufSize', sndBufSize ) # 64K
-    print( ' rcvBufSize', rcvBufSize ) # 64K 
+    print( ' rcvBufSize', rcvBufSize ) # 64K
 #############################################################################
 
 def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
@@ -20,7 +20,8 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
     return sapStateMachineInfo
 #############################################################################
 
-def getUserInput(q,l):
+def getUserInput(q,aLock):
+    userInput = None
     while True:
 
         with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
@@ -30,22 +31,20 @@ def getUserInput(q,l):
         else:
             prompt = '\n Choice (m=menu, q=quit) -> '
 
-        l.acquire()
+        with aLock:
 
-        if stateMachInfo['sapState'] in [0,1]: 
-            userInput = input( prompt )
+            if stateMachInfo['sapState'] in [0,1]:
+                userInput = input( prompt )
 
-        if stateMachInfo['sapState'] == 1: 
-            updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
+            if stateMachInfo['sapState'] == 1:
+                updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
 
-        if stateMachInfo['sapState'] != 0: 
-            q.put('sap')
-        else:
-            q.put(userInput)
+            if stateMachInfo['sapState'] != 0:
+                q.put('sap')
+            else:
+                q.put(userInput)
 
-        l.release()
-
-        time.sleep(.01)
+        time.sleep(.01) # Gives 'main' a chance to run.
         if userInput == 'close':
             break
 #############################################################################
@@ -71,16 +70,15 @@ if __name__ == '__main__':
         else:
             clientSocket.send(message.encode())
 
-        threadLock.acquire()
-        readyToRead, _, _ = select.select([clientSocket], [], [], .6)
-        if readyToRead:
-            rspStr = ''
-            while readyToRead:
-                response = clientSocket.recv(1024)
-                rspStr += response.decode()
-                readyToRead, _, _ = select.select([clientSocket],[],[], .25)
-            print('{}'.format(rspStr))
-        threadLock.release()
+        with threadLock:
+            readyToRead, _, _ = select.select([clientSocket], [], [], .6)
+            if readyToRead:
+                rspStr = ''
+                while readyToRead:
+                    response = clientSocket.recv(1024)
+                    rspStr += response.decode()
+                    readyToRead, _, _ = select.select([clientSocket],[],[], .25)
+                print('{}'.format(rspStr))
 
         if message == 'close':
             break
