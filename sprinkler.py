@@ -69,29 +69,31 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     inputWords = inputStr.split()
     choice     = inputWords[0]
     optArgsStr = inputWords[1:]
-    optArgs    = ur.verifyRelayArgs( optArgsStr )
+    rtnLst     = ur.verifyRelayArgs( optArgsStr )
+    vraRspStr  = rtnLst[0]
+    optArgs    = rtnLst[1]
 
     if choice in strToFunctDict:
         func   = strToFunctDict[choice]['func']
         params = strToFunctDict[choice]['parm']
 
-        if choice in ['or','cr'] and len(optArgs) > 0:
+        if choice in ['or','cr','tr'] and len(optArgs) > 0:
             params    = strToFunctDict[choice]['parm'][:]
             params[2] = optArgs
 
         if params is None:
-            rsp = func()       # rsp[0] = rspStr
-            return rsp[0]      # return to srvr for forwarding to clnt.
+            rsp = func()            # rsp[0] = rspStr
+            return rsp[0]           # return to srvr for forwarding to clnt.
         else:
-            rsp = func(params) # rsp[0] = rspStr
-            return rsp[0]      # return to srvr for forwarding to clnt.
+            rsp = func(params)      # rsp[0] = rspStr
+            return vraRspStr+rsp[0] # return to srvr for forwarding to clnt.
 
     elif choice == 'm':
         rspStr = ''
         for k,v in strToFunctDict.items():
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-        return rspStr          # return to server so it can forward to client.
+        return rspStr               # return to srvr for forwarding to clnt.
 
     else:
         rspStr = 'Invalid command'
-        return rspStr          # return to server so it can forward to client.
+        return rspStr               # return to srvr for forwarding to clnt.

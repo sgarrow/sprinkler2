@@ -13,7 +13,6 @@ relayOCTR.
 
 import inspect
 import time
-import utilRoutines as ur
 
 ESC = '\x1b'
 RED = '[31m'
@@ -27,16 +26,15 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
     relayObjIdxs = parmLst[2] # A list of relays to perform the action on.
     rtnVal       = None
 
-    if relayObjIdxs is None:  # If the passed in list is empty, prompt user.
-        relayObjIdxs = []
-        while not relayObjIdxs:
-            relayStr = input(' relays -> ').split()
-            relayObjIdxs = ur.verifyRelayArgs( relayStr )
-
-    relays = [ relayObjLst[el-1] for el in relayObjIdxs ] # -1 RE: Relay nums
-                                                          #start @ 1, lst @ 0
-    whoCalledMeFuncNameStr = inspect.stack()[1][3]
     rspStr = ''
+    relays = []
+    if relayObjIdxs is not None:
+        # -1 RE: Relay nums start @ 1, lst index start @ 0.
+        relays = [ relayObjLst[el-1] for el in relayObjIdxs ]
+    else:
+        rspStr = ' No relays specified.'
+
+    whoCalledMeFuncNameStr = inspect.stack()[1][3]
     for relay in relays:
         gpioStr   = str(relay.pin)
         pinNum    = gpioDic[gpioStr]['pin']

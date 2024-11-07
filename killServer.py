@@ -1,7 +1,8 @@
 import subprocess
 
 # Get all processes
-result = subprocess.run(['ps','aux'], stdout=subprocess.PIPE,text=True) 
+result = subprocess.run(['ps','aux'],
+         stdout=subprocess.PIPE,text=True, check = False)
 rspStr = result.stdout.strip()
 lines = rspStr.splitlines()
 
@@ -20,5 +21,5 @@ for line in pythonServerLines:
 
 # Get all pids of python servers
 for pid in pythonServerPids:
-    result = subprocess.run(['kill','-9',pid], stdout=subprocess.PIPE,text=True) 
-
+    result = subprocess.run(['kill','-9',pid],
+             stdout=subprocess.PIPE,text=True, check = False)
