@@ -27,22 +27,22 @@ def getTimeDate( prnEn = True ):
     dowNum = now.weekday() # Monday is 0.
     dowStr = dowStrLst[dowNum]
 
+    rspStr  = ' {}\n'.format(now)
+    rspStr += ' year   {:4}'.format(   year   )
+    rspStr += ' month  {:4}'.format(   month  )
+    rspStr += ' day    {:4}\n'.format( day    )
+    rspStr += ' hour   {:4}'.format(   hour   )
+    rspStr += ' minute {:4}'.format(   minute )
+    rspStr += ' second {:4}\n'.format( second )
+    rspStr += ' dow    {:4} ({})'.format( dowNum, dowStr )
+
     if prnEn:
-        rspStr  = ' {}\n'.format(now)
-        rspStr += ' year   {:4}'.format(   year   )
-        rspStr += ' month  {:4}'.format(   month  )
-        rspStr += ' day    {:4}\n'.format( day    )
-        rspStr += ' hour   {:4}'.format(   hour   )
-        rspStr += ' minute {:4}'.format(   minute )
-        rspStr += ' second {:4}\n'.format( second )
-        rspStr += ' dow    {:4} ({})'.format( dowNum, dowStr )
         print(rspStr)
 
     rtnDict = {'year':   year,   'month':  month,  'day':   day,
                'hour':   hour,   'minute': minute, 'second':second,
                'dowNum': dowNum, 'dowStr': dowStr,
                'now':    now}
-
 
     return [rspStr, rtnDict]
 #############################################################################

@@ -105,7 +105,7 @@ def getActProf( pDict ):
 
     rspStr = ' Active Profile = {}'.format(ap)
     print(rspStr)
-    return [rspStr]
+    return [rspStr,ap]
 #############################################################################
 def setActProf( pDict ):
 
@@ -225,10 +225,9 @@ def checkTimeMatch( rlyData, currDT ):
 
     onTimes   = rlyData['Times']
     durations = rlyData['durations']
+    timeMatch = False
 
-    timeMatch     = False
-
-    print('   {:20} {:20} {:20} {:10}'.format('onTime','now','offTime','inWindow'))
+    rspStr = '   {:20} {:20} {:20} {:10} \n'.format('onTime','now','offTime','inWindow')
     for t,d in zip(onTimes,durations):
         onTime = dt.datetime( currDT['year'], currDT['month'], currDT['day'],
                               t//100, t%100, 0)
@@ -239,20 +238,14 @@ def checkTimeMatch( rlyData, currDT ):
         if tempTimeMatch:
             timeMatch = True
 
-        onT = '{}'.format( onTime.\
-              isoformat( timespec = 'seconds' ))
+        onT = '{}'.format( onTime.isoformat(        timespec = 'seconds' ))
+        cDT = '{}'.format( currDT['now'].isoformat( timespec = 'seconds' ))
+        ofT = '{}'.format( offTime.isoformat(       timespec = 'seconds' ))
 
-        cDT = '{}'.format( currDT['now'].\
-              isoformat( timespec = 'seconds' ))
+        rspStr += '   {:20} {:20} {:20} {} \n'.format(onT,cDT,ofT,tempTimeMatch)
+        #print(rspStr)
 
-        ofT = '{}'.format( offTime.\
-              isoformat( timespec = 'seconds' ))
-
-        print('   {:20} {:20} {:20} {}'.\
-            format( onT, cDT, ofT, tempTimeMatch ))
-
-
-    return timeMatch
+    return [rspStr,timeMatch]
 #############################################################################
 
 def runActProf( parmLst ):
@@ -260,13 +253,17 @@ def runActProf( parmLst ):
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
     pDict       = parmLst[2] # profile dict
-    rtnVal      = 0
-    apName      = getActProf( pDict )
+
+    rtnLst      = getActProf( pDict )
+    apName      = rtnLst[1]
     apDict      = pDict[apName]
 
+    rspStr = ''
     try:
         while 1:
-            curDT = tr.getTimeDate(False)
+            rspStr = ''
+            rspLst = tr.getTimeDate(False)
+            curDT  = rspLst[1]
             for relayName,relayData in apDict.items():
 
                 if relayName in ('active', 'about'):
@@ -276,34 +273,43 @@ def runActProf( parmLst ):
                 rtnLst    = ur.getTemp(False)
                 cpuInfo   = rtnLst[1]
 
-                print(' {} {} {} {} ( Temp = {:.1f}{}C )'.\
+                rspStr += ' {} {} {} {} ( Temp = {:.1f}{}C ) \n'.\
                     format( relayName, relayData['Days'],
                             relayData['Times'], relayData['durations'],
-                            cpuInfo.temperature, chr(176)))
+                            cpuInfo.temperature, chr(176))
 
                 dayMatch = checkDayMatch( relayData,curDT )
 
                 if dayMatch:
-                    timeMatch = checkTimeMatch( relayData, curDT )
+                    rspLst    = checkTimeMatch( relayData, curDT )
+                    rspStr   += rspLst[0]
+                    timeMatch = rspLst[1]
 
-                print( '   day  match = {}{}{}'.format( ESC+RED, dayMatch, ESC+TERMINATE ))
+                rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
                 if dayMatch:
-                    print( '   time match = {}{}{}'.format( ESC+RED, timeMatch, ESC+TERMINATE ))
+                    rspStr +=  '   time match = {}{}{} \n'.format( ESC+RED, timeMatch, ESC+TERMINATE )
 
                 if timeMatch:
-                    relayState = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rtnLst  = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rspStr += rtnLst[0]
+                    relayState = rtnLst[1]
                     if relayState == 'open':
-                        rtnVal = rr.closeRelay([relayObjLst,gpioDic,[relayNum]] )
+                        rtnLst  = rr.closeRelay([relayObjLst,gpioDic,[relayNum]] )
+                        rspStr += rtnLst[0]
                 else:
-                    relayState = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rtnLst  = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rspStr += rtnLst[0]
+                    relayState = rtnLst[1]
                     if relayState == 'closed':
-                        rtnVal = rr.openRelay( [relayObjLst,gpioDic,[relayNum]] )
-                print()
-            print('############################################')
-            time.sleep(5)
+                        rtnLst = rr.openRelay( [relayObjLst,gpioDic,[relayNum]] )
+                        rspStr += rtnLst[0]
+            rspStr += '############################################'
+            print(rspStr)
+            #time.sleep(5)
+            return [rspStr]
 
     except KeyboardInterrupt:
-        return rtnVal
+        return [rspStr]
 #############################################################################
 def initSapStateMachineInfo():
     sapStateMachineInfo = {
