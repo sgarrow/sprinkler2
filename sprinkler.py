@@ -49,21 +49,21 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     allRlys  = [1,2,3,4,5,6,7,8]
     strToFunctDict = {
-    'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Open    Relay    '},
-    'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Close   Relay    '},
-    'tr' :{'func':rr.toggleRelay,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Toggle  Relay    '},
-    'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':' Read    Relay    '},
-    'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':' Cycle   Relays\n '},
+    'or' :{'func':rr.openRelay,  'parm': [rlyObjLst,gpioDict,None   ], 'menu':'Open    Relay    '},
+    'cr' :{'func':rr.closeRelay, 'parm': [rlyObjLst,gpioDict,None   ], 'menu':'Close   Relay    '},
+    'tr' :{'func':rr.toggleRelay,'parm': [rlyObjLst,gpioDict,None   ], 'menu':'Toggle  Relay    '},
+    'rr' :{'func':rr.readRelay,  'parm': [rlyObjLst,gpioDict,allRlys], 'menu':'Read    Relay    '},
+    'cyr':{'func':rr.cycleRelays,'parm': [rlyObjLst,gpioDict,None   ], 'menu':'Cycle   Relays   '},
 
-    'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':' Make    Profiles '},
-    'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':' List    Profiles '},
-    'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':' Get Act Profile  '},
-    'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':' Set Act Profile  '},
-    'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':' Run Act Profile\n'},
+    'mp' :{'func':pr.makeProf,   'parm': None,                         'menu':'Make    Profiles '},
+    'lp' :{'func':pr.listProfs,  'parm': profDict,                     'menu':'List    Profiles '},
+    'gap':{'func':pr.getActProf, 'parm': profDict,                     'menu':'Get Act Profile  '},
+    'sap':{'func':pr.setActProf, 'parm': profDict,                     'menu':'Set Act Profile  '},
+    'rap':{'func':pr.runActProf, 'parm': [rlyObjLst,gpioDict,profDict],'menu':'Run Act Profile  '},
 
-    'gdt':{'func':tr.getTimeDate,'parm': None,                         'menu':' Get     Date/Time'},
-    'gt' :{'func':ur.getTemp,    'parm': None,                         'menu':' Get     CPU Temp '},
-    'gv' :{'func':ur.getVer,     'parm': None,                         'menu':' Get     Version  '},
+    'gdt':{'func':tr.getTimeDate,'parm': None,                         'menu':'Get     Date/Time'},
+    'gt' :{'func':ur.getTemp,    'parm': None,                         'menu':'Get     CPU Temp '},
+    'gv' :{'func':ur.getVer,     'parm': None,                         'menu':'Get     Version  '},
     }
 
     inputWords = inputStr.split()
@@ -91,6 +91,13 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     elif choice == 'm':
         rspStr = ''
         for k,v in strToFunctDict.items():
+            if k == 'or':
+                rspStr += ' RELAY COMMANDS \n'
+            elif k == 'mp':
+                rspStr += '\n PROFILE COMMANDS \n'
+            elif k == 'gdt':
+                rspStr += '\n MISC COMMANDS \n'
+
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
         return rspStr               # return to srvr for forwarding to clnt.
 

@@ -46,6 +46,7 @@ import yaml
 import relayRoutines as rr
 import timeRoutines  as tr
 import utilRoutines  as ur
+import queue
 
 ESC = '\x1b'
 RED = '[31m'
@@ -183,7 +184,7 @@ def setActProf( pDict ):
                         pDict[profileKey]['active'] = True
                     else:
                         pDict[profileKey]['active'] = False
-        makeProfSap(pDict)
+        makeProfSap(pDict) # new ap will be active on next start up as well.
         stateMachInfo = initSapStateMachineInfo()
         rspStr = ' Active profile set.'
         print(rspStr)
@@ -248,7 +249,28 @@ def checkTimeMatch( rlyData, currDT ):
     return [rspStr,timeMatch]
 #############################################################################
 
-def runActProf( parmLst ):
+def runActProf( cmdQ, rspQ ):
+    counter = 0
+    # first get doesn't seem to work unless this initial dummy put happens.
+    rspQ.put('runActProf rsp dummy')
+    while True:
+
+        try:
+            cmd = cmdQ.get(block=False)
+        except queue.Empty:
+            pass
+        else:
+            if cmd == 'rap':
+                rspQ.put('runActProf rsp {}'.format(counter))
+                #time.sleep(.01)
+
+        counter += 1
+        time.sleep(1)
+        if counter > 15:
+            break
+    return 0
+#############################################################################
+def X_runActProf( parmLst ):
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
