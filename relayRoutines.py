@@ -40,16 +40,16 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
         pinNum    = gpioDic[gpioStr]['pin']
         relayNum  = gpioDic[gpioStr]['relay']
 
-        if whoCalledMeFuncNameStr == 'openRelay':
+        if whoCalledMeFuncNameStr == 'openRly':
             rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.off()
-        if whoCalledMeFuncNameStr == 'closeRelay':
+        if whoCalledMeFuncNameStr == 'closeRly':
             rspStr +=' Closing relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.on()
-        if whoCalledMeFuncNameStr == 'toggleRelay':
+        if whoCalledMeFuncNameStr == 'toggleRly':
             rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.toggle()
-        if whoCalledMeFuncNameStr == 'readRelay':
+        if whoCalledMeFuncNameStr == 'readRly':
             rtnVal = 'open'
             rv = relay.value
             if rv == 1:
@@ -60,27 +60,27 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
     return [rspStr,rtnVal]
 #############################################################################
 
-def openRelay( parmLst ):   # Wrapper function.
+def openRly( parmLst ):   # Wrapper function.
     rtnLst = relayOCTR( parmLst )
     return rtnLst
 #############################################################################
 
-def closeRelay( parmLst ):  # Wrapper function.
+def closeRly( parmLst ):  # Wrapper function.
     rtnLst = relayOCTR( parmLst )
     return rtnLst
 #############################################################################
 
-def toggleRelay( parmLst ): # Wrapper function.
+def toggleRly( parmLst ): # Wrapper function.
     rtnLst = relayOCTR( parmLst )
     return rtnLst
 #############################################################################
 
-def readRelay( parmLst ):   # Wrapper function.
+def readRly( parmLst ):   # Wrapper function.
     rtnLst = relayOCTR( parmLst )
     return rtnLst
 #############################################################################
 
-def cycleRelays( parmLst ):
+def cycleRly( parmLst ):
 
     relayObjLst = parmLst[0]
     gpioDic     = parmLst[1]

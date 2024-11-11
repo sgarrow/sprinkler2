@@ -49,11 +49,11 @@ def handleClient(clientSocket, clientAddress, rapCQ,rapRQ):
             print('Closing: {}'.format(clientAddress))
             time.sleep(1)
             break # Causes the handler to stop and the thread end.
-        elif data.decode() == 'rap':
+        elif data.decode() == 'rp':
             tList = getListOfThreads()
-            if 'runActProf' not in tList:
-                rapThrd = threading.Thread( target = pr.runActProf,
-                                            name   = 'runActProf',
+            if 'runAP' not in tList:
+                rapThrd = threading.Thread( target = pr.runAP,
+                                            name   = 'runAP',
                                             args   = (rapCQ,rapRQ)
                                           )
                 rapThrd.start()
@@ -62,7 +62,7 @@ def handleClient(clientSocket, clientAddress, rapCQ,rapRQ):
                 print(' {}'.format(response))
             else:
 
-                rapCQ.put('rap')
+                rapCQ.put('rp')
                 try:
                     print('trying to read q')
                     response = ''

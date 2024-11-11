@@ -27,13 +27,13 @@ Command lp: Calls function listProfiles.
             This function prints the profiles, the data in the dictionary
             loaded at start up as described above.
 
-Command gap: Calls function getActiveProfile.
+Command gap: Calls function getAP (getActiveProfile).
              This function prints the name of the active profile -
              the profile that will be run when the rap command is entered.
 
-Command sap: Calls function setActiveProfile.
+Command sap: Calls function setAP (setActiveProfile).
 
-Command rap: Calls function runActiveProfile.
+Command rap: Calls function runAP (runActiveProfile).
              This function is an infinite loop.  The loop can be exited with
              ctrl-c.  Upon exit a return to the command prompt occurs.
 '''
@@ -93,7 +93,7 @@ def listProfs( pDict ):
     return [rspStr]
 #############################################################################
 
-def getActProf( pDict ):
+def getAP( pDict ):
     ap = None
     for profileKey,profileValue in pDict.items():
         for profKey,profValue in profileValue.items():
@@ -108,7 +108,7 @@ def getActProf( pDict ):
     print(rspStr)
     return [rspStr,ap]
 #############################################################################
-def setActProf( pDict ):
+def setAP( pDict ):
 
     # Read sapState info.
     with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
@@ -249,7 +249,7 @@ def checkTimeMatch( rlyData, currDT ):
     return [rspStr,timeMatch]
 #############################################################################
 
-def runActProf( cmdQ, rspQ ):
+def runAP( cmdQ, rspQ ):
     counter = 0
     # first get doesn't seem to work unless this initial dummy put happens.
     rspQ.put('runActProf rsp dummy')
@@ -260,17 +260,17 @@ def runActProf( cmdQ, rspQ ):
         except queue.Empty:
             pass
         else:
-            if cmd == 'rap':
+            if cmd == 'rp':
                 rspQ.put('runActProf rsp {}'.format(counter))
                 #time.sleep(.01)
 
         counter += 1
         time.sleep(1)
-        if counter > 15:
+        if counter > 30:
             break
     return 0
 #############################################################################
-def X_runActProf( parmLst ):
+def X_runAP( parmLst ):
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
@@ -312,18 +312,18 @@ def X_runActProf( parmLst ):
                     rspStr +=  '   time match = {}{}{} \n'.format( ESC+RED, timeMatch, ESC+TERMINATE )
 
                 if timeMatch:
-                    rtnLst  = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
                     rspStr += rtnLst[0]
                     relayState = rtnLst[1]
                     if relayState == 'open':
-                        rtnLst  = rr.closeRelay([relayObjLst,gpioDic,[relayNum]] )
+                        rtnLst  = rr.closeRly([relayObjLst,gpioDic,[relayNum]] )
                         rspStr += rtnLst[0]
                 else:
-                    rtnLst  = rr.readRelay([relayObjLst,gpioDic,[relayNum]])
+                    rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
                     rspStr += rtnLst[0]
                     relayState = rtnLst[1]
                     if relayState == 'closed':
-                        rtnLst = rr.openRelay( [relayObjLst,gpioDic,[relayNum]] )
+                        rtnLst = rr.openRly( [relayObjLst,gpioDic,[relayNum]] )
                         rspStr += rtnLst[0]
             rspStr += '############################################'
             print(rspStr)
