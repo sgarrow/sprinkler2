@@ -49,37 +49,56 @@ def handleClient(clientSocket, clientAddress, rapCQ, rapRQ):
             print('Closing: {}'.format(clientAddress))
             time.sleep(1)
             break # Causes the handler to stop and the thread end.
+
         elif data.decode() == 'rp':
             tList = getListOfThreads()
-            if 'runAP' not in tList:
+            if 'runAP' in tList:
+                startRsp = ' runAP thread alread started'
+                print(' {}'.format(startRsp))
+            else:
                 rapThrd = threading.Thread( target = pr.runAP,
                                             name   = 'runAP',
                                             args   = (rapCQ,rapRQ)
                                           )
                 rapThrd.start()
                 startRsp = ' runAP thread started'
-                clientSocket.send(startRsp.encode()) # sends all even if >1024.
-                print(' {}'.format(startRsp))
-            else:
+            print(' {}'.format(startRsp))
+            clientSocket.send(startRsp.encode()) # sends all even if >1024.
 
-                rapCQ.put('rp')
-                time.sleep(.05)
 
+        elif data.decode() == 'qp':
+            tList = getListOfThreads()
+            if 'runAP' in tList:
+                ###################
+                rapCQ.put('qp')
+                time.sleep(.001)
                 if not rapRQ.empty():
-                    response = ''
-                    print('Reading Q')
+                    cmdQsiz  = rapCQ.qsize()
+                    rspQsiz  = rapRQ.qsize()
+                    queryRsp = ''
+                    #queryRsp = 'RQ Not Empty. sizes = {},{} \n'.format(cmdQsiz,rspQsiz)
                     while not rapRQ.empty():
-                        response += rapRQ.get(block=False)
-                        time.sleep(.01)
-                    print(' Read = {} len = {}'.format(response, len(response)))
+                        queryRsp += rapRQ.get(block=False)
+                    print(' Read = {}'.format(queryRsp))
                 else:
-                    response = 'empty queue'
-
-                clientSocket.send(response.encode()) # sends all even if >1024.
-                print(' {}'.format(response))
+                    cmdQsiz  = rapCQ.qsize()
+                    rspQsiz  = rapRQ.qsize()
+                    queryRsp = 'RQ Empty. Sizes = {},{}'.format(cmdQsiz,rspQsiz)
+                    ###################
+            else:
+                queryRsp = ' runAP thread not running, so can\'t be queried'
+            clientSocket.send(queryRsp.encode()) # sends all even if >1024.
+            print(' {}'.format(queryRsp))
 
         elif data.decode() == 'sp':
-            rapCQ.put('sp')
+            tList = getListOfThreads()
+            if 'runAP' not in tList:
+                stopRsp = ' runAP thread not running, so can\'t be stopped.'
+            else:
+                rapCQ.put('sp')
+                stopRsp = ' runAP thread stopped'
+            clientSocket.send(stopRsp.encode()) # sends all even if >1024.
+            print(' {}'.format(stopRsp))
 
         else:
             response = sp.sprinkler(data.decode())

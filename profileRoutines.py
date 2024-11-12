@@ -251,28 +251,21 @@ def checkTimeMatch( rlyData, currDT ):
 
 def runAP( cmdQ, rspQ ):
     counter = 0
-    # first get doesn't seem to work unless this initial dummy put happens.
-    #rspQ.put('runActProf rsp dummy')
-    rspQ.put(' Query Status = {}'.format(counter))
+
     while True:
 
         try:
-            cmd = cmdQ.get(block=False)
+            cmd = cmdQ.get(timeout=1)
         except queue.Empty:
             pass
         else:
-            if cmd == 'rp':
-                while not rspQ.empty():
-                    rspQ.get()
-                rspQ.put(' Query Status = {}'.format(counter))
-                time.sleep(.01)
+            if cmd == 'qp':
+                rspQ.put(' Wrk Response = {}. \n'.format(counter))
+
             if cmd == 'sp':
-                while not rspQ.empty():
-                    rspQ.get()
                 break
 
         counter += 1
-        time.sleep(1)
 
     return 0
 #############################################################################
