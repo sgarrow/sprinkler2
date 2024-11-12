@@ -252,7 +252,8 @@ def checkTimeMatch( rlyData, currDT ):
 def runAP( cmdQ, rspQ ):
     counter = 0
     # first get doesn't seem to work unless this initial dummy put happens.
-    rspQ.put('runActProf rsp dummy')
+    #rspQ.put('runActProf rsp dummy')
+    rspQ.put(' Query Status = {}'.format(counter))
     while True:
 
         try:
@@ -261,15 +262,38 @@ def runAP( cmdQ, rspQ ):
             pass
         else:
             if cmd == 'rp':
-                rspQ.put('runActProf rsp {}'.format(counter))
-                #time.sleep(.01)
+                while not rspQ.empty():
+                    rspQ.get()
+                rspQ.put(' Query Status = {}'.format(counter))
+                time.sleep(.01)
+            if cmd == 'sp':
+                while not rspQ.empty():
+                    rspQ.get()
+                break
 
         counter += 1
         time.sleep(1)
-        if counter > 30:
-            break
+
     return 0
 #############################################################################
+#def runAP_worker( parmLst ):
+def runAP_worker(  ):
+    #relayObjLst = parmLst[0] # For access to relay methods.
+    #gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
+    #pDict       = parmLst[2] # profile dict
+
+    #rtnLst      = getActProf( pDict )
+    #apName      = rtnLst[1]
+    #apDict      = pDict[apName]
+
+    gpioDict = {'text':'runAP_worker'}
+    rspStr = ''
+    while 1:
+        rspStr = pp.pformat(gpioDic)
+        print(rspStr)
+        sleep(5)
+#############################################################################
+
 def X_runAP( parmLst ):
 
     relayObjLst = parmLst[0] # For access to relay methods.

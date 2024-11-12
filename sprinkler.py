@@ -61,7 +61,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'sap':{'func':pr.setAP,     'parm':profDict,                     'menu':'Set Act Profile  '},
 
     'rp':{'func':pr.runAP,      'parm':[rlyObjLst,gpioDict,profDict],'menu':'Run act Profile'},
-    #'sp':{'func':pr.stopRP,    'parm':[rlyObjLst,gpioDict,profDict],'menu':'Stop  Running Pro'},
+    'sp':{'func':pr.runRP,      'parm':[rlyObjLst,gpioDict,profDict],'menu':'Stop  Running Pro'},
     #'qp':{'func':pr.queryRP,   'parm':[rlyObjLst,gpioDict,profDict],'menu':'Query Running Pro'},
 
     'gdt':{'func':tr.getTimeDate,'parm':None,                         'menu':'Get Date/Time'    },

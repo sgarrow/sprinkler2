@@ -23,7 +23,7 @@ def listThreads():
         print(' ##################')
 #############################################################################
 
-def handleClient(clientSocket, clientAddress, rapCQ,rapRQ):
+def handleClient(clientSocket, clientAddress, rapCQ, rapRQ):
     ''' Each client handler is it's own thread.  Multiple instantiations of
         client handler threads may be active simultaneously.  These threads
         are started by the thread running "startServer". Each thread handles
@@ -57,25 +57,30 @@ def handleClient(clientSocket, clientAddress, rapCQ,rapRQ):
                                             args   = (rapCQ,rapRQ)
                                           )
                 rapThrd.start()
-                response = ' runActProf thread started'
-                clientSocket.send(response.encode()) # sends all even if >1024.
-                print(' {}'.format(response))
+                startRsp = ' runAP thread started'
+                clientSocket.send(startRsp.encode()) # sends all even if >1024.
+                print(' {}'.format(startRsp))
             else:
 
                 rapCQ.put('rp')
-                try:
-                    print('trying to read q')
+                time.sleep(.05)
+
+                if not rapRQ.empty():
                     response = ''
+                    print('Reading Q')
                     while not rapRQ.empty():
                         response += rapRQ.get(block=False)
-                except queue.Empty:
-                    print('q empty, so putting')
-                except:
-                    print('unexpected exception, so putting')
+                        time.sleep(.01)
+                    print(' Read = {} len = {}'.format(response, len(response)))
                 else:
-                    print('sending back to client')
-                    clientSocket.send(response.encode()) # sends all even if >1024.
-                    print(' {}'.format(response))
+                    response = 'empty queue'
+
+                clientSocket.send(response.encode()) # sends all even if >1024.
+                print(' {}'.format(response))
+
+        elif data.decode() == 'sp':
+            rapCQ.put('sp')
+
         else:
             response = sp.sprinkler(data.decode())
             clientSocket.send(response.encode())
@@ -90,15 +95,16 @@ def startServer():
         using the handleClient function. This thread is started by 'main'.
     '''
 
-    rapCmdQ = queue.Queue()
-    rapRspQ = queue.Queue()
-
     host = '0.0.0.0'  # Listen on all available interfaces
     port = 5000
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((host, port))
     serverSocket.listen(5)
+
+    # Putting these here will make all clients use the same rap queues.
+    rapCmdQ = queue.Queue()
+    rapRspQ = queue.Queue()
 
     sndBufSize = serverSocket.getsockopt(\
         socket.SOL_SOCKET, socket.SO_SNDBUF)
