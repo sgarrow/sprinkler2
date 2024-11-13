@@ -62,53 +62,43 @@ def checkTimeMatch( rlyData, currDT ):
     return [rspStr,timeMatch]
 #############################################################################
 
-def getListOfThreads():
-    threadLst = []
-    for t in threading.enumerate():
-        threadLst.append(t.name)
-    print(' list of threads = ', threadLst)
-    return threadLst
-#############################################################################
-
-def strtUiThrd( parmLst ):
+def strtTwoThrds( parmLst ):
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
     pDict       = parmLst[2] # profile dict
-    rapCQ       = parmLst[3]
-    rapRQ       = parmLst[4]
+
+    uiCQ       = parmLst[3] # For com between handleClient thread and
+    uiRQ       = parmLst[4] # runAP_UI thread (started below). 
+
+    wrkCQ = queue.Queue()   # For com between runAP_UI thread and 
+    wrkRQ = queue.Queue()   # runAP_WRK thread (started below).        
 
     pp.pprint(gpioDic)
 
-    threadLst = []
-    for t in threading.enumerate():
-        threadLst.append(t.name)
-    print(' list of threads = ', threadLst)
+    threadLst = [ t.name for t in threading.enumerate() ]
 
-    if 'runAP' in threadLst:
+    if 'runAP_UI' in threadLst:
         startRsp = ' runAP thread alread started'
         print(' {}'.format(startRsp))
     else:
-        rapThrd = threading.Thread( target = runAP,
-                                    name   = 'runAP',
-                                    args   = (rapCQ,rapRQ)
+        rapThrd = threading.Thread( target = runAP_UI,
+                                    name   = 'runAP_UI',
+                                    args   = (uiCQ,uiRQ)
                                   )
         rapThrd.start()
-        startRsp = ' runAP thread started'
+        startRsp = ' runAP_UI thread started'
     print(' {}'.format(startRsp))
     return [startRsp]
 #############################################################################
 
-def queryUiThrd( parmLst ):
+def queryViaTwoThrds( parmLst ):
     rapCQ = parmLst[0]
     rapRQ = parmLst[1]
 
-    threadLst = []
-    for t in threading.enumerate():
-        threadLst.append(t.name)
-    print(' list of threads = ', threadLst)
+    threadLst = [ t.name for t in threading.enumerate() ]
 
-    if 'runAP' in threadLst:
+    if 'runAP_UI' in threadLst:
         ###################
         rapCQ.put('qp')
         time.sleep(.001)
@@ -126,41 +116,38 @@ def queryUiThrd( parmLst ):
             queryRsp = 'RQ Empty. Sizes = {},{}'.format(cmdQsiz,rspQsiz)
             ###################
     else:
-        queryRsp = ' runAP thread not running, so can\'t be queried'
+        queryRsp = ' runAP_UI thread not running, so can\'t be queried'
     print(' {}'.format(queryRsp))
     return [queryRsp]
 #############################################################################
 
-def stopUiThrd( parmLst ):
+def stopTwoThrd( parmLst ):
     rapCQ = parmLst[0]
     rapRQ = parmLst[1]
 
-    threadLst = []
-    for t in threading.enumerate():
-        threadLst.append(t.name)
-    print(' list of threads = ', threadLst)
+    threadLst = [ t.name for t in threading.enumerate() ]
 
-    if 'runAP' not in threadLst:
-        stopRsp = ' runAP thread not running, so can\'t be stopped.'
+    if 'runAP_UI' not in threadLst:
+        stopRsp = ' runAP_UI thread not running, so can\'t be stopped.'
     else:
         rapCQ.put('sp')
-        stopRsp = ' runAP thread stopped'
+        stopRsp = ' runAP_UI thread stopped'
     print(' {}'.format(stopRsp))
     return [stopRsp]
 #############################################################################
 
-def runAP( cmdQ, rspQ ):
+def runAP_UI( UIcmdQ, UIrspQ ):
     counter = 0
 
     while True:
 
         try:
-            cmd = cmdQ.get(timeout=1)
+            cmd = UIcmdQ.get(timeout=1)
         except queue.Empty:
             pass
         else:
             if cmd == 'qp':
-                rspQ.put(' Wrk Response = {}. \n'.format(counter))
+                UIrspQ.put(' Wrk Response = {}. \n'.format(counter))
 
             if cmd == 'sp':
                 break
@@ -170,7 +157,7 @@ def runAP( cmdQ, rspQ ):
     return 0
 #############################################################################
 #def runAP_worker( parmLst ):
-def runAP_worker(  ):
+def runAP_WRK(  ):
     #relayObjLst = parmLst[0] # For access to relay methods.
     #gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
     #pDict       = parmLst[2] # profile dict

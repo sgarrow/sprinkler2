@@ -54,52 +54,59 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     allRlys  = [1,2,3,4,5,6,7,8]
     strToFunctDict = {
-    'or'   : {'func' : rr.openRly,        'parm' : [rlyObjLst,gpioDict,None   ], 
-    'menu' : 'Open    Relay '          },
 
-    'cr'   : {'func' : rr.closeRly,       'parm' : [rlyObjLst,gpioDict,None   ], 
-    'menu' : 'Close   Relay '          },
+    ## RELAY ###############################
 
-    'tr'   : {'func' : rr.toggleRly,      'parm' : [rlyObjLst,gpioDict,None   ], 
-    'menu' : 'Toggle  Relay '          },
+    'or'   : { 'func' : rr.openRly,           'parm':[rlyObjLst,gpioDict,None   ],
+    'menu' :   'Open    Relay '               },
 
-    'rr'   : {'func' : rr.readRly,        'parm' : [rlyObjLst,gpioDict,allRlys], 
-    'menu' : 'Read    Relay '          },
+    'cr'   : { 'func' : rr.closeRly,          'parm':[rlyObjLst,gpioDict,None   ],
+    'menu' :   'Close   Relay '               },
 
-    'cyr'  : {'func' : rr.cycleRly,       'parm' : [rlyObjLst,gpioDict,None   ], 
-    'menu' : 'Cycle   Relays'          },
+    'tr'   : { 'func' : rr.toggleRly,         'parm':[rlyObjLst,gpioDict,None   ],
+    'menu' :   'Toggle  Relay '               },
 
+    'rr'   : { 'func' : rr.readRly,           'parm':[rlyObjLst,gpioDict,allRlys],
+    'menu' :   'Read    Relay '               },
 
-    'mp'   : {'func' : pr.makeProf,       'parm' : None,                         
-    'menu' : 'Make    Profiles '       },
+    'cyr'  : { 'func' : rr.cycleRly,          'parm':[rlyObjLst,gpioDict,None   ],
+    'menu' :   'Cycle   Relays'               },
 
-    'lp'   : {'func' : pr.listProfs,      'parm' : profDict,                     
-    'menu' : 'List    Profiles '       },
+    ## PROFILE MGMT ########################
 
-    'gap'  : {'func' : pr.getAP,          'parm' : profDict,                     
-    'menu' : 'Get Act Profile  '       },
+    'mp'   : { 'func' : pr.makeProf,          'parm':None,
+    'menu' :   'Make    Profiles '            },
 
-    'sap'  : {'func' : pr.setAP,          'parm' : profDict,                     
-    'menu' : 'Set Act Profile  '       },
+    'lp'   : { 'func' : pr.listProfs,         'parm':profDict,
+    'menu' :   'List    Profiles '            },
 
-    'rp'   : {'func' : rap.strtUiThrd,    'parm' : [rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],
-    'menu' : 'Run act Profile'         },
+    'gap'  : { 'func' : pr.getAP,             'parm':profDict,
+    'menu' :   'Get Act Profile  '            },
 
-    'sp'   : {'func' : rap.stopUiThrd,    'parm' : [rapCmdQ,rapRspQ],                            
-    'menu' : 'Stop  Running Pro'       },
+    'sap'  : { 'func' : pr.setAP,             'parm':profDict,
+    'menu' :   'Set Act Profile  '            },
 
-    'qp'   : {'func' : rap.queryUiThrd,   'parm' : [rapCmdQ,rapRspQ],                            
-    'menu' : 'Query Running Pro'       },
+    ## PROFILE RUN #########################
 
+    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],
+    'menu' :   'Run   Active  Profile'        },
 
-    'gdt'  : {'func':tr.getTimeDate,      'parm' : None,                         
-    'menu' : 'Get Date/Time'           },
+    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[rapCmdQ,rapRspQ],
+    'menu' :   'Stop  Running Profile'        },
 
-    'gt'   : {'func':ur.getTemp,          'parm' : None,                         
-    'menu' : 'Get CPU Temp '           },
+    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[rapCmdQ,rapRspQ],
+    'menu' :   'Query Running Profile'        },
 
-    'gv'   : {'func':ur.getVer,           'parm' : None,                         
-    'menu' : 'Get Version  '           },
+    ## MISC ################################
+
+    'gdt'  : { 'func' : tr.getTimeDate,       'parm':None,
+    'menu' :   'Get Date/Time'                },
+
+    'gt'   : { 'func' : ur.getTemp,           'parm':None,
+    'menu' :   'Get CPU Temp '                },
+
+    'gv'   : { 'func' : ur.getVer,            'parm':None,
+    'menu' :   'Get Version  '                },
     }
 
     inputWords = inputStr.split()
