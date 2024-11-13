@@ -26,10 +26,14 @@ import timeRoutines    as tr
 import relayRoutines   as rr
 import profileRoutines as pr
 import utilRoutines    as ur
+import queue
 #############################################################################
 
 gpioDict  = None
 rlyObjLst = None
+rapCmdQ = queue.Queue()
+rapRspQ = queue.Queue()
+
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     global gpioDict
@@ -60,9 +64,9 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'gap':{'func':pr.getAP,      'parm':profDict,                     'menu':'Get Act Profile  '},
     'sap':{'func':pr.setAP,      'parm':profDict,                     'menu':'Set Act Profile  '},
 
-    'rp':{'func':pr.runAP,       'parm':[rlyObjLst,gpioDict,profDict],'menu':'Run act Profile'},
-    'sp':{'func':pr.runAP,       'parm':[rlyObjLst,gpioDict,profDict],'menu':'Stop  Running Pro'},
-    'qp':{'func':pr.runAP,       'parm':[rlyObjLst,gpioDict,profDict],'menu':'Query Running Pro'},
+    'rp' :{'func':pr.strtUiThrd, 'parm':[rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],'menu':'Run act Profile'},
+    'sp' :{'func':pr.stopUiThrd, 'parm':[rapCmdQ,rapRspQ],                            'menu':'Stop  Running Pro'},
+    'qp' :{'func':pr.queryUiThrd,'parm':[rapCmdQ,rapRspQ],                            'menu':'Query Running Pro'},
 
     'gdt':{'func':tr.getTimeDate,'parm':None,                         'menu':'Get Date/Time'    },
     'gt' :{'func':ur.getTemp,    'parm':None,                         'menu':'Get CPU Temp '    },

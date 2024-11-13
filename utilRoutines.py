@@ -1,7 +1,7 @@
 import subprocess
 import gpiozero
 
-VERSION  = ' Version:  1.8'
+VERSION  = ' Version:  1.9'
 RELEASED = ' Released: 12-Nov-2024'
 #############################################################################
 

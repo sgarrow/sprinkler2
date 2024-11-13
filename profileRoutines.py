@@ -47,6 +47,7 @@ import relayRoutines as rr
 import timeRoutines  as tr
 import utilRoutines  as ur
 import queue
+import threading  # For handling multiple clients concurrently.
 
 ESC = '\x1b'
 RED = '[31m'
@@ -247,6 +248,93 @@ def checkTimeMatch( rlyData, currDT ):
         #print(rspStr)
 
     return [rspStr,timeMatch]
+#############################################################################
+
+def getListOfThreads():
+    threadLst = []
+    for t in threading.enumerate():
+        threadLst.append(t.name)
+    print(' list of threads = ', threadLst)
+    return threadLst
+#############################################################################
+
+def strtUiThrd( parmLst ):
+
+    relayObjLst = parmLst[0] # For access to relay methods.
+    gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
+    pDict       = parmLst[2] # profile dict
+    rapCQ       = parmLst[3]   
+    rapRQ       = parmLst[4]
+
+    pp.pprint(gpioDic)
+
+    threadLst = []
+    for t in threading.enumerate():
+        threadLst.append(t.name)
+    print(' list of threads = ', threadLst)
+
+    if 'runAP' in threadLst:
+        startRsp = ' runAP thread alread started'
+        print(' {}'.format(startRsp))
+    else:
+        rapThrd = threading.Thread( target = runAP,
+                                    name   = 'runAP',
+                                    args   = (rapCQ,rapRQ)
+                                  )
+        rapThrd.start()
+        startRsp = ' runAP thread started'
+    print(' {}'.format(startRsp))
+    return [startRsp]
+#############################################################################
+
+def queryUiThrd( parmLst ):
+    rapCQ = parmLst[0]
+    rapRQ = parmLst[1]
+
+    threadLst = []
+    for t in threading.enumerate():
+        threadLst.append(t.name)
+    print(' list of threads = ', threadLst)
+    
+    if 'runAP' in threadLst:
+        ###################
+        rapCQ.put('qp')
+        time.sleep(.001)
+        if not rapRQ.empty():
+            cmdQsiz  = rapCQ.qsize()
+            rspQsiz  = rapRQ.qsize()
+            queryRsp = ''
+            #queryRsp = 'RQ Not Empty. sizes = {},{} \n'.format(cmdQsiz,rspQsiz)
+            while not rapRQ.empty():
+                queryRsp += rapRQ.get(block=False)
+            print(' Read = {}'.format(queryRsp))
+        else:
+            cmdQsiz  = rapCQ.qsize()
+            rspQsiz  = rapRQ.qsize()
+            queryRsp = 'RQ Empty. Sizes = {},{}'.format(cmdQsiz,rspQsiz)
+            ###################
+    else:
+        queryRsp = ' runAP thread not running, so can\'t be queried'
+    print(' {}'.format(queryRsp))
+    return [queryRsp]
+#############################################################################
+
+def stopUiThrd( parmLst ):
+    rapCQ = parmLst[0]   
+    rapRQ = parmLst[1]
+
+    threadLst = []
+    for t in threading.enumerate():
+        threadLst.append(t.name)
+    print(' list of threads = ', threadLst)
+    
+    if 'runAP' not in threadLst:
+        stopRsp = ' runAP thread not running, so can\'t be stopped.'
+    else:
+        rapCQ.put('sp')
+        stopRsp = ' runAP thread stopped'
+    print(' {}'.format(stopRsp))
+    return [stopRsp]
 #############################################################################
 
 def runAP( cmdQ, rspQ ):
