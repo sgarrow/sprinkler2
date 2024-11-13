@@ -25,6 +25,7 @@ import initRoutines    as ir
 import timeRoutines    as tr
 import relayRoutines   as rr
 import profileRoutines as pr
+import runActProfRtns  as rap
 import utilRoutines    as ur
 import queue
 #############################################################################
@@ -53,24 +54,52 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     allRlys  = [1,2,3,4,5,6,7,8]
     strToFunctDict = {
-    'or' :{'func':rr.openRly,    'parm':[rlyObjLst,gpioDict,None   ], 'menu':'Open    Relay '   },
-    'cr' :{'func':rr.closeRly,   'parm':[rlyObjLst,gpioDict,None   ], 'menu':'Close   Relay '   },
-    'tr' :{'func':rr.toggleRly,  'parm':[rlyObjLst,gpioDict,None   ], 'menu':'Toggle  Relay '   },
-    'rr' :{'func':rr.readRly,    'parm':[rlyObjLst,gpioDict,allRlys], 'menu':'Read    Relay '   },
-    'cyr':{'func':rr.cycleRly,   'parm':[rlyObjLst,gpioDict,None   ], 'menu':'Cycle   Relays'   },
+    'or'   : {'func' : rr.openRly,        'parm' : [rlyObjLst,gpioDict,None   ], 
+    'menu' : 'Open    Relay '          },
 
-    'mp' :{'func':pr.makeProf,   'parm':None,                         'menu':'Make    Profiles '},
-    'lp' :{'func':pr.listProfs,  'parm':profDict,                     'menu':'List    Profiles '},
-    'gap':{'func':pr.getAP,      'parm':profDict,                     'menu':'Get Act Profile  '},
-    'sap':{'func':pr.setAP,      'parm':profDict,                     'menu':'Set Act Profile  '},
+    'cr'   : {'func' : rr.closeRly,       'parm' : [rlyObjLst,gpioDict,None   ], 
+    'menu' : 'Close   Relay '          },
 
-    'rp' :{'func':pr.strtUiThrd, 'parm':[rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],'menu':'Run act Profile'},
-    'sp' :{'func':pr.stopUiThrd, 'parm':[rapCmdQ,rapRspQ],                            'menu':'Stop  Running Pro'},
-    'qp' :{'func':pr.queryUiThrd,'parm':[rapCmdQ,rapRspQ],                            'menu':'Query Running Pro'},
+    'tr'   : {'func' : rr.toggleRly,      'parm' : [rlyObjLst,gpioDict,None   ], 
+    'menu' : 'Toggle  Relay '          },
 
-    'gdt':{'func':tr.getTimeDate,'parm':None,                         'menu':'Get Date/Time'    },
-    'gt' :{'func':ur.getTemp,    'parm':None,                         'menu':'Get CPU Temp '    },
-    'gv' :{'func':ur.getVer,     'parm':None,                         'menu':'Get Version  '    },
+    'rr'   : {'func' : rr.readRly,        'parm' : [rlyObjLst,gpioDict,allRlys], 
+    'menu' : 'Read    Relay '          },
+
+    'cyr'  : {'func' : rr.cycleRly,       'parm' : [rlyObjLst,gpioDict,None   ], 
+    'menu' : 'Cycle   Relays'          },
+
+
+    'mp'   : {'func' : pr.makeProf,       'parm' : None,                         
+    'menu' : 'Make    Profiles '       },
+
+    'lp'   : {'func' : pr.listProfs,      'parm' : profDict,                     
+    'menu' : 'List    Profiles '       },
+
+    'gap'  : {'func' : pr.getAP,          'parm' : profDict,                     
+    'menu' : 'Get Act Profile  '       },
+
+    'sap'  : {'func' : pr.setAP,          'parm' : profDict,                     
+    'menu' : 'Set Act Profile  '       },
+
+    'rp'   : {'func' : rap.strtUiThrd,    'parm' : [rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],
+    'menu' : 'Run act Profile'         },
+
+    'sp'   : {'func' : rap.stopUiThrd,    'parm' : [rapCmdQ,rapRspQ],                            
+    'menu' : 'Stop  Running Pro'       },
+
+    'qp'   : {'func' : rap.queryUiThrd,   'parm' : [rapCmdQ,rapRspQ],                            
+    'menu' : 'Query Running Pro'       },
+
+
+    'gdt'  : {'func':tr.getTimeDate,      'parm' : None,                         
+    'menu' : 'Get Date/Time'           },
+
+    'gt'   : {'func':ur.getTemp,          'parm' : None,                         
+    'menu' : 'Get CPU Temp '           },
+
+    'gv'   : {'func':ur.getVer,           'parm' : None,                         
+    'menu' : 'Get Version  '           },
     }
 
     inputWords = inputStr.split()
@@ -101,7 +130,9 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             if k == 'or':
                 rspStr += ' RELAY COMMANDS \n'
             elif k == 'mp':
-                rspStr += '\n PROFILE COMMANDS \n'
+                rspStr += '\n MANAGE PROFILE COMMANDS \n'
+            elif k == 'rp':
+                rspStr += '\n RUN PROFILE COMMANDS \n'
             elif k == 'gdt':
                 rspStr += '\n MISC COMMANDS \n'
 
