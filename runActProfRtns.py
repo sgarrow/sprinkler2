@@ -1,16 +1,15 @@
 '''
+fixme
 '''
 
-import pickle
 import time
+import queue
+import threading
 import datetime      as dt
 import pprint        as pp
-import yaml
 import relayRoutines as rr
 import timeRoutines  as tr
 import utilRoutines  as ur
-import queue
-import threading  # For handling multiple clients concurrently.
 
 ESC = '\x1b'
 RED = '[31m'
@@ -76,7 +75,7 @@ def strtUiThrd( parmLst ):
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
     pDict       = parmLst[2] # profile dict
-    rapCQ       = parmLst[3]   
+    rapCQ       = parmLst[3]
     rapRQ       = parmLst[4]
 
     pp.pprint(gpioDic)
@@ -108,7 +107,7 @@ def queryUiThrd( parmLst ):
     for t in threading.enumerate():
         threadLst.append(t.name)
     print(' list of threads = ', threadLst)
-    
+
     if 'runAP' in threadLst:
         ###################
         rapCQ.put('qp')
@@ -133,14 +132,14 @@ def queryUiThrd( parmLst ):
 #############################################################################
 
 def stopUiThrd( parmLst ):
-    rapCQ = parmLst[0]   
+    rapCQ = parmLst[0]
     rapRQ = parmLst[1]
 
     threadLst = []
     for t in threading.enumerate():
         threadLst.append(t.name)
     print(' list of threads = ', threadLst)
-    
+
     if 'runAP' not in threadLst:
         stopRsp = ' runAP thread not running, so can\'t be stopped.'
     else:
@@ -185,7 +184,7 @@ def runAP_worker(  ):
     while 1:
         rspStr = pp.pformat(gpioDic)
         print(rspStr)
-        sleep(5)
+        time.sleep(5)
 #############################################################################
 
 def X_runAP( parmLst ):
@@ -227,7 +226,7 @@ def X_runAP( parmLst ):
 
                 rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
                 if dayMatch:
-                    rspStr +=  '   time match = {}{}{} \n'.format( ESC+RED, timeMatch, ESC+TERMINATE )
+                    rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
 
                 if timeMatch:
                     rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])

@@ -88,9 +88,9 @@ def cycleRly( parmLst ):
     try:
         while True:
             for ii in range(len(relayObjLst)):
-                rtnVal = closeRelay([relayObjLst,  gpioDic, [ii+1]])
+                rtnVal = closeRly([relayObjLst,  gpioDic, [ii+1]])
                 time.sleep(1)
-                rtnVal = openRelay( [relayObjLst,  gpioDic, [ii+1]])
+                rtnVal = openRly( [relayObjLst,  gpioDic, [ii+1]])
                 time.sleep(3)
     except KeyboardInterrupt:
         pass

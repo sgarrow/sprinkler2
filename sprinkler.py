@@ -21,13 +21,13 @@ After reading the doc-strings perusing the comments will also be helpful.
 import pickle
 
 # Import other source files that are in the same directory as this file.
+import queue
 import initRoutines    as ir
 import timeRoutines    as tr
 import relayRoutines   as rr
 import profileRoutines as pr
 import runActProfRtns  as rap
 import utilRoutines    as ur
-import queue
 #############################################################################
 
 gpioDict  = None

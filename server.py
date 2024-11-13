@@ -1,6 +1,5 @@
 import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
-import queue
 import time
 import sprinkler as sp
 import profileRoutines as pr

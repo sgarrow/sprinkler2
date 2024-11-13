@@ -39,15 +39,8 @@ Command rap: Calls function runAP (runActiveProfile).
 '''
 
 import pickle
-import time
-import datetime      as dt
 import pprint        as pp
 import yaml
-import relayRoutines as rr
-import timeRoutines  as tr
-import utilRoutines  as ur
-import queue
-import threading  # For handling multiple clients concurrently.
 
 ESC = '\x1b'
 RED = '[31m'
