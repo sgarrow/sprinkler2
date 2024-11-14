@@ -32,8 +32,11 @@ import utilRoutines    as ur
 
 gpioDict  = None
 rlyObjLst = None
-rapCmdQ = queue.Queue()
-rapRspQ = queue.Queue()
+uiCmdQ = queue.Queue()
+uiRspQ = queue.Queue()
+wkCmdQ = queue.Queue()
+wkRspQ = queue.Queue()
+
 
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
@@ -88,13 +91,13 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     ## PROFILE RUN #########################
 
-    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,rapCmdQ,rapRspQ],
+    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
     'menu' :   'Run   Active  Profile'        },
 
-    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[rapCmdQ,rapRspQ],
+    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
     'menu' :   'Stop  Running Profile'        },
 
-    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[rapCmdQ,rapRspQ],
+    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
     'menu' :   'Query Running Profile'        },
 
     ## MISC ################################

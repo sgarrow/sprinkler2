@@ -1,8 +1,8 @@
 import subprocess
 import gpiozero
 
-VERSION  = ' Version:  1.93'
-RELEASED = ' Released: 12-Nov-2024'
+VERSION  = ' Version:  1.94'
+RELEASED = ' Released: 13-Nov-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
