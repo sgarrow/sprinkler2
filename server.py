@@ -4,16 +4,6 @@ import time
 import sprinkler as sp
 #############################################################################
 
-def listThreads():
-    while True:
-        time.sleep(10)
-        print(' Active Threads: ')
-        for t in threading.enumerate():
-            print('   {}'.format(t.name))
-        print(' ##################')
-#############################################################################
-
-#def handleClient(clientSocket, clientAddress, rapCQ, rapRQ):
 def handleClient(clientSocket, clientAddress):
     ''' Each client handler is it's own thread.  Multiple instantiations of
         client handler threads may be active simultaneously.  These threads
@@ -21,14 +11,10 @@ def handleClient(clientSocket, clientAddress):
         com with a single client.  Receives data from the client, processes
         it, and sends a response back.
     '''
-
     print('Accepted connection from: {}'.format(clientAddress))
 
     while True:
         data    = clientSocket.recv(1024)
-
-        # Below if not needed.  clientSocket.recv blocks by default.
-        #if not data: break
 
         print('*********************************')
         print('Received from: {} {}'.format(clientAddress, data.decode()))
@@ -82,6 +68,4 @@ def startServer():
 #############################################################################
 
 if __name__ == '__main__':
-    thread = threading.Thread(target=listThreads, name = 'listThreads')
-    thread.start()
     startServer()

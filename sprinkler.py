@@ -61,16 +61,16 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     ## RELAY ###############################
 
     'or'   : { 'func' : rr.openRly,           'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Open    Relay '               },
+    'menu' :   'Open    Relay'                },
 
     'cr'   : { 'func' : rr.closeRly,          'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Close   Relay '               },
+    'menu' :   'Close   Relay'                },
 
     'tr'   : { 'func' : rr.toggleRly,         'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Toggle  Relay '               },
+    'menu' :   'Toggle  Relay'                },
 
     'rr'   : { 'func' : rr.readRly,           'parm':[rlyObjLst,gpioDict,allRlys],
-    'menu' :   'Read    Relay '               },
+    'menu' :   'Read    Relay'                },
 
     'cyr'  : { 'func' : rr.cycleRly,          'parm':[rlyObjLst,gpioDict,None   ],
     'menu' :   'Cycle   Relays'               },
@@ -78,16 +78,16 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     ## PROFILE MGMT ########################
 
     'mp'   : { 'func' : pr.makeProf,          'parm':None,
-    'menu' :   'Make    Profiles '            },
+    'menu' :   'Make    Profiles'             },
 
     'lp'   : { 'func' : pr.listProfs,         'parm':profDict,
-    'menu' :   'List    Profiles '            },
+    'menu' :   'List    Profiles'             },
 
     'gap'  : { 'func' : pr.getAP,             'parm':profDict,
-    'menu' :   'Get Act Profile  '            },
+    'menu' :   'Get Act Profile'              },
 
     'sap'  : { 'func' : pr.setAP,             'parm':profDict,
-    'menu' :   'Set Act Profile  '            },
+    'menu' :   'Set Act Profile'              },
 
     ## PROFILE RUN #########################
 
@@ -106,10 +106,13 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'menu' :   'Get Date/Time'                },
 
     'gt'   : { 'func' : ur.getTemp,           'parm':None,
-    'menu' :   'Get CPU Temp '                },
+    'menu' :   'Get CPU Temp'                 },
 
     'gv'   : { 'func' : ur.getVer,            'parm':None,
-    'menu' :   'Get Version  '                },
+    'menu' :   'Get Version'                  },
+
+    'gat'  : { 'func' : ur.getActiveThreads,  'parm':None,
+    'menu' :   'Get Active Threads'            },
     }
 
     inputWords = inputStr.split()

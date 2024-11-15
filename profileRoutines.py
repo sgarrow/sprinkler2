@@ -64,7 +64,7 @@ def makeProf( ):
 
     rspStr = pp.pformat(sd)
 
-    print(rspStr)
+    #print(rspStr)
     return [rspStr]
 #############################################################################
 
@@ -83,7 +83,7 @@ def listProfs( pDict ):
                 rspStr += '          Days: {}, Times: {}, Durations: {}\n'.\
                     format(data['Days'], data['Times'], data['durations'])
 
-    print(rspStr)
+    #print(rspStr)
     return [rspStr]
 #############################################################################
 
@@ -99,7 +99,7 @@ def getAP( pDict ):
             break
 
     rspStr = ' Active Profile = {}'.format(ap)
-    print(rspStr)
+    #print(rspStr)
     return [rspStr,ap]
 #############################################################################
 def setAP( pDict ):
@@ -110,8 +110,8 @@ def setAP( pDict ):
     state     = stateMachInfo[ 'sapState'    ]
     profIdx   = stateMachInfo[ 'dsrdProfIdx' ]
     profNms   = stateMachInfo[ 'profNames'   ]
-    print(' sapStateMachineInfo on entry:')
-    print('',stateMachInfo,'\n')
+    #print(' sapStateMachineInfo on entry:')
+    #print('',stateMachInfo,'\n')
     ########################################
 
     # Print a menu of available profiles.
@@ -124,15 +124,15 @@ def setAP( pDict ):
 
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
         sapState  = 1, profNames = ks)
-        print(rspStr)
-        print('   Going from state 0 to state 1.')
+        #print(rspStr)
+        #print('   Going from state 0 to state 1.')
     ########################################
 
     # Get idx of desired profile to make active.
     if state == 1:
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
         rspStr = ''
-        print('   Going from state 1 to state 2.')
+        #print('   Going from state 1 to state 2.')
     ########################################
 
     # Error check idx of desired active profile to make active
@@ -140,30 +140,30 @@ def setAP( pDict ):
     if state == 2:
         # Get the index of the desired profle from pickle.
         idxStr = profIdx
-        print(' idxStr = ', idxStr)
+        #print(' idxStr = ', idxStr)
         try:
             idx = int(idxStr)
         except ValueError:
             if idxStr == 'q':
                 stateMachInfo = initSapStateMachineInfo()
                 rspStr = ' Quiting sap. Resetting sapStateMachine.'
-                print(rspStr)
+                #print(rspStr)
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
                 print(rspStr)
-                print('   Going from state 2 back to state 1')
+                #print('   Going from state 2 back to state 1')
         else: # There was no exception.
             if idx > len(pDict):
                 updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Integer out of range. Try again.'
-                print(rspStr)
-                print('   Going from state 2 back to state 1')
+                #print(rspStr)
+                #print('   Going from state 2 back to state 1')
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
                 sapState  = 3)
                 rspStr = ''
-                print('  Vaild Entry.')
+                #print('  Vaild Entry.')
 
     ########################################
 
@@ -181,19 +181,19 @@ def setAP( pDict ):
         makeProfSap(pDict) # new ap will be active on next start up as well.
         stateMachInfo = initSapStateMachineInfo()
         rspStr = ' Active profile set.'
-        print(rspStr)
-        print('   Resetting sapStateMachine.')
+        #print(rspStr)
+        #print('   Resetting sapStateMachine.')
     ########################################
 
     # Should never get here, but jusr in case ...
     if 0 > state > 3:
         stateMachInfo = initSapStateMachineInfo()
         rspStr = ' ERROR. Invalid sapState. Resetting sapStateMachine.'
-        print(rspStr)
+        #print(rspStr)
     ########################################
 
-    print('\n sapStateMachineInfo on exit:')
-    print('',stateMachInfo)
+    #print('\n sapStateMachineInfo on exit:')
+    #print('',stateMachInfo)
     return [rspStr,pDict]
 #############################################################################
 

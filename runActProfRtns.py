@@ -78,7 +78,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
     #######################
     if 'runAP_UI' in threadLst:
         startRsp = ' runAP_UI thread already started \n'
-        print(' {}'.format(startRsp))
+        #print(' {}'.format(startRsp))
     else:
         prmLst = [uiCQ,uiRQ,wkCQ,wkRQ]
         runAP_UI_Thrd = threading.Thread( target = runAP_UI,
@@ -90,7 +90,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
     #######################
     if 'runAP_WRK' in threadLst:
         startRsp += ' runAP_WRK thread already started \n'
-        print(' {}'.format(startRsp))
+        #print(' {}'.format(startRsp))
     else:
         prmLst = [relayObjLst,gpioDic,pDict,wkCQ,wkRQ]
         runAP_WRK_Thrd = threading.Thread( target = runAP_WRK,
@@ -101,7 +101,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
         startRsp += '\n runAP_WRK thread started'
     #######################
 
-    print(' {}'.format(startRsp))
+    #print(' {}'.format(startRsp))
     return [startRsp]
 #############################################################################
 
@@ -146,7 +146,7 @@ def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
         uiCQ.put('sp')
         stopRsp = ' runAP_UI  thread stopped \n'
         stopRsp += ' runAP_WRK thread stopped'
-    print(' {}'.format(stopRsp))
+    #print(' {}'.format(stopRsp))
     return [stopRsp]
 #############################################################################
 

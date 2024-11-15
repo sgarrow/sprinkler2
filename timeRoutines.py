@@ -37,7 +37,8 @@ def getTimeDate( prnEn = True ):
     rspStr += ' dow    {:4} ({})'.format( dowNum, dowStr )
 
     if prnEn:
-        print(rspStr)
+        pass
+        #print(rspStr)
 
     rtnDict = {'year':   year,   'month':  month,  'day':   day,
                'hour':   hour,   'minute': minute, 'second':second,

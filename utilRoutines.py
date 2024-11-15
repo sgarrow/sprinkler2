@@ -1,3 +1,4 @@
+import threading
 import subprocess
 import gpiozero
 
@@ -24,7 +25,7 @@ def getTemp(prnEn = True):
         rspStr += ' 16: under-voltage has occurred\n'
         rspStr += ' 17: arm frequency capped has occurred\n'
         rspStr += ' 18: throttling has occurred'
-        print(rspStr)
+        #print(rspStr)
 
     return [rspStr, cpu]
 #############################################################################
@@ -32,7 +33,7 @@ def getTemp(prnEn = True):
 def getVer():
     rspStr  = VERSION  + '\n'
     rspStr += RELEASED
-    print(rspStr)
+    #print(rspStr)
     return [rspStr]
 #############################################################################
 
@@ -49,3 +50,13 @@ def verifyRelayArgs( optArgsStrLst ):
 
     return [rspStr, sorted(argsByIntNoDupsNo_0)]
 #############################################################################
+
+def getActiveThreads():
+    rspStr = ' Active Threads:'
+    for t in threading.enumerate():
+        rspStr += '\n   {}'.format(t.name)
+    return [rspStr]
+#############################################################################
+
+
+
