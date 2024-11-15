@@ -98,7 +98,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
                                            args   = (prmLst,)
                                         )
         runAP_WRK_Thrd.start()
-        startRsp += ' runAP_WRK thread started'
+        startRsp += '\n runAP_WRK thread started'
     #######################
 
     print(' {}'.format(startRsp))
@@ -144,7 +144,8 @@ def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
         stopRsp = ' runAP_UI thread not running, so can\'t be stopped.'
     else:
         uiCQ.put('sp')
-        stopRsp = ' runAP_UI thread stopped'
+        stopRsp = ' runAP_UI  thread stopped \n'
+        stopRsp += ' runAP_WRK thread stopped'
     print(' {}'.format(stopRsp))
     return [stopRsp]
 #############################################################################
@@ -176,6 +177,7 @@ def runAP_UI( parmLst ): # Runs in thread started br startTwo...
                 uiRQ.put('{}'.format(wkInfo))
 
             if cmd == 'sp':
+                wkCQ.put('{}'.format(cmd))
                 break
     return 0
 #############################################################################
@@ -193,61 +195,63 @@ def runAP_WRK( parmLst ): # Runs in thread started br startTwo...
     apDict      = pDict[apName]
 
     while True:
-        dt = tr.getTimeDate(prnEn=False)[1]['now']
-        wkRQ.put('runAP_WRK = {}'.format(dt))
-        time.sleep(1)
-    return 0
-#############################################################################
-    ##############
-    #rspStr = ''
-    #while 1:
-    #    rspStr = ''
-    #    rspLst = tr.getTimeDate(False)
-    #    curDT  = rspLst[1]
-    #    for relayName,relayData in apDict.items():
-    #
-    #        if relayName in ('active', 'about'):
-    #            continue
-    #
-    #        relayNum  = int(relayName[-1])
-    #        rtnLst    = ur.getTemp(False)
-    #        cpuInfo   = rtnLst[1]
-    #
-    #        rspStr += ' {} {} {} {} ( Temp = {:.1f}{}C ) \n'.\
-    #            format( relayName, relayData['Days'],
-    #                    relayData['Times'], relayData['durations'],
-    #                    cpuInfo.temperature, chr(176))
-    #
-    #        dayMatch = checkDayMatch( relayData,curDT )
-    #
-    #        if dayMatch:
-    #            rspLst    = checkTimeMatch( relayData, curDT )
-    #            rspStr   += rspLst[0]
-    #            timeMatch = rspLst[1]
-    #
-    #        rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
-    #        if dayMatch:
-    #            rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
-    #
-    #        if timeMatch:
-    #            rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
-    #            rspStr += rtnLst[0]
-    #            relayState = rtnLst[1]
-    #            if relayState == 'open':
-    #                rtnLst  = rr.closeRly([relayObjLst,gpioDic,[relayNum]] )
-    #                rspStr += rtnLst[0]
-    #        else:
-    #            rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
-    #            rspStr += rtnLst[0]
-    #            relayState = rtnLst[1]
-    #            if relayState == 'closed':
-    #                rtnLst = rr.openRly( [relayObjLst,gpioDic,[relayNum]] )
-    #                rspStr += rtnLst[0]
-    #    rspStr += '############################################'
-    #    print(rspStr)
-    #    #time.sleep(5)
-    #    return [rspStr]
 
+        try:
+            cmd = wkCQ.get(block=False)
+        except queue.Empty:
+            pass
+        else:
+            if cmd == 'sp':
+                break
+        ####
+        rspStr = ''
+        rspLst = tr.getTimeDate(False)
+        curDT  = rspLst[1]
+        for relayName,relayData in apDict.items():
+    
+            if relayName in ('active', 'about'):
+                continue
+    
+            relayNum  = int(relayName[-1])
+            rtnLst    = ur.getTemp(False)
+            cpuInfo   = rtnLst[1]
+    
+            rspStr += ' {} {} {} {} ( Temp = {:.1f}{}C ) \n'.\
+                format( relayName, relayData['Days'],
+                        relayData['Times'], relayData['durations'],
+                        cpuInfo.temperature, chr(176))
+    
+            dayMatch = checkDayMatch( relayData,curDT )
+    
+            if dayMatch:
+                rspLst    = checkTimeMatch( relayData, curDT )
+                rspStr   += rspLst[0]
+                timeMatch = rspLst[1]
+    
+            rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
+            if dayMatch:
+                rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
+    
+            if timeMatch:
+                rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
+                rspStr += rtnLst[0]
+                relayState = rtnLst[1]
+                if relayState == 'open':
+                    rtnLst  = rr.closeRly([relayObjLst,gpioDic,[relayNum]] )
+                    rspStr += rtnLst[0]
+            else:
+                rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
+                rspStr += rtnLst[0]
+                relayState = rtnLst[1]
+                if relayState == 'closed':
+                    rtnLst = rr.openRly( [relayObjLst,gpioDic,[relayNum]] )
+                    rspStr += rtnLst[0]
+        rspStr += '############################################'
+        ####
+
+        wkRQ.put('runAP_WRK = {}'.format(rspStr))
+        time.sleep(5)
+    return 0
 #############################################################################
 
 if __name__ == '__main__':
