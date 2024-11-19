@@ -116,6 +116,15 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     }
 
     inputWords = inputStr.split()
+
+    print('inputStr       = ***{}***'.format(inputStr))
+    print('inputWords)    = ***{}***'.format(inputWords))
+    print('len(inputWords)= {}'.format(len(inputWords)))
+
+    if inputWords == []: # In case user entered string of just spaces.
+        rspStr = 'Invalid command'
+        return rspStr               # return to srvr for forwarding to clnt.
+
     choice     = inputWords[0]
     optArgsStr = inputWords[1:]
     rtnLst     = ur.verifyRelayArgs( optArgsStr )

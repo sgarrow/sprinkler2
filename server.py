@@ -27,7 +27,7 @@ def handleClient(clientSocket, clientAddress):
         data    = clientSocket.recv(1024)
 
         print('*********************************')
-        print('Received from: {} {}'.format(clientAddress, data.decode()))
+        print('Received from: {} ***{}***'.format(clientAddress, data.decode()))
 
         # Process data and send response back to the client
         if data.decode() == 'close':
@@ -38,7 +38,12 @@ def handleClient(clientSocket, clientAddress):
             break # Causes the handler to stop and the thread end.
         else:
             response = sp.sprinkler(data.decode())
-            clientSocket.send(response.encode())
+            try: # In case user closes client by (x) instead if by close cmd.
+                clientSocket.send(response.encode())
+            except:
+                #print('exception in clientSocket.send')
+                break
+
 
     clientSocket.close()
 #############################################################################
