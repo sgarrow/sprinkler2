@@ -3,6 +3,14 @@ import threading  # For handling multiple clients concurrently.
 import time
 import sprinkler as sp
 #############################################################################
+def listThreads():
+    while True:
+        time.sleep(5)
+        print(' Active Threads: ')
+        for t in threading.enumerate():
+            print('   {}'.format(t.name))
+        print(' ##################')
+#############################################################################
 
 def handleClient(clientSocket, clientAddress):
     ''' Each client handler is it's own thread.  Multiple instantiations of
@@ -14,6 +22,8 @@ def handleClient(clientSocket, clientAddress):
     print('Accepted connection from: {}'.format(clientAddress))
 
     while True:
+        # put try/except here in case user hits x on client w/o closing first.
+        # or better yet goto 'closing connection'.
         data    = clientSocket.recv(1024)
 
         print('*********************************')
@@ -68,4 +78,6 @@ def startServer():
 #############################################################################
 
 if __name__ == '__main__':
+    thread = threading.Thread(target=listThreads, name = 'listThreads')
+    thread.start()
     startServer()

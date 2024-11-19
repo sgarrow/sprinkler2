@@ -6,7 +6,6 @@ import time
 import queue
 import threading
 import datetime      as dt
-import pprint        as pp
 import relayRoutines as rr
 import timeRoutines  as tr
 import utilRoutines  as ur
@@ -15,52 +14,6 @@ import profileRoutines as pr
 ESC = '\x1b'
 RED = '[31m'
 TERMINATE = '[0m'
-#############################################################################
-
-def checkDayMatch( rlyData, currDT ):
-
-    dayMatch = False
-    onDays   = rlyData['Days']
-
-    if 'all' in onDays:
-        dayMatch  = True
-
-    elif currDT['dowStr'] in onDays:
-        dayMatch  = True
-
-    elif 'even' in onDays and currDT['day']%2 == 0:
-        dayMatch  = True
-
-    elif 'odd'  in onDays and currDT['day']%2 == 1:
-        dayMatch  = True
-
-    return dayMatch
-#############################################################################
-def checkTimeMatch( rlyData, currDT ):
-
-    onTimes   = rlyData['Times']
-    durations = rlyData['durations']
-    timeMatch = False
-
-    rspStr = '   {:20} {:20} {:20} {:10} \n'.format('onTime','now','offTime','inWindow')
-    for t,d in zip(onTimes,durations):
-        onTime = dt.datetime( currDT['year'], currDT['month'], currDT['day'],
-                              t//100, t%100, 0)
-
-        offTime = onTime + dt.timedelta(seconds = d*60)
-
-        tempTimeMatch = onTime <= currDT['now'] <= offTime
-        if tempTimeMatch:
-            timeMatch = True
-
-        onT = '{}'.format( onTime.isoformat(        timespec = 'seconds' ))
-        cDT = '{}'.format( currDT['now'].isoformat( timespec = 'seconds' ))
-        ofT = '{}'.format( offTime.isoformat(       timespec = 'seconds' ))
-
-        rspStr += '   {:20} {:20} {:20} {} \n'.format(onT,cDT,ofT,tempTimeMatch)
-        #print(rspStr)
-
-    return [rspStr,timeMatch]
 #############################################################################
 
 def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
@@ -109,8 +62,6 @@ def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
 
     uiCQ = parmLst[0]
     uiRQ = parmLst[1]
-    wkCQ = parmLst[2]
-    wkRQ = parmLst[3]
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
@@ -134,9 +85,6 @@ def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
 def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
 
     uiCQ = parmLst[0]
-    uiRQ = parmLst[1]
-    wkCQ = parmLst[2]
-    wkRQ = parmLst[3]
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
@@ -158,7 +106,7 @@ def runAP_UI( parmLst ): # Runs in thread started br startTwo...
     wkRQ        = parmLst[3] # runAP_UI thread (started below).
     while True:
 
-        # See if queryViaTwoThrds or stopTwoThrd wants to communicate. 
+        # See if queryViaTwoThrds or stopTwoThrd wants to communicate.
         try:
             cmd = uiCQ.get(timeout=1)
         except queue.Empty:
@@ -208,30 +156,30 @@ def runAP_WRK( parmLst ): # Runs in thread started br startTwo...
         rspLst = tr.getTimeDate(False)
         curDT  = rspLst[1]
         for relayName,relayData in apDict.items():
-    
+
             if relayName in ('active', 'about'):
                 continue
-    
+
             relayNum  = int(relayName[-1])
             rtnLst    = ur.getTemp(False)
             cpuInfo   = rtnLst[1]
-    
+
             rspStr += ' {} {} {} {} ( Temp = {:.1f}{}C ) \n'.\
                 format( relayName, relayData['Days'],
                         relayData['Times'], relayData['durations'],
                         cpuInfo.temperature, chr(176))
-    
+
             dayMatch = checkDayMatch( relayData,curDT )
-    
+
             if dayMatch:
                 rspLst    = checkTimeMatch( relayData, curDT )
                 rspStr   += rspLst[0]
                 timeMatch = rspLst[1]
-    
+
             rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
             if dayMatch:
                 rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
-    
+
             if timeMatch:
                 rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
                 rspStr += rtnLst[0]
@@ -249,9 +197,57 @@ def runAP_WRK( parmLst ): # Runs in thread started br startTwo...
         rspStr += '############################################'
         ####
 
-        wkRQ.put('runAP_WRK = {}'.format(rspStr))
+        wkRQsize = wkRQ.qsize()
+        #print(' wkRQ.qsize = {}'.format(wkRQsize))
+        if wkRQsize < 5:
+            wkRQ.put('runAP_WRK = {}'.format(rspStr))
         time.sleep(5)
     return 0
+#############################################################################
+def checkDayMatch( rlyData, currDT ):
+
+    dayMatch = False
+    onDays   = rlyData['Days']
+
+    if 'all' in onDays:
+        dayMatch  = True
+
+    elif currDT['dowStr'] in onDays:
+        dayMatch  = True
+
+    elif 'even' in onDays and currDT['day']%2 == 0:
+        dayMatch  = True
+
+    elif 'odd'  in onDays and currDT['day']%2 == 1:
+        dayMatch  = True
+
+    return dayMatch
+#############################################################################
+def checkTimeMatch( rlyData, currDT ):
+
+    onTimes   = rlyData['Times']
+    durations = rlyData['durations']
+    timeMatch = False
+
+    rspStr = '   {:20} {:20} {:20} {:10} \n'.format('onTime','now','offTime','inWindow')
+    for t,d in zip(onTimes,durations):
+        onTime = dt.datetime( currDT['year'], currDT['month'], currDT['day'],
+                              t//100, t%100, 0)
+
+        offTime = onTime + dt.timedelta(seconds = d*60)
+
+        tempTimeMatch = onTime <= currDT['now'] <= offTime
+        if tempTimeMatch:
+            timeMatch = True
+
+        onT = '{}'.format( onTime.isoformat(        timespec = 'seconds' ))
+        cDT = '{}'.format( currDT['now'].isoformat( timespec = 'seconds' ))
+        ofT = '{}'.format( offTime.isoformat(       timespec = 'seconds' ))
+
+        rspStr += '   {:20} {:20} {:20} {} \n'.format(onT,cDT,ofT,tempTimeMatch)
+        #print(rspStr)
+
+    return [rspStr,timeMatch]
 #############################################################################
 
 if __name__ == '__main__':

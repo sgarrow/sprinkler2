@@ -94,10 +94,10 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
     'menu' :   'Run   Active  Profile'        },
 
-    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
+    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[uiCmdQ],
     'menu' :   'Stop  Running Profile'        },
 
-    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
+    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[uiCmdQ,uiRspQ],
     'menu' :   'Query Running Profile'        },
 
     ## MISC ################################

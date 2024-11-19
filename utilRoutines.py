@@ -2,8 +2,8 @@ import threading
 import subprocess
 import gpiozero
 
-VERSION  = ' Version:  1.96'
-RELEASED = ' Released: 14-Nov-2024'
+VERSION  = ' Version:  1.97'
+RELEASED = ' Released: 18-Nov-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -43,12 +43,12 @@ def verifyRelayArgs( optArgsStrLst ):
     argsSingleWord  = ''.join(optArgsStrLst)
     argsByIntLst    = [ int(x) for x in filter(str.isdigit,argsSingleWord) ]
     argsByIntNoDups = list(set(argsByIntLst))
-    argsByIntNoDupsNo_0 = [ x for x in argsByIntNoDups if 0 < x < 9 ]
+    argsByIntNoDupsNo0 = [ x for x in argsByIntNoDups if 0 < x < 9 ]
 
-    if len(argsSingleWord) != len(argsByIntNoDupsNo_0):
+    if len(argsSingleWord) != len(argsByIntNoDupsNo0):
         rspStr += ' Note: Duplicate and/or invalid relay numbers ignored.\n'
 
-    return [rspStr, sorted(argsByIntNoDupsNo_0)]
+    return [rspStr, sorted(argsByIntNoDupsNo0)]
 #############################################################################
 
 def getActiveThreads():
@@ -57,6 +57,3 @@ def getActiveThreads():
         rspStr += '\n   {}'.format(t.name)
     return [rspStr]
 #############################################################################
-
-
-
