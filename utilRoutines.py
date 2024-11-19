@@ -2,7 +2,7 @@ import threading
 import subprocess
 import gpiozero
 
-VERSION  = ' Version:  1.98'
+VERSION  = ' Version:  1.99'
 RELEASED = ' Released: 19-Nov-2024'
 #############################################################################
 

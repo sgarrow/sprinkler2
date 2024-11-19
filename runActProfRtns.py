@@ -22,36 +22,36 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
     pDict       = parmLst[2] # profile dict
     uiCQ        = parmLst[3] # For com between handleClient thread and
-    uiRQ        = parmLst[4] # runAP_UI thread (started below).
+    uiRQ        = parmLst[4] # runApUi thread (started below).
     wkCQ        = parmLst[5]
     wkRQ        = parmLst[6]
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
     #######################
-    if 'runAP_UI' in threadLst:
-        startRsp = ' runAP_UI thread already started \n'
+    if 'runApUi' in threadLst:
+        startRsp = ' runApUi thread already started \n'
         #print(' {}'.format(startRsp))
     else:
         prmLst = [uiCQ,uiRQ,wkCQ,wkRQ]
-        runAP_UI_Thrd = threading.Thread( target = runAP_UI,
-                                          name   = 'runAP_UI',
-                                          args   = (prmLst,)
-                                        )
-        runAP_UI_Thrd.start()
-        startRsp = ' runAP_UI thread started'
+        runApUiThrd = threading.Thread( target = runApUi,
+                                        name   = 'runApUi',
+                                        args   = (prmLst,)
+                                      )
+        runApUiThrd.start()
+        startRsp = ' runApUi thread started'
     #######################
-    if 'runAP_WRK' in threadLst:
-        startRsp += ' runAP_WRK thread already started \n'
+    if 'runApWrk' in threadLst:
+        startRsp += ' runApWrk thread already started \n'
         #print(' {}'.format(startRsp))
     else:
         prmLst = [relayObjLst,gpioDic,pDict,wkCQ,wkRQ]
-        runAP_WRK_Thrd = threading.Thread( target = runAP_WRK,
-                                           name   = 'runAP_WRK',
-                                           args   = (prmLst,)
+        runApWrkThrd = threading.Thread( target = runApWrk,
+                                         name   = 'runApWrk',
+                                         args   = (prmLst,)
                                         )
-        runAP_WRK_Thrd.start()
-        startRsp += '\n runAP_WRK thread started'
+        runApWrkThrd.start()
+        startRsp += '\n runApWrk thread started'
     #######################
 
     #print(' {}'.format(startRsp))
@@ -65,7 +65,7 @@ def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
-    if 'runAP_UI' in threadLst:
+    if 'runApUi' in threadLst:
         ###################
         uiCQ.put('qp')
         time.sleep(.001)
@@ -77,7 +77,7 @@ def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
             queryRsp = 'queryViaTwoThrds = uiRQ Empty'
             ###################
     else:
-        queryRsp = ' runAP_UI thread not running, so can\'t be queried'
+        queryRsp = ' runApUi thread not running, so can\'t be queried'
     #print(' {}'.format(queryRsp))
     return [queryRsp]
 #############################################################################
@@ -88,22 +88,22 @@ def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
-    if 'runAP_UI' not in threadLst:
-        stopRsp = ' runAP_UI thread not running, so can\'t be stopped.'
+    if 'runApUi' not in threadLst:
+        stopRsp = ' runApUi thread not running, so can\'t be stopped.'
     else:
         uiCQ.put('sp')
-        stopRsp = ' runAP_UI  thread stopped \n'
-        stopRsp += ' runAP_WRK thread stopped'
+        stopRsp = ' runApUi  thread stopped \n'
+        stopRsp += ' runApWrk thread stopped'
     #print(' {}'.format(stopRsp))
     return [stopRsp]
 #############################################################################
 
-def runAP_UI( parmLst ): # Runs in thread started br startTwo...
+def runApUi( parmLst ): # Runs in thread started br startTwo...
 
     uiCQ        = parmLst[0] # For com between handleClient thread and
-    uiRQ        = parmLst[1] # runAP_UI thread (started below).
+    uiRQ        = parmLst[1] # runApUi thread (started below).
     wkCQ        = parmLst[2] # For com between handleClient thread and
-    wkRQ        = parmLst[3] # runAP_UI thread (started below).
+    wkRQ        = parmLst[3] # runApUi thread (started below).
     while True:
 
         # See if queryViaTwoThrds or stopTwoThrd wants to communicate.
@@ -114,8 +114,8 @@ def runAP_UI( parmLst ): # Runs in thread started br startTwo...
         else:
             if cmd == 'qp':
 
-                # See if runAP_WRK has any new data.
-                wkInfo = 'runAP_UI = \n'
+                # See if runApWrk has any new data.
+                wkInfo = 'runApUi = \n'
                 if not wkRQ.empty():
                     while not wkRQ.empty():
                         wkInfo += wkRQ.get(timeout=.1) + '\n'
@@ -130,7 +130,7 @@ def runAP_UI( parmLst ): # Runs in thread started br startTwo...
     return 0
 #############################################################################
 
-def runAP_WRK( parmLst ): # Runs in thread started br startTwo...
+def runApWrk( parmLst ): # Runs in thread started br startTwo...
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
@@ -180,27 +180,23 @@ def runAP_WRK( parmLst ): # Runs in thread started br startTwo...
             if dayMatch:
                 rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
 
+            rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
+            rspStr += rtnLst[0]
+            relayState = rtnLst[1]
             if timeMatch:
-                rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
-                rspStr += rtnLst[0]
-                relayState = rtnLst[1]
                 if relayState == 'open':
                     rtnLst  = rr.closeRly([relayObjLst,gpioDic,[relayNum]] )
-                    rspStr += rtnLst[0]
             else:
-                rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
-                rspStr += rtnLst[0]
-                relayState = rtnLst[1]
                 if relayState == 'closed':
                     rtnLst = rr.openRly( [relayObjLst,gpioDic,[relayNum]] )
-                    rspStr += rtnLst[0]
+            rspStr += rtnLst[0]
         rspStr += '############################################'
         ####
 
         wkRQsize = wkRQ.qsize()
         #print(' wkRQ.qsize = {}'.format(wkRQsize))
         if wkRQsize < 5:
-            wkRQ.put('runAP_WRK = {}'.format(rspStr))
+            wkRQ.put('runApWrk = {}'.format(rspStr))
         time.sleep(5)
     return 0
 #############################################################################

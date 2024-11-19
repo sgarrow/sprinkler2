@@ -91,7 +91,8 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     ## PROFILE RUN #########################
 
-    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
+    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,
+                                                      uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
     'menu' :   'Run   Active  Profile'        },
 
     'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[uiCmdQ],
