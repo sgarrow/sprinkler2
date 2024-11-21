@@ -30,7 +30,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
 
     #######################
     if 'runApUi' in threadLst:
-        startRsp = ' runApUi thread already started \n'
+        startRsp = ' runApUi  thread already started \n'
         #print(' {}'.format(startRsp))
     else:
         prmLst = [uiCQ,uiRQ,wkCQ,wkRQ]
@@ -39,10 +39,10 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
                                         args   = (prmLst,)
                                       )
         runApUiThrd.start()
-        startRsp = ' runApUi thread started'
+        startRsp = ' runApUi  thread started \n'
     #######################
     if 'runApWrk' in threadLst:
-        startRsp += ' runApWrk thread already started \n'
+        startRsp += ' runApWrk thread already started'
         #print(' {}'.format(startRsp))
     else:
         prmLst = [relayObjLst,gpioDic,pDict,wkCQ,wkRQ]
@@ -51,7 +51,7 @@ def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
                                          args   = (prmLst,)
                                         )
         runApWrkThrd.start()
-        startRsp += '\n runApWrk thread started'
+        startRsp += ' runApWrk thread started'
     #######################
 
     #print(' {}'.format(startRsp))
@@ -89,11 +89,18 @@ def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
     threadLst = [ t.name for t in threading.enumerate() ]
 
     if 'runApUi' not in threadLst:
-        stopRsp = ' runApUi thread not running, so can\'t be stopped.'
+        stopRsp = ' runApUi thread not running,\n'
+        stopRsp += ' so can\'t send stop command.'
     else:
         uiCQ.put('sp')
-        stopRsp = ' runApUi  thread stopped \n'
-        stopRsp += ' runApWrk thread stopped'
+        stopRsp = ' Stop command sent.'
+        while True:
+            threadLst = [ t.name for t in threading.enumerate() ]
+            #print(threadLst)
+            ThrdsToKill = ['runApUi','runApWrk']
+            if not any(el in threadLst for el in ThrdsToKill):
+                break
+
     #print(' {}'.format(stopRsp))
     return [stopRsp]
 #############################################################################
@@ -125,7 +132,9 @@ def runApUi( parmLst ): # Runs in thread started br startTwo...
                 uiRQ.put('{}'.format(wkInfo))
 
             if cmd == 'sp':
+                #print('ui2wk brk')
                 wkCQ.put('{}'.format(cmd))
+                #print('ui brk')
                 break
     return 0
 #############################################################################
@@ -145,11 +154,12 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     while True:
 
         try:
-            cmd = wkCQ.get(block=False)
+            cmd = wkCQ.get(timeout=5)
         except queue.Empty:
             pass
         else:
             if cmd == 'sp':
+                #print('wk brk')
                 break
         ####
         rspStr = ''
@@ -181,7 +191,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
                 rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
 
             rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
-            rspStr += rtnLst[0]
+            #rspStr += rtnLst[0]
             relayState = rtnLst[1]
             if timeMatch:
                 if relayState == 'open':
@@ -197,7 +207,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
         #print(' wkRQ.qsize = {}'.format(wkRQsize))
         if wkRQsize < 5:
             wkRQ.put('runApWrk = {}'.format(rspStr))
-        time.sleep(5)
+        #time.sleep(5)
     return 0
 #############################################################################
 def checkDayMatch( rlyData, currDT ):

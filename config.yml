@@ -1,18 +1,21 @@
-# This file defines the watering shedule and can be edited by the user.  When
-# editing, only change things that follow a colon.  Things before the colons 
-# are variable names that the program assumes are defined. Things that come 
-# after the colons are the values of the variables. No tab characters allowed,
-# use only spaces.
+# This file defines various watering profiles and can be edited by the user.
+# When editing, only change things that follow a colon.  Things before the 
+# colons are variable names that the program assumes are defined. Things 
+# that come after the colons are the values of the variables.
+# No tab characters allowed, use only spaces.
 #
 # This file can contain any number of profiles.  One profile is set to active
-# the others MUST be set to inactive.  The active profile at run time will be
+# the others MUST be set to inactive.  The active profile at startup will be
 # set to the one marked active in this file but can be changed via the sap 
 # (Set Active Profile) command.
+#
+# Profiles can be viewed (listed) via the 'lp' (List Profiles) command.
+# Actice profiles can be chnged (set) via th 'sap' (Set Active Profile) cmd.
 #
 # The last profile herein is a comprehensive profile example with comments
 # a wise person will read this example carefully before editing this file.
 ############################################
-profile1:
+profile0:
   about:       Just relay 1, 3 times per day for 1 min.
   active:      True
   relay1:
@@ -20,26 +23,26 @@ profile1:
     Days:      [all]
     Times:     [800,1000,1700]
     durations: [1,1,1]
-  relay2:
-    About:     Back Yard Spa Side 
-    Days:      [None]
-    Times:     [None]
-    durations: [None]
-  relay3:
-    About:     Hill Below Driveway 
-    Days:      [None]
-    Times:     [None]
-    durations: [None]
-  relay4:
-    About:     Hill Above Driveway 
-    Days:      [None]
-    Times:     [None]
-    durations: [None]
-  relay5:
-    About:     Front Yard Planter Strip 
-    Days:      [None]
-    Times:     [None]
-    durations: [None]
+  #relay2:
+  #  About:     Back Yard Spa Side 
+  #  Days:      [None]
+  #  Times:     [None]
+  #  durations: [None]
+  #relay3:
+  #  About:     Hill Below Driveway 
+  #  Days:      [None]
+  #  Times:     [None]
+  #  durations: [None]
+  #relay4:
+  #  About:     Hill Above Driveway 
+  #  Days:      [None]
+  #  Times:     [None]
+  #  durations: [None]
+  #relay5:
+  #  About:     Front Yard Planter Strip 
+  #  Days:      [None]
+  #  Times:     [None]
+  #  durations: [None]
   #relay6:
   #  About:     NC - 24V Ready 
   #  Days:      [None]
@@ -56,7 +59,7 @@ profile1:
   #  Times:     [None]
   #  durations: [None]
 ############################################
-profile2:
+profile1:
   active:      False
   about:       A comprehensive example profile.
   #relay1:
@@ -98,19 +101,19 @@ profile2:
   relay6:
     About:     NC so use to test w/o turning on a sprinkler 
     Days:      [all]
-    Times:     [600,1900,2000]
-    durations: [1,4,1]
+    Times:     [2042,2043,2044]
+    durations: [1,.5,1]
 
   relay7:
     About:     NC so use to test w/o turning on a sprinkler 
-    Days:      [Friday]
-    Times:     [600,1901,2000]
-    durations: [1,4,1]
+    Days:      [Tuesday]
+    Times:     [2043,2044,2045]
+    durations: [.5,.1,1]
 
   relay8:
     About:     NC so use to test w/o turning on a sprinkler
     Days:      [odd]
-    Times:     [600,1902,2000]
-    durations: [1,4,1]
+    Times:     [2044,2045,2046]
+    durations: [1,2,1]
 ############################################
 

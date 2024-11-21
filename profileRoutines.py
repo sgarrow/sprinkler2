@@ -41,7 +41,7 @@ Command rap: Calls function runAP (runActiveProfile).
 import pickle
 import pprint        as pp
 import yaml
-
+import threading
 ESC = '\x1b'
 RED = '[31m'
 TERMINATE = '[0m'
@@ -104,6 +104,12 @@ def getAP( pDict ):
 #############################################################################
 def setAP( pDict ):
 
+    threadLst = [ t.name for t in threading.enumerate() ]
+    if 'runApWrk' in threadLst:
+        rspStr  = ' Can\'t set active profile while a profile is\n'
+        rspStr += ' running. Issue the sp rcommand and try again.'
+        return [rspStr]
+
     # Read sapState info.
     with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
         stateMachInfo = pickle.load(handle)
@@ -118,8 +124,8 @@ def setAP( pDict ):
     if state == 0:
         ks = [] # list of profile names
         rspStr = ''
-        for ii,profileKey in enumerate(pDict):
-            rspStr += ' {} - {}\n'.format(ii,profileKey)
+        for ii,(profileKey,v) in enumerate(pDict.items()):
+            rspStr += ' {} - {} ({})\n'.format(ii,profileKey,v['about'])
             ks.append(profileKey)
 
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,

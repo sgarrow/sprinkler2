@@ -5,7 +5,7 @@ import sprinkler as sp
 #############################################################################
 def listThreads():
     while True:
-        time.sleep(5)
+        time.sleep(10)
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))
@@ -27,7 +27,7 @@ def handleClient(clientSocket, clientAddress):
         data    = clientSocket.recv(1024)
 
         print('*********************************')
-        print('Received from: {} ***{}***'.format(clientAddress, data.decode()))
+        print('Received from: {} {}'.format(clientAddress, data.decode()))
 
         # Process data and send response back to the client
         if data.decode() == 'close':
