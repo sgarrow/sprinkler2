@@ -23,27 +23,34 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
 
 def getUserInput(q,aLock):
     userInput = None
+
+    with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
+        stateMachInfo = pickle.load(handle)
+
     while True:
 
-        with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
-            stateMachInfo = pickle.load(handle)
-        if stateMachInfo['sapState'] == 1:
-            prompt = stateMachInfo['prompt']
-        else:
-            prompt = '\n Choice (m=menu, q=quit) -> '
 
         with aLock:
-
+            with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
+                stateMachInfo = pickle.load(handle)
             if stateMachInfo['sapState'] in [0,1]:
+                if stateMachInfo['sapState'] == 1:
+                    prompt = stateMachInfo['prompt']
+                else:
+                    prompt = '\n Choice (m=menu, q=quit) -> '
+
                 userInput = input( prompt )
 
-            if stateMachInfo['sapState'] == 1:
-                updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
+        if stateMachInfo['sapState'] == 1:
+            updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
 
-            if stateMachInfo['sapState'] != 0:
-                q.put('sap')
-            else:
-                q.put(userInput)
+        if stateMachInfo['sapState'] != 0:
+            # Sleep RE: hammering w/ back-to-back sap's causes occasional
+            # probs w/ server writing to pickle while client trying to read.
+            time.sleep(.015)
+            q.put('sap')
+        else:
+            q.put(userInput)
 
         time.sleep(.01) # Gives 'main' a chance to run.
         if userInput == 'close':

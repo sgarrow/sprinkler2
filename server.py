@@ -5,7 +5,7 @@ import sprinkler as sp
 #############################################################################
 def listThreads():
     while True:
-        time.sleep(10)
+        time.sleep(60)
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))

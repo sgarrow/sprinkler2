@@ -38,6 +38,7 @@ Command rap: Calls function runAP (runActiveProfile).
              ctrl-c.  Upon exit a return to the command prompt occurs.
 '''
 
+import time
 import pickle
 import pprint        as pp
 import yaml
@@ -104,6 +105,7 @@ def getAP( pDict ):
 #############################################################################
 def setAP( pDict ):
 
+    #kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
         rspStr  = ' Can\'t set active profile while a profile is\n'
@@ -130,6 +132,7 @@ def setAP( pDict ):
 
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
         sapState  = 1, profNames = ks)
+        time.sleep(.05)
         #print(rspStr)
         #print('   Going from state 0 to state 1.')
     ########################################
@@ -200,6 +203,7 @@ def setAP( pDict ):
 
     #print('\n sapStateMachineInfo on exit:')
     #print('',stateMachInfo)
+    #print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
     return [rspStr,pDict]
 #############################################################################
 
