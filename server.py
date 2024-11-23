@@ -85,4 +85,5 @@ def startServer():
 if __name__ == '__main__':
     thread = threading.Thread(target=listThreads, name = 'listThreads')
     thread.start()
+    sp.sprinkler('rp')
     startServer()
