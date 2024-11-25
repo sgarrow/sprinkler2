@@ -22,7 +22,12 @@ def handleClient(clientSocket, clientAddress):
     print('Accepted connection from: {}'.format(clientAddress))
 
     while True:
-        data = clientSocket.recv(1024)
+        try: # In case user closes client by (x) instead if by close cmd.
+            data = clientSocket.recv(1024)
+        except ConnectionResetError: # Whereas Windows throws this.
+            print(' ConnectionResetError exception in clientSocket.send')
+            print(' Closing associated client socket.')
+            break
 
         print('*********************************')
         print('Received from: {} {}'.format(clientAddress, data.decode()))
@@ -38,7 +43,7 @@ def handleClient(clientSocket, clientAddress):
         response = sp.sprinkler(data.decode())
         try: # In case user closes client by (x) instead if by close cmd.
             clientSocket.send(response.encode())
-        except BrokenPipeError:
+        except BrokenPipeError: # RPi throws this.
             print(' BrokenPipeError exception in clientSocket.send')
             print(' Closing associated client socket.')
             break

@@ -1,4 +1,8 @@
-import readline
+try:
+    import readline
+except ModuleNotFoundError:
+    print(' exception importing readline. ok to continue.')
+
 import socket
 import time
 import select
@@ -61,8 +65,14 @@ if __name__ == '__main__':
 
     # Each client will connect to the server with a new address.
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Replace with the server's address if needed.
-    clientSocket.connect(('localhost', 5000))
+
+    # if client running on a different machine and host ip = 192.168.1.5
+    # and server and client on same network.
+    clientSocket.connect(('192.168.1.5', 5000))
+
+    # if client and host running on same machine.
+    #clientSocket.connect(('localhost', 5000))
+
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
     theQ        = queue.Queue()
