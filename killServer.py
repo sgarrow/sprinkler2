@@ -19,7 +19,7 @@ for line in pythonServerLines:
     processNum = splitLine[1]
     pythonServerPids.append(processNum)
 
-# Get all pids of python servers
+# Kill all pids of python servers
 for pid in pythonServerPids:
     result = subprocess.run(['kill','-9',pid],
              stdout=subprocess.PIPE,text=True, check = False)

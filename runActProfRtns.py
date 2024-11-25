@@ -97,8 +97,8 @@ def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
         while True:
             threadLst = [ t.name for t in threading.enumerate() ]
             #print(threadLst)
-            ThrdsToKill = ['runApUi','runApWrk']
-            if not any(el in threadLst for el in ThrdsToKill):
+            thrdsToKill = ['runApUi','runApWrk']
+            if not any(el in threadLst for el in thrdsToKill):
                 break
 
     #print(' {}'.format(stopRsp))

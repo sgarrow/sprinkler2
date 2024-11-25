@@ -37,7 +37,6 @@ uiRspQ = queue.Queue()
 wkCmdQ = queue.Queue()
 wkRspQ = queue.Queue()
 
-
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     global gpioDict
@@ -71,9 +70,6 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     'rr'   : { 'func' : rr.readRly,           'parm':[rlyObjLst,gpioDict,allRlys],
     'menu' :   'Read    Relay'                },
-
-    'cyr'  : { 'func' : rr.cycleRly,          'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Cycle   Relays'               },
 
     ## PROFILE MGMT ########################
 
@@ -139,11 +135,11 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         if params is None:
             rsp = func()            # rsp[0] = rspStr
             return rsp[0]           # return to srvr for forwarding to clnt.
-        else:
-            rsp = func(params)      # rsp[0] = rspStr
-            return vraRspStr+rsp[0] # return to srvr for forwarding to clnt.
 
-    elif choice == 'm':
+        rsp = func(params)          # rsp[0] = rspStr
+        return vraRspStr+rsp[0]     # return to srvr for forwarding to clnt.
+
+    if choice == 'm':
         rspStr = ''
         for k,v in strToFunctDict.items():
             if k == 'or':
@@ -158,6 +154,5 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
         return rspStr               # return to srvr for forwarding to clnt.
 
-    else:
-        rspStr = 'Invalid command'
-        return rspStr               # return to srvr for forwarding to clnt.
+    rspStr = 'Invalid command'
+    return rspStr                   # return to srvr for forwarding to clnt.

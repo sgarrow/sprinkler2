@@ -40,9 +40,9 @@ Command rap: Calls function runAP (runActiveProfile).
 
 import time
 import pickle
-import pprint        as pp
-import yaml
 import threading
+import pprint as pp
+import yaml
 ESC = '\x1b'
 RED = '[31m'
 TERMINATE = '[0m'

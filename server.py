@@ -22,9 +22,7 @@ def handleClient(clientSocket, clientAddress):
     print('Accepted connection from: {}'.format(clientAddress))
 
     while True:
-        # put try/except here in case user hits x on client w/o closing first.
-        # or better yet goto 'closing connection'.
-        data    = clientSocket.recv(1024)
+        data = clientSocket.recv(1024)
 
         print('*********************************')
         print('Received from: {} {}'.format(clientAddress, data.decode()))
@@ -36,14 +34,14 @@ def handleClient(clientSocket, clientAddress):
             print('Closing: {}'.format(clientAddress))
             time.sleep(1)
             break # Causes the handler to stop and the thread end.
-        else:
-            response = sp.sprinkler(data.decode())
-            try: # In case user closes client by (x) instead if by close cmd.
-                clientSocket.send(response.encode())
-            except:
-                #print('exception in clientSocket.send')
-                break
 
+        response = sp.sprinkler(data.decode())
+        try: # In case user closes client by (x) instead if by close cmd.
+            clientSocket.send(response.encode())
+        except BrokenPipeError:
+            print(' BrokenPipeError exception in clientSocket.send')
+            print(' Closing associated client socket.')
+            break
 
     clientSocket.close()
 #############################################################################

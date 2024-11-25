@@ -12,7 +12,6 @@ relayOCTR.
 '''
 
 import inspect
-import time
 
 ESC = '\x1b'
 RED = '[31m'
@@ -78,21 +77,4 @@ def toggleRly( parmLst ): # Wrapper function.
 def readRly( parmLst ):   # Wrapper function.
     rtnLst = relayOCTR( parmLst )
     return rtnLst
-#############################################################################
-
-def cycleRly( parmLst ):
-
-    relayObjLst = parmLst[0]
-    gpioDic     = parmLst[1]
-    rtnVal      = 0
-    try:
-        while True:
-            for ii in range(len(relayObjLst)):
-                rtnVal = closeRly([relayObjLst,  gpioDic, [ii+1]])
-                time.sleep(1)
-                rtnVal = openRly( [relayObjLst,  gpioDic, [ii+1]])
-                time.sleep(3)
-    except KeyboardInterrupt:
-        pass
-    return [rtnVal]
 #############################################################################
