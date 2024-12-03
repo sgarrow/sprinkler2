@@ -1,11 +1,12 @@
 '''
-fixme
+A collection of misc routines for getting version, temp, active threads and
+verifying relay args.
 '''
 import threading
 import subprocess
 import gpiozero
 
-VERSION = ' Version:  2.06'
+VERSION = ' Version:  2.07'
 RELEASED = ' Released: 2-Dec-2024'
 #############################################################################
 

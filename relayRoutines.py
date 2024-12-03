@@ -2,13 +2,16 @@
 This module contains all the functions that talk directly to the relays.
 This is the only module that talks directly to the relays.
 
-This module has 6 functions 5 of which are callable directly from the prompt.
+This module has 5 functions 4 of which are callable directly from the prompt.
 Commands or,cr,tr,rr,cycr call functions openRelay, closeRelay, toggleRelay
 and readRelay, respectively.
 
-The 6th function (relayOCTR) is a driver for or,cr,tr,rr.  Those 4 functions
+The 5th function (relayOCTR) is a driver for or,cr,tr,rr.  Those 4 functions
 (openRelay, closeRelay, toggleRelay, readRelay) are just thin wrappers to
 relayOCTR.
+
+Any time a relay is open or closed that fact, along with a timestamp is
+written to file sprinklerLog.txt.
 '''
 
 import inspect

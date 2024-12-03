@@ -1,7 +1,18 @@
 '''
-Command rap: Calls function runAP (runActiveProfile).
-             This function is an infinite loop.  The loop can be exited with
-             ctrl-c.  Upon exit a return to the command prompt occurs.
+The rp (Run (active) Profile) command, starts the active profie.
+This function is an infinite loop.
+
+The sp (Stop Profile) command terminates the infinite loop.
+
+The qp (Query Profile) command gives instantaneous status of the 
+running profile (day match, time match, relay on/off status).
+
+These commands operate within two threads.  One thread provides a responsive
+user interface (UI) the other thread executes the profile in the background.
+
+The profile execution thread is executed once every 5 seconds.  The UI thread
+is executed on command.  These two threads communicate with each other and 
+with the program at large via two command/response queue pairs.
 '''
 
 import time

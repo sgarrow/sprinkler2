@@ -1,6 +1,6 @@
 '''
-The only function in this file is named "init".  It is called automatically
-when the main script (sprinkler.py) is started (from the command line).
+The only function in this file is named "init".  It is called automatically,
+if required, when function sprinkler (in file sprinkler.py) is called.
 
 The init routine creates two things:
 

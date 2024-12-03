@@ -32,7 +32,6 @@ Command gap: Calls function getAP (getActiveProfile).
              the profile that will be run when the rap command is entered.
 
 Command sap: Calls function setAP (setActiveProfile).
-
 '''
 
 import time
