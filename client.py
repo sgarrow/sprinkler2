@@ -1,3 +1,14 @@
+'''
+This is the user interface to the server.  All of the files in this project
+must be on the RPi except this one although it may also be on the RPi.
+
+If this file is on the RPi then both the server and the client may both be
+run on the RPi.  
+
+If this file is on, for example, a PC, the the client can be rn on a PC.
+This is like how, for example, your Web Browser (a client) talks to the 
+google server.
+'''
 try:
     import readline
 except ModuleNotFoundError:

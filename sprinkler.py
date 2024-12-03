@@ -1,7 +1,10 @@
 #  C:\Users\stang\AppData\Roaming\Python\Python312\Scripts\pylint .\*.py
 '''
-This is the main script for the sprinkler project.
-To run it from the RPi command line type "python3 sprinkler.py".
+When a client enters a command those commands are received by function 
+handleClient in file server.py.  The command (string) is forwarded to
+function "sprinkler" (in this file) and the appropriate "worker" function
+is then vectored to.
+
 This project (collection of files/scripts) cannot be run on a PC,
 it has to be run on an RPi.
 
@@ -11,8 +14,9 @@ doc-strings are like comments but ... different. Comments are proceeded by #.
 
 The recommended way to learn about this project is to read the comments at
 the top of the files in this order:
+  server.py, client.py,
   initRoutines.py, timeRoutines.py, relayRoutines.py,
-  profileRoutines.py, config.yml.
+  profileRoutines.py, runActProfRtns.py, config.yml.
 
 After reading the doc-strings perusing the comments will also be helpful.
 '''

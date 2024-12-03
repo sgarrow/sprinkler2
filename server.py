@@ -1,3 +1,32 @@
+'''
+This file contains three functions.
+
+Function startServer:
+Starts the server and listens for incoming connections. Creates a socket
+object and binds it to a specified host and port.  When a client connects,
+it creates a new thread to handle that client using the handleClient 
+function.  It is called automatically when "python3 server.py" is entered 
+on the RPi command line.  Start server is an infinite loop that waits for 
+clients to connect to it.  When a client connects startDerver spawns a new
+thread to handle that client.
+
+Function handleClient:
+Each client handler is it's own thread.  Multiple instantiations of client 
+handler threads may be active simultaneously.  These threads are started by 
+the thread running "startServer". Each thread handles com with a single 
+client.  Receives data from the client, processes it, and sends a response 
+back to the client.
+
+A given client can be run on the RPi itself or on another machine via an SSH
+connection (like on a PC or on your phone via the Terminus App.
+
+Function listThreads:
+This function runs in it's own thread and runs every 60 seconds.  It prints 
+all the currently running threads in the server's terminal window.  It's
+basically just a debug function and could be eliminated.  Similar 
+functionality is available to he client via the gat (Get Active Threads) cmd.
+'''
+
 import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
 import time
@@ -13,12 +42,6 @@ def listThreads():
 #############################################################################
 
 def handleClient(clientSocket, clientAddress):
-    ''' Each client handler is it's own thread.  Multiple instantiations of
-        client handler threads may be active simultaneously.  These threads
-        are started by the thread running "startServer". Each thread handles
-        com with a single client.  Receives data from the client, processes
-        it, and sends a response back.
-    '''
     print('Accepted connection from: {}'.format(clientAddress))
 
     while True:
@@ -52,12 +75,6 @@ def handleClient(clientSocket, clientAddress):
 #############################################################################
 
 def startServer():
-    ''' Starts the server and listens for incoming connections.
-        Creates a socket object and binds it to a specified host and port.
-        When a client connects, it creates a new thread to handle that client
-        using the handleClient function. This thread is started by 'main'.
-    '''
-
     host = '0.0.0.0'  # Listen on all available interfaces
     port = 5000
 

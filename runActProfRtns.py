@@ -1,5 +1,7 @@
 '''
-fixme
+Command rap: Calls function runAP (runActiveProfile).
+             This function is an infinite loop.  The loop can be exited with
+             ctrl-c.  Upon exit a return to the command prompt occurs.
 '''
 
 import time

@@ -3,11 +3,11 @@ Simple module that contains only one function that returns the date and time.
 It can be called from the program's main prompt (gt command).
 It's also called from the function rap (Run Active Profile).
 
-rap is in file profileRoutines.py and it is an ifinite loop that continually
+rap is in file runActProfRtns.py and it is an ifinite loop that continually
 reads the date/time and compares it the the profile to see if a relay should
 be opened or closed ... rap is the whole point of this project ...
 
-The infinite can be exited with ctrl-c.
+The infinite can be exited with the sp (Stop Profile) command.
 '''
 
 import datetime as dt

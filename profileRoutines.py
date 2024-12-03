@@ -7,7 +7,7 @@ but it is in specific format that is parseable by the python module named
 'yaml' (yet another mark up language ... sort of like xml files).
 config.yml can be edited on a PC and can contain multiple profiles.
 
-This module has 5 funcs all of which are callable directly from the prompt.
+This module has 4 funcs all of which are callable directly from the prompt.
 
 Command mp: Calls function makeProfile.
             This function reads config.yml and converts the text therein into
@@ -33,9 +33,6 @@ Command gap: Calls function getAP (getActiveProfile).
 
 Command sap: Calls function setAP (setActiveProfile).
 
-Command rap: Calls function runAP (runActiveProfile).
-             This function is an infinite loop.  The loop can be exited with
-             ctrl-c.  Upon exit a return to the command prompt occurs.
 '''
 
 import time
@@ -108,8 +105,7 @@ def setAP( pDict ):
     #kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
-        rspStr  = ' Can\'t set active profile while a profile is\n'
-        rspStr += ' running. Issue the sp rcommand and try again.'
+        rspStr  = ' Can\'t sap while a profile is running. Issue sp and try again.'
         return [rspStr]
 
     # Read sapState info.
@@ -160,7 +156,7 @@ def setAP( pDict ):
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
-                print(rspStr)
+                #print(rspStr)
                 #print('   Going from state 2 back to state 1')
         else: # There was no exception.
             if idx > len(pDict):

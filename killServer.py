@@ -1,3 +1,8 @@
+'''
+Run in a seperate RPi terminal.  Kills the server process and 
+all of the threads it may have started.
+'''
+
 import subprocess
 
 # Get all processes

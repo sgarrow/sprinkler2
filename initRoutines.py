@@ -10,7 +10,7 @@ The init routine creates two things:
    (2) a cross reference dictionary of GPIO to board-pin and associated
        relay it is wired to.
 
-These 2 items are returned to the main scrips who, in turn, passes them to
+These two items are returned to the main scrips who, in turn, passes them to
 other functions who need them (those functions are in file relayRoutines.py).
 
 Relay-objs have methods on,off,pin to close,open,get-GPIO-name, respectively.
