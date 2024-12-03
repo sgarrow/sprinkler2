@@ -12,6 +12,7 @@ relayOCTR.
 '''
 
 import inspect
+import timeRoutines  as tr
 
 ESC = '\x1b'
 RED = '[31m'
@@ -39,15 +40,26 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
         pinNum    = gpioDic[gpioStr]['pin']
         relayNum  = gpioDic[gpioStr]['relay']
 
+        rspLst = tr.getTimeDate(False)
+        curDT  = rspLst[1]
+        cDT = '{}'.format( curDT['now'].isoformat( timespec = 'seconds' ))
+
         if whoCalledMeFuncNameStr == 'openRly':
             rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.off()
+            with open('sprinklerLog.txt', 'a') as f:
+                f.write( 'Relay {} opened at {} \n'.format(relayNum,cDT))
+
         if whoCalledMeFuncNameStr == 'closeRly':
             rspStr +=' Closing relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.on()
+            with open('sprinklerLog.txt', 'a') as f:
+                f.write( 'Relay {} closed at {} \n'.format(relayNum,cDT))
+
         if whoCalledMeFuncNameStr == 'toggleRly':
             rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
             relay.toggle()
+
         if whoCalledMeFuncNameStr == 'readRly':
             rtnVal = 'open'
             rv = relay.value
