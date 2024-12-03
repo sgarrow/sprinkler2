@@ -42,7 +42,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
 
         rspLst = tr.getTimeDate(False)
         curDT  = rspLst[1]
-        cDT = '{}'.format( curDT['now'].isoformat( timespec = 'seconds' ))
+        cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
 
         if whoCalledMeFuncNameStr == 'openRly':
             rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
