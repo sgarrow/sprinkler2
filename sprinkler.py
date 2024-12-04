@@ -58,7 +58,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
 
-    allRlys  = [1,2,3,4,5,6,7,8]
+    allRlys  = ['12345678']
     strToFunctDict = {
 
     ## RELAY ###############################
@@ -124,24 +124,21 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     choice     = inputWords[0]
     optArgsStr = inputWords[1:]
-    rtnLst     = ur.verifyRelayArgs( optArgsStr )
-    vraRspStr  = rtnLst[0]
-    optArgs    = rtnLst[1]
 
     if choice in strToFunctDict:
         func   = strToFunctDict[choice]['func']
         params = strToFunctDict[choice]['parm']
 
-        if choice in ['or','cr','tr'] and len(optArgs) > 0:
+        if choice in ['or','cr','tr']:# and len(optArgs) > 0:
             params    = strToFunctDict[choice]['parm'][:]
-            params[2] = optArgs
+            params[2] = optArgsStr
 
         if params is None:
             rsp = func()            # rsp[0] = rspStr
             return rsp[0]           # return to srvr for forwarding to clnt.
 
         rsp = func(params)          # rsp[0] = rspStr
-        return vraRspStr+rsp[0]     # return to srvr for forwarding to clnt.
+        return rsp[0]               # return to srvr for forwarding to clnt.
 
     if choice == 'm':
         rspStr = ''

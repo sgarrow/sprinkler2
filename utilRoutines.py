@@ -6,7 +6,7 @@ import threading
 import subprocess
 import gpiozero
 
-VERSION = ' Version:  2.08'
+VERSION = ' Version:  2.09'
 RELEASED = ' Released: 3-Dec-2024'
 #############################################################################
 
@@ -39,20 +39,6 @@ def getVer():
     rspStr += RELEASED
     #print(rspStr)
     return [rspStr]
-#############################################################################
-
-def verifyRelayArgs( optArgsStrLst ):
-
-    rspStr = ''
-    argsSingleWord  = ''.join(optArgsStrLst)
-    argsByIntLst    = [ int(x) for x in filter(str.isdigit,argsSingleWord) ]
-    argsByIntNoDups = list(set(argsByIntLst))
-    argsByIntNoDupsNo0 = [ x for x in argsByIntNoDups if 0 < x < 9 ]
-
-    if len(argsSingleWord) != len(argsByIntNoDupsNo0):
-        rspStr += ' Note: Duplicate and/or invalid relay numbers ignored.\n'
-
-    return [rspStr, sorted(argsByIntNoDupsNo0)]
 #############################################################################
 
 def getActiveThreads():

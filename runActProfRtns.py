@@ -203,15 +203,15 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
             if dayMatch:
                 rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
 
-            rtnLst  = rr.readRly([relayObjLst,gpioDic,[relayNum]])
+            rtnLst  = rr.readRly([relayObjLst,gpioDic,str(relayNum)])
             #rspStr += rtnLst[0]
             relayState = rtnLst[1]
             if timeMatch:
                 if relayState == 'open':
-                    rtnLst  = rr.closeRly([relayObjLst,gpioDic,[relayNum]] )
+                    rtnLst = rr.closeRly([relayObjLst,gpioDic,str(relayNum)])
             else:
                 if relayState == 'closed':
-                    rtnLst = rr.openRly( [relayObjLst,gpioDic,[relayNum]] )
+                    rtnLst = rr.openRly( [relayObjLst,gpioDic,str(relayNum)])
             rspStr += rtnLst[0]
         rspStr += '############################################'
         ####

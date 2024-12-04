@@ -20,22 +20,42 @@ import timeRoutines  as tr
 ESC = '\x1b'
 RED = '[31m'
 TERMINATE = '[0m'
+
+#############################################################################
+
+def verifyRelayArgs( optArgsStrLst ):
+
+    rspStr = ''
+    argsSingleWord  = ''.join(optArgsStrLst)
+    argsByIntLst    = [ int(x) for x in filter(str.isdigit,argsSingleWord) ]
+    argsByIntNoDups = list(set(argsByIntLst))
+    argsByIntNoDupsNo0 = [ x for x in argsByIntNoDups if 0 < x < 9 ]
+
+    if len(argsSingleWord) != len(argsByIntNoDupsNo0):
+        rspStr += ' Note: Duplicate and/or invalid relay numbers ignored.\n'
+
+    return [rspStr, sorted(argsByIntNoDupsNo0)]
 #############################################################################
 
 def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
 
     relayObjLst  = parmLst[0] # This was created by function in file init.py
     gpioDic      = parmLst[1] # Also from init.py, refer to comments therein.
-    relayObjIdxs = parmLst[2] # A list of relays to perform the action on.
+    optArgsStr   = parmLst[2] # A list of relays to perform the action on.
     rtnVal       = None
 
     rspStr = ''
     relays = []
-    if relayObjIdxs is not None:
+
+    if optArgsStr != []:
+        rtnLst       = verifyRelayArgs( optArgsStr )
+        rspStr      += rtnLst[0]
+        relayObjIdxs = rtnLst[1]
         # -1 RE: Relay nums start @ 1, lst index start @ 0.
         relays = [ relayObjLst[el-1] for el in relayObjIdxs ]
     else:
         rspStr = ' No relays specified.'
+
 
     whoCalledMeFuncNameStr = inspect.stack()[1][3]
     for relay in relays:
