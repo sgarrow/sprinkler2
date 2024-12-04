@@ -86,7 +86,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'gap'  : { 'func' : pr.getAP,             'parm':profDict,
     'menu' :   'Get Act Profile'              },
 
-    'sap'  : { 'func' : pr.setAP,             'parm':profDict,
+    'sap'  : { 'func' : pr.setAP,             'parm':[profDict,None],
     'menu' :   'Set Act Profile'              },
 
     ## PROFILE RUN #########################
@@ -129,9 +129,13 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         func   = strToFunctDict[choice]['func']
         params = strToFunctDict[choice]['parm']
 
-        if choice in ['or','cr','tr']:# and len(optArgs) > 0:
+        if choice in ['or','cr','tr']:
             params    = strToFunctDict[choice]['parm'][:]
             params[2] = optArgsStr
+
+        if choice in ['sap']:
+            params    = strToFunctDict[choice]['parm'][:]
+            params[1] = optArgsStr
 
         if params is None:
             rsp = func()            # rsp[0] = rspStr

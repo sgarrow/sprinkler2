@@ -99,8 +99,12 @@ def getAP( pDict ):
     #print(rspStr)
     return [rspStr,ap]
 #############################################################################
-def setAP( pDict ):
+def setAP( parmLst ):
 
+    pDict       = parmLst[0]
+    dsrdProfIdx = parmLst[1]
+
+    print(' *** setAP dsrdProfIdx = ',dsrdProfIdx)
     kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
@@ -110,9 +114,8 @@ def setAP( pDict ):
     # Read sapState info.
     with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
         stateMachInfo = pickle.load(handle)
-    state     = stateMachInfo[ 'sapState'    ]
-    profIdx   = stateMachInfo[ 'dsrdProfIdx' ]
-    profNms   = stateMachInfo[ 'profNames'   ]
+    state     = stateMachInfo[ 'sapState'  ]
+    profNms   = stateMachInfo[ 'profNames' ]
     print(' sapStateMachineInfo on entry:')
     print('',stateMachInfo,'\n')
     ########################################
@@ -141,8 +144,7 @@ def setAP( pDict ):
     # desired profile index will have been updated in dict by client.
     if state == 2:
         # Get the index of the desired profle from pickle.
-        idxStr = profIdx
-        #print(' idxStr = ', idxStr)
+        idxStr = dsrdProfIdx[0]
         try:
             idx = int(idxStr)
         except ValueError:
@@ -153,13 +155,12 @@ def setAP( pDict ):
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
-                rspStr += ' sv sapState = 2'
+                rspStr += ' sv sapState = 1'
         else: # There was no exception.
             if idx > len(pDict)-1:
                 updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Integer out of range. Try again.'
-                rspStr += ' sv sapState = 2'
-                #print('   Going from state 2 back to state 1')
+                rspStr += ' sv sapState = 1'
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
                 sapState  = 3)
@@ -169,7 +170,8 @@ def setAP( pDict ):
     # Set active profile.
     # Set all profiles to inactive, except selected profile is set to active.
     if state == 3:
-        ap = profNms[int(profIdx)] # Name of the profile to set active.
+        idxStr = dsrdProfIdx[0]
+        ap = profNms[int(idxStr)] # Name of the profile to set active.
         for profileKey,profileValue in pDict.items():
             for profKey in profileValue:
                 if profKey == 'active':
@@ -199,7 +201,6 @@ def setAP( pDict ):
 def initSapStateMachineInfo():
     sapStateMachineInfo = {
     'sapState'   : 0,
-    'dsrdProfIdx': 1,
     'profNames'  : [],
     }
     with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:

@@ -30,13 +30,6 @@ def printSocketInfo(cSocket):
     print( ' rcvBufSize', rcvBufSize ) # 64K
 #############################################################################
 
-def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
-    sapStateMachineInfo.update(kwargs)
-    with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:
-        pickle.dump(sapStateMachineInfo, handle)
-    return sapStateMachineInfo
-#############################################################################
-
 def getUserInput( mainToUiQ, UiToMainQ, aLock ):
     userInput = None
 
@@ -58,16 +51,15 @@ def getUserInput( mainToUiQ, UiToMainQ, aLock ):
 
                 userInput = input( prompt )
 
-        if sapState == '1':
-            with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
-                stateMachInfo = pickle.load(handle)
-            updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
-
         if sapState != '0':
             # Sleep RE: hammering w/ back-to-back sap's causes occasional
             # probs w/ server writing to pickle while client trying to read.
             time.sleep(.015)
-            UiToMainQ.put('sap')
+            #UiToMainQ.put('sap')
+            if sapState == '1':
+                UiToMainQ.put('sap {}'.format(userInput))
+            else:
+                UiToMainQ.put('sap {}'.format(userInput))
         else:
             UiToMainQ.put(userInput)
 
