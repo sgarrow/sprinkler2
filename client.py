@@ -37,36 +37,39 @@ def updateSapStateMachineInfo(sapStateMachineInfo, **kwargs):
     return sapStateMachineInfo
 #############################################################################
 
-def getUserInput(q,aLock):
+def getUserInput( mainToUiQ, UiToMainQ, aLock ):
     userInput = None
-
-    with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
-        stateMachInfo = pickle.load(handle)
 
     while True:
 
-
         with aLock:
-            with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
-                stateMachInfo = pickle.load(handle)
-            if stateMachInfo['sapState'] in [0,1]:
-                if stateMachInfo['sapState'] == 1:
-                    prompt = stateMachInfo['prompt']
+
+            try:
+                sapState = main2UiQ.get(timeout=.02)
+            except queue.Empty:
+                sapState = '0'
+            print(' ui sapState = ', sapState)
+
+            if sapState in ['0','1']:
+                if sapState == '1':
+                    prompt = '\n Enter num of dsrd Act Prof (or \'q\') -> ' 
                 else:
                     prompt = '\n Choice (m=menu, q=quit) -> '
 
                 userInput = input( prompt )
 
-        if stateMachInfo['sapState'] == 1:
+        if sapState == '1':
+            with open('pickle/sapStateMachineInfo.pickle', 'rb') as handle:
+                stateMachInfo = pickle.load(handle)
             updateSapStateMachineInfo(stateMachInfo,dsrdProfIdx=userInput)
 
-        if stateMachInfo['sapState'] != 0:
+        if sapState != '0':
             # Sleep RE: hammering w/ back-to-back sap's causes occasional
             # probs w/ server writing to pickle while client trying to read.
             time.sleep(.015)
-            q.put('sap')
+            UiToMainQ.put('sap')
         else:
-            q.put(userInput)
+            UiToMainQ.put(userInput)
 
         time.sleep(.01) # Gives 'main' a chance to run.
         if userInput == 'close':
@@ -87,14 +90,17 @@ if __name__ == '__main__':
 
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
-    theQ        = queue.Queue()
-    inputThread = threading.Thread( target = getUserInput, args = (theQ,threadLock) )
+    main2UiQ    = queue.Queue()
+    Ui2MainQ    = queue.Queue()
+    inputThread = threading.Thread( target = getUserInput, 
+                                    args   = (main2UiQ,Ui2MainQ,threadLock)
+                                  )
     inputThread.start()
 
     while True:
 
         try:
-            message = theQ.get()
+            message = Ui2MainQ.get()
         except queue.Empty:
             pass
         else:
@@ -109,6 +115,15 @@ if __name__ == '__main__':
                     rspStr += response.decode()
                     readyToRead, _, _ = select.select([clientSocket],[],[], .25)
                 print('\n{}'.format(rspStr))
+
+                sapState = 0
+                if 'sapState = ' in rspStr:
+                    idxStart = rspStr.index('sapState = ')
+                    idxEnd   = idxStart + len('sapState = ')
+                    sapState = rspStr[idxEnd]
+                    main2UiQ.put(sapState)
+                print(' mn sapState = ', sapState)
+
 
         if message == 'close':
             break

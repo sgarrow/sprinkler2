@@ -101,7 +101,7 @@ def getAP( pDict ):
 #############################################################################
 def setAP( pDict ):
 
-    #kStart    = time.time()
+    kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
         rspStr  = ' Can\'t sap while a profile is running. Issue sp and try again.'
@@ -113,8 +113,8 @@ def setAP( pDict ):
     state     = stateMachInfo[ 'sapState'    ]
     profIdx   = stateMachInfo[ 'dsrdProfIdx' ]
     profNms   = stateMachInfo[ 'profNames'   ]
-    #print(' sapStateMachineInfo on entry:')
-    #print('',stateMachInfo,'\n')
+    print(' sapStateMachineInfo on entry:')
+    print('',stateMachInfo,'\n')
     ########################################
 
     # Print a menu of available profiles.
@@ -127,6 +127,7 @@ def setAP( pDict ):
 
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
         sapState  = 1, profNames = ks)
+        rspStr += ' sv sapState = 1'
         time.sleep(.05)
         #print(rspStr)
         #print('   Going from state 0 to state 1.')
@@ -135,7 +136,7 @@ def setAP( pDict ):
     # Get idx of desired profile to make active.
     if state == 1:
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
-        rspStr = ''
+        rspStr = ' sv sapState = 2'
         #print('   Going from state 1 to state 2.')
     ########################################
 
@@ -150,23 +151,26 @@ def setAP( pDict ):
         except ValueError:
             if idxStr == 'q':
                 stateMachInfo = initSapStateMachineInfo()
-                rspStr = ' Quiting sap. Resetting sapStateMachine.'
+                rspStr = ' Quiting sap. Resetting sapStateMachine.\n'
+                rspStr += ' sv sapState = 0'
                 #print(rspStr)
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
+                rspStr += ' sv sapState = 2'
                 #print(rspStr)
                 #print('   Going from state 2 back to state 1')
         else: # There was no exception.
-            if idx > len(pDict):
+            if idx > len(pDict)-1:
                 updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Integer out of range. Try again.'
+                rspStr += ' sv sapState = 2'
                 #print(rspStr)
                 #print('   Going from state 2 back to state 1')
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
                 sapState  = 3)
-                rspStr = ''
+                rspStr = ' sv sapState = 3'
                 #print('  Vaild Entry.')
 
     ########################################
@@ -184,7 +188,8 @@ def setAP( pDict ):
                         pDict[profileKey]['active'] = False
         makeProfSap(pDict) # new ap will be active on next start up as well.
         stateMachInfo = initSapStateMachineInfo()
-        rspStr = ' Active profile set.'
+        rspStr = ' sv sapState = 0 \n'
+        rspStr += ' Active profile set.'
         #print(rspStr)
         #print('   Resetting sapStateMachine.')
     ########################################
@@ -192,13 +197,14 @@ def setAP( pDict ):
     # Should never get here, but jusr in case ...
     if 0 > state > 3:
         stateMachInfo = initSapStateMachineInfo()
-        rspStr = ' ERROR. Invalid sapState. Resetting sapStateMachine.'
+        rspStr  = ' ERROR. Invalid sapState. Resetting sapStateMachine.\n'
+        rspStr += ' sv sapState = 0'
         #print(rspStr)
     ########################################
 
-    #print('\n sapStateMachineInfo on exit:')
-    #print('',stateMachInfo)
-    #print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
+    print('\n sapStateMachineInfo on exit:')
+    print('',stateMachInfo)
+    print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
     return [rspStr,pDict]
 #############################################################################
 
@@ -207,7 +213,6 @@ def initSapStateMachineInfo():
     'sapState'   : 0,
     'dsrdProfIdx': 1,
     'profNames'  : [],
-    'prompt'     : ' Enter num of dsrd Act Prof (or \'q\') -> '
     }
     with open('pickle/sapStateMachineInfo.pickle', 'wb') as handle:
         pickle.dump(sapStateMachineInfo, handle)

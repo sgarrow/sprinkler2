@@ -98,7 +98,8 @@ def startServer():
         cThrd = threading.Thread( target=handleClient,
                                   args=( clientSocket,
                                          clientAddress),
-                                  name = 'handleClient' )
+                                  name = 'handleClient-{}'.\
+                                          format(clientAddress) )
         cThrd.start()
 #############################################################################
 

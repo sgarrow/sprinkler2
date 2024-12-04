@@ -6,8 +6,8 @@ import threading
 import subprocess
 import gpiozero
 
-VERSION = ' Version:  2.07'
-RELEASED = ' Released: 2-Dec-2024'
+VERSION = ' Version:  2.08'
+RELEASED = ' Released: 3-Dec-2024'
 #############################################################################
 
 def getTemp(prnEn = True):
