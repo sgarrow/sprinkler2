@@ -129,15 +129,12 @@ def setAP( pDict ):
         sapState  = 1, profNames = ks)
         rspStr += ' sv sapState = 1'
         time.sleep(.05)
-        #print(rspStr)
-        #print('   Going from state 0 to state 1.')
     ########################################
 
     # Get idx of desired profile to make active.
     if state == 1:
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
         rspStr = ' sv sapState = 2'
-        #print('   Going from state 1 to state 2.')
     ########################################
 
     # Error check idx of desired active profile to make active
@@ -153,26 +150,20 @@ def setAP( pDict ):
                 stateMachInfo = initSapStateMachineInfo()
                 rspStr = ' Quiting sap. Resetting sapStateMachine.\n'
                 rspStr += ' sv sapState = 0'
-                #print(rspStr)
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
                 rspStr += ' sv sapState = 2'
-                #print(rspStr)
-                #print('   Going from state 2 back to state 1')
         else: # There was no exception.
             if idx > len(pDict)-1:
                 updateSapStateMachineInfo(stateMachInfo,sapState=1)
                 rspStr = ' Invalid entry. Integer out of range. Try again.'
                 rspStr += ' sv sapState = 2'
-                #print(rspStr)
                 #print('   Going from state 2 back to state 1')
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
                 sapState  = 3)
                 rspStr = ' sv sapState = 3'
-                #print('  Vaild Entry.')
-
     ########################################
 
     # Set active profile.
@@ -190,8 +181,6 @@ def setAP( pDict ):
         stateMachInfo = initSapStateMachineInfo()
         rspStr = ' sv sapState = 0 \n'
         rspStr += ' Active profile set.'
-        #print(rspStr)
-        #print('   Resetting sapStateMachine.')
     ########################################
 
     # Should never get here, but jusr in case ...
@@ -199,7 +188,6 @@ def setAP( pDict ):
         stateMachInfo = initSapStateMachineInfo()
         rspStr  = ' ERROR. Invalid sapState. Resetting sapStateMachine.\n'
         rspStr += ' sv sapState = 0'
-        #print(rspStr)
     ########################################
 
     print('\n sapStateMachineInfo on exit:')

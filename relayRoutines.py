@@ -53,9 +53,10 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
         relayObjIdxs = rtnLst[1]
         # -1 RE: Relay nums start @ 1, lst index start @ 0.
         relays = [ relayObjLst[el-1] for el in relayObjIdxs ]
+        if len(relays) == 0:
+            rspStr = ' No relays specified.'
     else:
         rspStr = ' No relays specified.'
-
 
     whoCalledMeFuncNameStr = inspect.stack()[1][3]
     for relay in relays:
