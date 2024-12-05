@@ -27,7 +27,7 @@ for line in pythonServerLines:
 # Kill all pids of python servers.
 for pid in pythonServerPids:
     result = subprocess.run( [ 'kill','-9', pid ],
-                              stdout = subprocess.PIPE, 
-                              text   = True, 
+                              stdout = subprocess.PIPE,
+                              text   = True,
                               check  = False
                            )

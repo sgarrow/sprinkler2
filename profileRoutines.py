@@ -104,8 +104,7 @@ def setAP( parmLst ):
     pDict       = parmLst[0]
     dsrdProfIdx = parmLst[1]
 
-    print(' *** setAP dsrdProfIdx = ',dsrdProfIdx)
-    kStart    = time.time()
+    #kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
         rspStr  = ' Can\'t sap while a profile is running. Issue sp and try again.'
@@ -116,8 +115,8 @@ def setAP( parmLst ):
         stateMachInfo = pickle.load(handle)
     state     = stateMachInfo[ 'sapState'  ]
     profNms   = stateMachInfo[ 'profNames' ]
-    print(' sapStateMachineInfo on entry:')
-    print('',stateMachInfo,'\n')
+    #print(' sapStateMachineInfo on entry:')
+    #print('',stateMachInfo,'\n')
     ########################################
 
     # Print a menu of available profiles.
@@ -192,9 +191,9 @@ def setAP( parmLst ):
         rspStr += ' sv sapState = 0'
     ########################################
 
-    print('\n sapStateMachineInfo on exit:')
-    print('',stateMachInfo)
-    print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
+    #print('\n sapStateMachineInfo on exit:')
+    #print('',stateMachInfo)
+    #print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
     return [rspStr,pDict]
 #############################################################################
 
