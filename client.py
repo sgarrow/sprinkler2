@@ -37,7 +37,7 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
                 sapState = mainToUiQ.get(timeout=.02)
             except queue.Empty:
                 sapState = '0'
-            print(' ui sapState = ', sapState)
+            #print(' ui sapState = ', sapState)
 
             if sapState in ['0','1']:
                 if sapState == '1':
@@ -68,14 +68,15 @@ if __name__ == '__main__':
     # Each client will connect to the server with a new address.
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    connectType = input('local, 192, 98 (1,2,3) -> ')
-    
-    if connectType == '1':
-        clientSocket.connect(( 'localhost',   5000 )) # same machine.
-    if connectType == '2':
-        clientSocket.connect(( '192.168.1.5', 5000 )) # same lan.
-    if connectType == '3':
-        clientSocket.connect(( '98.37.90.37', 2222 )) # internet -p 2222.
+    connectType = input(' ssh, lan, internet (s,l,i) -> ')
+
+    port = 5000
+    if connectType == 's':
+        clientSocket.connect(( 'localhost',   port )) # same machine.
+    if connectType == 'l':
+        clientSocket.connect(( '192.168.1.5', port )) # same lan.
+    if connectType == 'i':
+        clientSocket.connect(( '98.37.90.37', port )) # internet (router 5000 -> 5000)
 
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
@@ -109,8 +110,7 @@ if __name__ == '__main__':
                     idxEnd   = idxStart + len('sapState = ')
                     sapSte = rspStr[idxEnd]
                     main2UiQ.put(sapSte)
-                print(' mn sapState = ', sapSte)
-
+                #print(' mn sapState = ', sapSte)
 
         if message == 'close':
             break
