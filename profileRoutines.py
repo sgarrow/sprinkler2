@@ -107,7 +107,7 @@ def setAP( parmLst ):
     #kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
-        rspStr  = ' Can\'t sap while a profile is running. Issue sp and try again.'
+        rspStr=' Can\'t sap while a profile is running. Issue sp and re-try.'
         return [rspStr]
 
     # Read sapState info.
@@ -152,7 +152,8 @@ def setAP( parmLst ):
                 rspStr = ' Quiting sap. Resetting sapStateMachine.\n'
                 rspStr += ' sv sapState = 0'
             else:
-                stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=1)
+                stateMachInfo = updateSapStateMachineInfo( stateMachInfo,
+                                                           sapState=1 )
                 rspStr = ' Invalid entry. Must be an integer. Try again.'
                 rspStr += ' sv sapState = 1'
         else: # There was no exception.
@@ -193,7 +194,7 @@ def setAP( parmLst ):
 
     #print('\n sapStateMachineInfo on exit:')
     #print('',stateMachInfo)
-    #print( ' state {} exeTime {:8.5f} sec'.format( state,time.time() - kStart ))
+    #print( ' state {} exeTime {:8.5f} sec'.format(state,time.time()-kStart))
     return [rspStr,pDict]
 #############################################################################
 

@@ -96,10 +96,10 @@ def startServer():
         # Create a new thread to handle the client
         print('Starting a new client handler thread.')
         cThrd = threading.Thread( target=handleClient,
-                                  args=( clientSocket,
-                                         clientAddress),
-                                  name = 'handleClient-{}'.\
-                                          format(clientAddress) )
+                                  args = ( clientSocket,
+                                           clientAddress ),
+                                  name =   'handleClient-{}'.\
+                                           format(clientAddress) )
         cThrd.start()
 #############################################################################
 

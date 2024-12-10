@@ -72,11 +72,11 @@ if __name__ == '__main__':
 
     port = 5000
     if connectType == 's':
-        clientSocket.connect(( 'localhost',   port )) # same machine.
+        clientSocket.connect(('localhost',  port))#same machine.
     if connectType == 'l':
-        clientSocket.connect(( '192.168.1.5', port )) # same lan.
+        clientSocket.connect(('192.168.1.5',port))#same lan.
     if connectType == 'i':
-        clientSocket.connect(( '98.37.90.37', port )) # internet (router 5000 -> 5000)
+        clientSocket.connect(('98.37.90.37',port))#internet (router 5000->5000)
 
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 while readyToRead:
                     response = clientSocket.recv(1024)
                     rspStr += response.decode()
-                    readyToRead, _, _ = select.select([clientSocket],[],[], .25)
+                    readyToRead,_, _=select.select([clientSocket],[],[],.25)
                 print('\n{}'.format(rspStr))
 
                 sapSte = 0

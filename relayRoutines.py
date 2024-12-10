@@ -69,19 +69,24 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
         cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
 
         if whoCalledMeFuncNameStr == 'openRly':
-            rspStr +=' Opening relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
+            rspStr +=' Opening relay {} ({:6} on pin {}).\n'.\
+            format(relayNum, gpioStr, pinNum)
             relay.off()
             with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
-                f.write( 'Relay {} opened at {} \n'.format(relayNum,cDT))
+                f.write( 'Relay {} opened at {} \n'.\
+                    format(relayNum,cDT))
 
         if whoCalledMeFuncNameStr == 'closeRly':
-            rspStr +=' Closing relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
+            rspStr +=' Closing relay {} ({:6} on pin {}).\n'.\
+                format(relayNum, gpioStr, pinNum)
             relay.on()
             with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
-                f.write( 'Relay {} closed at {} \n'.format(relayNum,cDT))
+                f.write( 'Relay {} closed at {} \n'.\
+                    format(relayNum,cDT))
 
         if whoCalledMeFuncNameStr == 'toggleRly':
-            rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.format(relayNum, gpioStr, pinNum)
+            rspStr +=' Toggling relay {} ({:6} on pin {}).\n'.\
+                format(relayNum, gpioStr, pinNum)
             relay.toggle()
 
         if whoCalledMeFuncNameStr == 'readRly':
@@ -90,7 +95,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             if rv == 1:
                 rtnVal = 'closed'
             rspStr += ' Relay {} ({:6} on pin {}) is {}{}{}.\n'.\
-                format(relayNum, gpioStr, pinNum, ESC+RED ,rtnVal, ESC+TERMINATE)
+                format(relayNum,gpioStr,pinNum,ESC+RED,rtnVal,ESC+TERMINATE)
 
     return [rspStr,rtnVal]
 #############################################################################

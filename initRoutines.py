@@ -33,14 +33,29 @@ def init():
     # So doing something like x = relay.pin will result in x being assigned a
     # value like "GPIO5". From that one can print the  RPi pin number and
     # associated relay that that pin is controlling.
-    gpioDict = { 'GPIO5' : { 'pin': 29, 'relay': 1, 'desc': 'Back Yard Mstr Bed Side' },
-                 'GPIO6' : { 'pin': 31, 'relay': 2, 'desc': 'Back Yard Spa Side' },
-                 'GPIO13': { 'pin': 33, 'relay': 3, 'desc': 'Hill Below Driveway' },
-                 'GPIO16': { 'pin': 36, 'relay': 4, 'desc': 'Hill Above Driveway' },
-                 'GPIO19': { 'pin': 35, 'relay': 5, 'desc': 'Front Yard Planter Strip' },
-                 'GPIO20': { 'pin': 38, 'relay': 6, 'desc': 'NC - 24V Ready' },
-                 'GPIO21': { 'pin': 40, 'relay': 7, 'desc': 'NC' },
-                 'GPIO26': { 'pin': 37, 'relay': 8, 'desc': 'NC' }}
+    gpioDict = { 'GPIO5' : { 'pin': 29, 'relay': 1,
+                 'desc': 'Back Yard Mstr Bed Side'  },
+
+                 'GPIO6' : { 'pin': 31, 'relay': 2,
+                 'desc': 'Back Yard Spa Side'       },
+
+                 'GPIO13': { 'pin': 33, 'relay': 3,
+                 'desc': 'Hill Below Driveway'      },
+
+                 'GPIO16': { 'pin': 36, 'relay': 4,
+                 'desc': 'Hill Above Driveway'      },
+
+                 'GPIO19': { 'pin': 35, 'relay': 5,
+                 'desc': 'Front Yard Planter Strip' },
+
+                 'GPIO20': { 'pin': 38, 'relay': 6,
+                 'desc': 'NC - 24V Ready'           },
+
+                 'GPIO21': { 'pin': 40, 'relay': 7,
+                 'desc': 'NC'                       },
+
+                 'GPIO26': { 'pin': 37, 'relay': 8,
+                 'desc': 'NC'                       }}
     #################################################
 
     # From the relay board datasheet.
