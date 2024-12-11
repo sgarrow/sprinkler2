@@ -21,8 +21,8 @@ profile0:
   relay1:
     About:     Back Yard Mstr Bed Side 
     Days:      [all]
-    Times:     [800,1000,1700]
-    durations: [1,1,1]
+    Times:     [830]
+    durations: [1.5]
   #relay2:
   #  About:     Back Yard Spa Side 
   #  Days:      [None]

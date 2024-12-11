@@ -76,7 +76,7 @@ def handleClient(clientSocket, clientAddress):
 
 def startServer():
     host = '0.0.0.0'  # Listen on all available interfaces
-    port = 5000
+    port = 
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((host, port))

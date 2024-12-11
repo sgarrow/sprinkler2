@@ -6,8 +6,10 @@ import threading
 import subprocess
 import gpiozero
 
-VERSION = ' Version:  3.00'
+# CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+VERSION = ' Version:  3.10'
 RELEASED = ' Released: 6-Dec-2024'
+# CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -47,3 +49,18 @@ def getActiveThreads():
         rspStr += '\n   {}'.format(t.name)
     return [rspStr]
 #############################################################################
+
+# Read last 25 lines.
+# Relay 7 closed at 2024-12-02T16:10:07 # 1024/37 = 27.7 lines.
+def getLogFile():
+    with open('sprinklerLog.txt', 'r') as f:
+        lines = f.readlines()
+    rspStr = ' '.join(lines)
+    return [rspStr]
+#############################################################################
+
+def clearLogFile():
+    with open('sprinklerLog.txt', 'w',encoding='utf-8') as f:
+        pass
+    return [' sprinklerLog.txt file cleared.']
+

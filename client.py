@@ -70,13 +70,13 @@ if __name__ == '__main__':
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
 
-    port = 5000
+    port = 
     if connectType == 's':
-        clientSocket.connect(('localhost',  port))#same machine.
+        clientSocket.connect(('',  port))#same machine.
     if connectType == 'l':
-        clientSocket.connect(('192.168.1.5',port))#same lan.
+        clientSocket.connect(('',port))#same lan.
     if connectType == 'i':
-        clientSocket.connect(('98.37.90.37',port))#internet (router 5000->5000)
+        clientSocket.connect(('',port))#internet (router 5000->5000)
 
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()

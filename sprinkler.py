@@ -114,6 +114,12 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
     'gat'  : { 'func' : ur.getActiveThreads,  'parm':None,
     'menu' :   'Get Active Threads'            },
+
+    'glf'  : { 'func' : ur.getLogFile,        'parm':None,
+    'menu' :   'Get Log File'                  },
+
+    'clf'  : { 'func' : ur.clearLogFile,      'parm':None,
+    'menu' :   'Clear Log File'                },
     }
 
     inputWords = inputStr.split()
