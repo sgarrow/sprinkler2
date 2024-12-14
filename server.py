@@ -29,49 +29,116 @@ functionality is available to he client via the gat (Get Active Threads) cmd.
 
 import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
+import subprocess # For Killing Server.
 import time
 import sprinkler as sp
+
+openSocketsLst = []
 #############################################################################
+
 def listThreads():
+    global openSocketsLst
     while True:
-        time.sleep(60)
+        time.sleep(10)
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))
         print(' ##################')
+        print(' Open Sockets: ')
+        for openS in openSocketsLst:
+            print('   {}'.format(openS['ca']))
+        print(' ##################')
+#############################################################################
+
+def killSrvr(): 
+    # Get all processes.
+    result = subprocess.run(['ps','aux'],
+             stdout=subprocess.PIPE,text=True, check = False)
+    rspStr = result.stdout.strip()
+    lines = rspStr.splitlines()
+
+    # Get all processes that are running the python server.
+    pythonServerLines = []
+    for line in lines:
+        if 'python' and 'server' in line:
+            pythonServerLines.append(line)
+
+    # Get all pids of processes that are running the python server.
+    pythonServerPids = []
+    for line in pythonServerLines:
+        splitLine  = line.split()
+        processNum = splitLine[1]
+        pythonServerPids.append(processNum)
+
+    # Kill all pids of python servers.
+    for pid in pythonServerPids:
+        result = subprocess.run( [ 'kill','-9', pid ],
+                                  stdout = subprocess.PIPE,
+                                  text   = True,
+                                  check  = False
+                               )
 #############################################################################
 
 def handleClient(clientSocket, clientAddress):
-    print('Accepted connection from: {}'.format(clientAddress))
+    global openSocketsLst
+    print(' Accepted connection from: {}'.format(clientAddress))
+    openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
+    clientSocket.settimeout(3.0)
 
-    while True:
-        try: # In case user closes client by (x) instead if by close cmd.
+    while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:
+
+        # Recieve a message from the client.
+        try:     # User closed client window by (x) instead of by close cmd.
             data = clientSocket.recv(1024)
-        except ConnectionResetError: # Whereas Windows throws this.
-            print(' ConnectionResetError exception in clientSocket.send')
-            print(' Closing associated client socket.')
+        except ConnectionResetError: # Windows throws this on (x).
+            print(' handleClient {} ConnectRstErr except in s.recv'.format(clientAddress))
+            # Breaks the loop. handler/thread stops. Connection closed.
+            openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
+        except socket.timeout:
+            print(' handleClient {} s.timeout except in s.recv'.\
+                format(clientAddress)) 
+            continue
 
         print('*********************************')
-        print('Received from: {} {}'.format(clientAddress, data.decode()))
-
-        # Process data and send response back to the client
+        print(' handleClient {} received: {}'.format(clientAddress, data.decode()))
+        # Process a "close" message and send response back to the local client.
         if data.decode() == 'close':
-            response = 'Closing connection'
-            clientSocket.send(response.encode()) # sends all even if >1024.
-            print('Closing: {}'.format(clientAddress))
-            time.sleep(1)
-            break # Causes the handler to stop and the thread end.
+            rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
+            clientSocket.send(rspStr.encode()) # sends all even if >1024.
+            time.sleep(1) # Required so .send happens before socket closed.
+            print(rspStr)
+            # Breaks the loop. handler/thread stops. Connection closed.
+            openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 
-        response = sp.sprinkler(data.decode())
-        try: # In case user closes client by (x) instead if by close cmd.
-            clientSocket.send(response.encode())
-        except BrokenPipeError: # RPi throws this.
-            print(' BrokenPipeError exception in clientSocket.send')
-            print(' Closing associated client socket.')
-            break
+        # Process a "ks" message and send response back to the remote client(s).
+        elif data.decode() == 'ks':
+            rspStr = ' handleClient {} set loop break for self RE: ks'.format(clientAddress)
+            clientSocket.send(rspStr.encode()) # sends all even if >1024.
+            time.sleep(1) # Required so .send happens before socket closed.
+            print(rspStr)
+            # Breaks ALL client loops. ALL handler/thread stops. ALL Connections closed.
+            for el in openSocketsLst:
+                if el['ca'] != clientAddress:
+                    rspStr = ' handleClient {} set loop break for {} RE: ks'.format(clientAddress, el['ca'])
+                    el['cs'].send(rspStr.encode()) # sends all even if >1024.
+                    time.sleep(1) # Required so .send happens before socket closed.
+                    print(rspStr)
+            openSocketsLst = []
 
+        # Process a "standard" message and send response back to the client.
+        else:
+            response = sp.sprinkler(data.decode())
+            try: # User closed client window by (x) instead of by close cmd.
+                clientSocket.send(response.encode())
+            except BrokenPipeError:      # RPi throws this on (x).
+                print(' handleClient {} BrokePipeErr except in s.send'.format(clientAddress))
+                # Breaks the loop. handler/thread stops. Connection closed.
+                openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+
+    print(' handleClient {} closing socket and breaking loop'.format(clientAddress))
     clientSocket.close()
+
 #############################################################################
 
 def startServer():

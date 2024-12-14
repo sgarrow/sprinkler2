@@ -47,10 +47,9 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
                 userInput = input( prompt )
 
         if sapState != '0':
-            # Sleep RE: hammering w/ back-to-back sap's causes occasional
-            # probs w/ server writing to pickle while client trying to read.
+            # Sleep RE: hammering w/ back-to-back sap's causes occasional probs.
+            # Maybe delete now that pickle out of the picture
             time.sleep(.015)
-            #UiToMainQ.put('sap')
             if sapState == '1':
                 uiToMainQ.put('sap {}'.format(userInput))
             else:
@@ -59,8 +58,6 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
             uiToMainQ.put(userInput)
 
         time.sleep(.01) # Gives 'main' a chance to run.
-        if userInput == 'close':
-            break
 #############################################################################
 
 if __name__ == '__main__':
@@ -72,7 +69,7 @@ if __name__ == '__main__':
 
     port = 
     if connectType == 's':
-        clientSocket.connect(('',  port))#same machine.
+        clientSocket.connect(('localhost',  port))#same machine.
     if connectType == 'l':
         clientSocket.connect(('',port))#same lan.
     if connectType == 'i':
@@ -83,7 +80,8 @@ if __name__ == '__main__':
     main2UiQ    = queue.Queue()
     Ui2MainQ    = queue.Queue()
     inputThread = threading.Thread( target = getUserInput,
-                                    args   = (main2UiQ,Ui2MainQ,threadLock) )
+                                    args   = (main2UiQ,Ui2MainQ,threadLock),
+                                    daemon = True )
     inputThread.start()
 
     while True:
@@ -101,6 +99,11 @@ if __name__ == '__main__':
                 while readyToRead:
                     response = clientSocket.recv(1024)
                     rspStr += response.decode()
+
+                    # Another client has killed server.
+                    if 'RE: ks' in rspStr:
+                        break
+
                     readyToRead,_, _=select.select([clientSocket],[],[],.25)
                 print('\n{}'.format(rspStr))
 
@@ -112,7 +115,8 @@ if __name__ == '__main__':
                     main2UiQ.put(sapSte)
                 #print(' mn sapState = ', sapSte)
 
-        if message == 'close':
+        if message == 'close' or 'RE: ks' in rspStr:
             break
 
+    print('\n Client closing Socket')
     clientSocket.close()

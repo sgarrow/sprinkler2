@@ -7,8 +7,8 @@ import subprocess
 import gpiozero
 
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VERSION = ' Version:  3.10'
-RELEASED = ' Released: 6-Dec-2024'
+VERSION = ' Version:  3.11'
+RELEASED = ' Released: 13-Dec-2024'
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #############################################################################
 
@@ -63,4 +63,5 @@ def clearLogFile():
     with open('sprinklerLog.txt', 'w',encoding='utf-8') as f:
         pass
     return [' sprinklerLog.txt file cleared.']
-
+    import subprocess
+#############################################################################

@@ -32,6 +32,7 @@ import relayRoutines   as rr
 import profileRoutines as pr
 import runActProfRtns  as rap
 import utilRoutines    as ur
+import server          as sv
 #############################################################################
 
 gpioDict  = None
@@ -113,13 +114,16 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'menu' :   'Get Version'                  },
 
     'gat'  : { 'func' : ur.getActiveThreads,  'parm':None,
-    'menu' :   'Get Active Threads'            },
+    'menu' :   'Get Active Threads'           },
 
     'glf'  : { 'func' : ur.getLogFile,        'parm':None,
-    'menu' :   'Get Log File'                  },
+    'menu' :   'Get Log File'                 },
 
     'clf'  : { 'func' : ur.clearLogFile,      'parm':None,
-    'menu' :   'Clear Log File'                },
+    'menu' :   'Clear Log File'               },
+
+    'ks'   : { 'func' : sv.killSrvr,          'parm':None,
+    'menu' :   'Kill Server'                  },
     }
 
     inputWords = inputStr.split()
