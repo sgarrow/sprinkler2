@@ -7,8 +7,8 @@ import subprocess
 import gpiozero
 
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VERSION = ' Version:  3.11'
-RELEASED = ' Released: 13-Dec-2024'
+VERSION = ' Version:  3.12'
+RELEASED = ' Released: 16-Dec-2024'
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #############################################################################
 

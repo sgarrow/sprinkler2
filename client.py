@@ -47,13 +47,7 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
                 userInput = input( prompt )
 
         if sapState != '0':
-            # Sleep RE: hammering w/ back-to-back sap's causes occasional probs.
-            # Maybe delete now that pickle out of the picture
-            time.sleep(.015)
-            if sapState == '1':
-                uiToMainQ.put('sap {}'.format(userInput))
-            else:
-                uiToMainQ.put('sap {}'.format(userInput))
+            uiToMainQ.put('sap {}'.format(userInput))
         else:
             uiToMainQ.put(userInput)
 
@@ -66,16 +60,14 @@ if __name__ == '__main__':
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
+    connectDict = {'s':'localhost','l':'192.168.1.100','i':'98.37.90.37'}
+    #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
 
-    port = 
-    if connectType == 's':
-        clientSocket.connect(('localhost',  port))#same machine.
-    if connectType == 'l':
-        clientSocket.connect(('',port))#same lan.
-    if connectType == 'i':
-        clientSocket.connect(('',port))#internet (router 5000->5000)
+    port = 5210
+    #port = 
+    clientSocket.connect((connectDict[connectType],  port))#same machine.
 
-    printSocketInfo(clientSocket)
+    #printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
     main2UiQ    = queue.Queue()
     Ui2MainQ    = queue.Queue()
@@ -100,7 +92,6 @@ if __name__ == '__main__':
                     response = clientSocket.recv(1024)
                     rspStr += response.decode()
 
-                    # Another client has killed server.
                     if 'RE: ks' in rspStr:
                         break
 

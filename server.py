@@ -39,7 +39,7 @@ openSocketsLst = []
 def listThreads():
     global openSocketsLst
     while True:
-        time.sleep(10)
+        time.sleep(30)
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))
@@ -75,8 +75,7 @@ def killSrvr():
         result = subprocess.run( [ 'kill','-9', pid ],
                                   stdout = subprocess.PIPE,
                                   text   = True,
-                                  check  = False
-                               )
+                                  check  = False )
 #############################################################################
 
 def handleClient(clientSocket, clientAddress):
@@ -87,6 +86,7 @@ def handleClient(clientSocket, clientAddress):
 
     while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:
 
+        data = ' '.encode()
         # Recieve a message from the client.
         try:     # User closed client window by (x) instead of by close cmd.
             data = clientSocket.recv(1024)
@@ -96,8 +96,7 @@ def handleClient(clientSocket, clientAddress):
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except socket.timeout:
-            print(' handleClient {} s.timeout except in s.recv'.\
-                format(clientAddress)) 
+            #print(' handleClient {} s.timeout except in s.recv'.format(clientAddress))
             continue
 
         print('*********************************')
@@ -113,17 +112,18 @@ def handleClient(clientSocket, clientAddress):
 
         # Process a "ks" message and send response back to the remote client(s).
         elif data.decode() == 'ks':
+            # Client sending ks has to be terminated first, I don't know why.
             rspStr = ' handleClient {} set loop break for self RE: ks'.format(clientAddress)
             clientSocket.send(rspStr.encode()) # sends all even if >1024.
             time.sleep(1) # Required so .send happens before socket closed.
             print(rspStr)
-            # Breaks ALL client loops. ALL handler/thread stops. ALL Connections closed.
+            # Breaks ALL remaning client loops. ALL handler/thread stops. ALL Connections closed.
             for el in openSocketsLst:
                 if el['ca'] != clientAddress:
-                    rspStr = ' handleClient {} set loop break for {} RE: ks'.format(clientAddress, el['ca'])
-                    el['cs'].send(rspStr.encode()) # sends all even if >1024.
-                    time.sleep(1) # Required so .send happens before socket closed.
-                    print(rspStr)
+                     rspStr = ' handleClient {} set loop break for {} RE: ks'.format(clientAddress, el['ca'])
+                     el['cs'].send(rspStr.encode()) # sends all even if >1024.
+                     time.sleep(1) # Required so .send happens before socket closed.
+                     print(rspStr)
             openSocketsLst = []
 
         # Process a "standard" message and send response back to the client.
@@ -138,12 +138,11 @@ def handleClient(clientSocket, clientAddress):
 
     print(' handleClient {} closing socket and breaking loop'.format(clientAddress))
     clientSocket.close()
-
 #############################################################################
 
 def startServer():
     host = '0.0.0.0'  # Listen on all available interfaces
-    port = 
+    port = 5210
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((host, port))
@@ -153,8 +152,8 @@ def startServer():
         socket.SOL_SOCKET, socket.SO_SNDBUF)
     rcvBufSize = serverSocket.getsockopt(\
         socket.SOL_SOCKET, socket.SO_RCVBUF)
-    print('sndBufSize',sndBufSize) # 64K
-    print('rcvBufSize',rcvBufSize) # 64K
+    #print('sndBufSize',sndBufSize) # 64K
+    #print('rcvBufSize',rcvBufSize) # 64K
 
     print('Server listening on: {} {}'.format(host, port))
 
