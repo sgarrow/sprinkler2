@@ -5,8 +5,8 @@ handleClient in file server.py.  The command (string) is forwarded to
 function "sprinkler" (in this file) and the appropriate "worker" function
 is then vectored to.
 
-This project (collection of files/scripts) cannot be run on a PC,
-it has to be run on an RPi.
+This project cannot be run on a PC, it has to be run on an RPi with the
+exception of file client.py which may be run on a PC.
 
 Every file in this project has comments like this at the top.
 Comments like this (enclosed by three single quotes) are called doc-strings.
@@ -21,11 +21,11 @@ the top of the files in this order:
 After reading the doc-strings perusing the comments will also be helpful.
 '''
 
-# Import a standard python libraries.
+# Import standard python libraries.
 import pickle
+import queue
 
 # Import other source files that are in the same directory as this file.
-import queue
 import initRoutines    as ir
 import timeRoutines    as tr
 import relayRoutines   as rr
@@ -36,20 +36,22 @@ import utilRoutines    as ur
 
 gpioDict  = None
 rlyObjLst = None
-uiCmdQ = queue.Queue()
-uiRspQ = queue.Queue()
-wkCmdQ = queue.Queue()
-wkRspQ = queue.Queue()
+uiCmdQ = queue.Queue() # These queues are used by the rp, qp qnd sp commands.
+uiRspQ = queue.Queue() # These commands (run/query/stop active profile) are
+wkCmdQ = queue.Queue() # run in various threads and these queues serve as 
+wkRspQ = queue.Queue() # communication vehicles to/from these threads.
 #############################################################################
 
-def killSrvr():
-    return
+def killSrvr(): # The ks cmd is handled directly in the handleClient 
+    return      # function so doesn't need a "worker" function.  However,
+                # because of the way the menu/vectoring is done a function
+                # needs to at least exist.  This function is never called.
 #############################################################################
 
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
-    global gpioDict
-    global rlyObjLst
+    global gpioDict      # These global variables are 
+    global rlyObjLst     # discussed in file initRoutines.py.
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()
 
@@ -64,6 +66,8 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             profDict = pickle.load(f)
 
     allRlys  = ['12345678']
+
+    # This dictionary embosies the worker function vector (and menu) info.
     strToFunctDict = {
 
     ## RELAY ###############################
@@ -130,11 +134,13 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'menu' :   'Kill Server'                  },
     }
 
+    # Process the string (command) passed to this function via the call
+    # from function handleClient in file server.py.
     inputWords = inputStr.split()
 
-    if inputWords == []: # In case user entered string of just spaces.
+    if inputWords == []:       # In case user entered just spaces.
         rspStr = 'Invalid command'
-        return rspStr               # return to srvr for forwarding to clnt.
+        return rspStr          # Return to srvr for forwarding to clnt.
 
     choice     = inputWords[0]
     optArgsStr = inputWords[1:]
@@ -152,11 +158,11 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             params[1] = optArgsStr
 
         if params is None:
-            rsp = func()            # rsp[0] = rspStr
-            return rsp[0]           # return to srvr for forwarding to clnt.
+            rsp = func()       # rsp[0] = rspStr. Vector to worker.
+            return rsp[0]      # return to srvr for forwarding to clnt.
 
-        rsp = func(params)          # rsp[0] = rspStr
-        return rsp[0]               # return to srvr for forwarding to clnt.
+        rsp = func(params)     # rsp[0] = rspStr. Vector to worker.
+        return rsp[0]          # Return to srvr for forwarding to clnt.
 
     if choice == 'm':
         rspStrDict = { 'or':' RELAY COMMANDS \n',
@@ -169,7 +175,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
             if k in rspStrDict:
                 rspStr += rspStrDict[k]
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
-        return rspStr               # return to srvr for forwarding to clnt.
+        return rspStr          # Return to srvr for forwarding to clnt.
 
     rspStr = 'Invalid command'
-    return rspStr                   # return to srvr for forwarding to clnt.
+    return rspStr              # Return to srvr for forwarding to clnt.

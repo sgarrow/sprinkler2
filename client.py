@@ -5,7 +5,7 @@ must be on the RPi except this one although it may/can also be on the RPi.
 If this file is on the RPi then both the server and the client may both be
 run on the RPi.  
 
-If this file is on, for example, a PC, the the client can be rn on a PC.
+If this file is on, for example, a PC, the the client can be run on a PC.
 This is like how, for example, your Web Browser (a client) talks to the 
 google server.
 '''
@@ -37,7 +37,6 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
                 sapState = mainToUiQ.get(timeout=.02)
             except queue.Empty:
                 sapState = '0'
-            #print(' ui sapState = ', sapState)
 
             if sapState in ['0','1']:
                 if sapState == '1':
@@ -61,7 +60,6 @@ if __name__ == '__main__':
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
     #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
-
     #port =
     clientSocket.connect((connectDict[connectType],  port))#same machine.
 

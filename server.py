@@ -6,22 +6,30 @@ Starts the server and listens for incoming connections. Creates a socket
 object and binds it to a specified host and port.  When a client connects,
 it creates a new thread to handle that client using the handleClient
 function.  It is called automatically when "python3 server.py" is entered
-on the RPi command line.  Start server is an infinite loop that waits for
-clients to connect to it.  When a client connects startDerver spawns a new
-thread to handle that client.
+on the RPi command line.  startServer is an infinite loop that waits for
+clients to connect to it.  When a client connects startServer spawns a new
+thread to handle that client. The server can/will be shutdown when a client
+issues ta "ks" (kill server) command.  The ks command will (1) send a 
+message to all clients (including the client that sent the command) that the
+server is shutting down so that the client will exit gracefully, (2) close 
+all client sockets and then finally (3) exit it's infinite loop.
+
+The server can be automatically started at boot time by inserting the follow
+command in file crontab (open via crontab -e command):
+@reboot /bin/sleep 30; cd python/sprinkler2; nohup python3 server.py & >> /home/pi/mycronlog.txt 2>&1
 
 Function handleClient:
 Each client handler is it's own thread.  Multiple instantiations of client
-handler threads may be active simultaneously.  These threads are started by
-the thread running "startServer". Each thread handles com with a single
-client.  Receives data from the client, processes it, and sends a response
-back to the client.
+handler threads may be active simultaneously.  Each thread handles com with 
+a single client.  Receives data from the client, processes it, and sends a 
+response back to the client.
 
-A given client can be run on the RPi itself or on another machine via an SSH
-connection (like on a PC or on your phone via the Terminus App.
+A given client can be run on (1) the RPi itself or on another machine via an
+SSH connection (like on a PC or on your phone via the Terminus App. Or on a
+remote machine directly (not on an SSH connection).
 
 Function listThreads:
-This function runs in it's own thread and runs every 60 seconds.  It prints
+This function runs in it's own thread and runs every 30 seconds.  It prints
 all the currently running threads in the server's terminal window.  It's
 basically just a debug function and could be eliminated.  Similar
 functionality is available to he client via the gat (Get Active Threads) cmd.
@@ -31,9 +39,10 @@ import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
 import queue      # For Killing Server.
 import time
-import sprinkler as sp
+import sprinkler as sp # Contains vectors to "worker" functions 
+                       # associated with a recieved client command. 
 
-openSocketsLst = []
+openSocketsLst = []    # Needed for processing the "ks" command only.
 #############################################################################
 
 def listThreads():
@@ -55,10 +64,12 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
     clientSocket.settimeout(3.0) # Sets the .recv timeout - ks processing.
 
+    # The condition within the while conditional is made false by 
+    # the "close" command and the "ks" command.
     while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:
 
         # Recieve a message from the client.
-        try:     # User closed client window by (x) instead of by close cmd.
+        try: # In case user closed client window (x) instead of by close cmd.
             data = clientSocket.recv(1024)
         except ConnectionResetError: # Windows throws this on (x).
             print(' handleClient {} ConnectRstErr except in s.recv'.format(clientAddress))
@@ -66,11 +77,12 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except socket.timeout:
-            #print(' handleClient {} s.timeout except in s.recv'.format(clientAddress))
             continue
 
+        # Getting here means a command has been received.
         print('*********************************')
         print(' handleClient {} received: {}'.format(clientAddress, data.decode()))
+
         # Process a "close" message and send response back to the local client.
         if data.decode() == 'close':
             rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
@@ -101,7 +113,7 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
         # Process a "standard" message and send response back to the client.
         else:
             response = sp.sprinkler(data.decode())
-            try: # User closed client window by (x) instead of by close cmd.
+            try: # In case user closed client window (x) instead of by close cmd.
                 clientSocket.send(response.encode())
             except BrokenPipeError:      # RPi throws this on (x).
                 print(' handleClient {} BrokePipeErr except in s.send'.format(clientAddress))
@@ -140,7 +152,7 @@ def startServer():
     print('Server listening on: {} {}'.format(host, port))
     while True:
 
-        # See if any client has requested the server to halt.
+        # See if any client has requested the server to halt (ks command).
         try:
             cmd = clientToServerCmdQ.get(timeout=.1)
         except queue.Empty:

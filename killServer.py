@@ -1,6 +1,7 @@
 '''
 Run in a seperate RPi terminal.  Kills the server process and
 all of the threads it may have started.  Slightly hackish.
+Not needed now that the "ks" command is working.
 '''
 
 import subprocess

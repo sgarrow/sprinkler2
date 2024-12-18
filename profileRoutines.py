@@ -39,6 +39,8 @@ import pickle
 import threading
 import pprint as pp
 import yaml
+
+# For print red text in the client wondows.
 ESC = '\x1b'
 RED = '[31m'
 TERMINATE = '[0m'

@@ -11,17 +11,17 @@ These commands operate within two threads.  One thread provides a responsive
 user interface (UI) the other thread executes the profile in the background.
 
 The profile execution thread is executed once every 5 seconds.  The UI thread
-is executed on command.  These two threads communicate with each other and 
+is executed on demand.  These two threads communicate with each other and 
 with the program at large via two command/response queue pairs.
 '''
 
 import time
 import queue
 import threading
-import datetime      as dt
-import relayRoutines as rr
-import timeRoutines  as tr
-import utilRoutines  as ur
+import datetime        as dt
+import relayRoutines   as rr
+import timeRoutines    as tr
+import utilRoutines    as ur
 import profileRoutines as pr
 
 ESC = '\x1b'
@@ -29,7 +29,7 @@ RED = '[31m'
 TERMINATE = '[0m'
 #############################################################################
 
-def strtTwoThrds( parmLst ): # Called from sprinklerb (rp).
+def strtTwoThrds( parmLst ): # Called from sprinkler.py (rp).
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )

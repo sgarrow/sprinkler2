@@ -8,8 +8,8 @@ import gpiozero
 import timeRoutines  as tr
 
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VERSION = ' Version:  3.13'
-RELEASED = ' Released: 17-Dec-2024'
+VERSION = ' Version:  3.14'
+RELEASED = ' Released: 18-Dec-2024'
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #############################################################################
 
