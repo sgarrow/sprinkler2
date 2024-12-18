@@ -5,10 +5,11 @@ verifying relay args.
 import threading
 import subprocess
 import gpiozero
+import timeRoutines  as tr
 
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VERSION = ' Version:  3.12'
-RELEASED = ' Released: 16-Dec-2024'
+VERSION = ' Version:  3.13'
+RELEASED = ' Released: 17-Dec-2024'
 # CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #############################################################################
 
@@ -53,15 +54,17 @@ def getActiveThreads():
 # Read last 25 lines.
 # Relay 7 closed at 2024-12-02T16:10:07 # 1024/37 = 27.7 lines.
 def getLogFile():
-    with open('sprinklerLog.txt', 'r') as f:
+    with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
         lines = f.readlines()
     rspStr = ' '.join(lines)
     return [rspStr]
 #############################################################################
 
 def clearLogFile():
+    rspLst = tr.getTimeDate(False)
+    curDT  = rspLst[1]
+    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
     with open('sprinklerLog.txt', 'w',encoding='utf-8') as f:
-        pass
+        f.write( 'File cleared on {} \n'.format(cDT))
     return [' sprinklerLog.txt file cleared.']
-    import subprocess
 #############################################################################

@@ -60,14 +60,12 @@ if __name__ == '__main__':
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
-    connectDict = {'s':'localhost','l':'192.168.1.100','i':'98.37.90.37'}
     #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
 
-    port = 5210
-    #port = 
+    #port =
     clientSocket.connect((connectDict[connectType],  port))#same machine.
 
-    #printSocketInfo(clientSocket)
+    printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
     main2UiQ    = queue.Queue()
     Ui2MainQ    = queue.Queue()

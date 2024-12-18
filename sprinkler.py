@@ -32,7 +32,6 @@ import relayRoutines   as rr
 import profileRoutines as pr
 import runActProfRtns  as rap
 import utilRoutines    as ur
-import server          as sv
 #############################################################################
 
 gpioDict  = None
@@ -41,6 +40,11 @@ uiCmdQ = queue.Queue()
 uiRspQ = queue.Queue()
 wkCmdQ = queue.Queue()
 wkRspQ = queue.Queue()
+#############################################################################
+
+def killSrvr():
+    return
+#############################################################################
 
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
@@ -122,7 +126,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'clf'  : { 'func' : ur.clearLogFile,      'parm':None,
     'menu' :   'Clear Log File'               },
 
-    'ks'   : { 'func' : sv.killSrvr,          'parm':None,
+    'ks'   : { 'func' : killSrvr,             'parm':None,
     'menu' :   'Kill Server'                  },
     }
 
@@ -155,17 +159,15 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         return rsp[0]               # return to srvr for forwarding to clnt.
 
     if choice == 'm':
+        rspStrDict = { 'or':' RELAY COMMANDS \n',
+                       'mp':'\n MANAGE PROFILE COMMANDS \n',
+                       'rp':'\n RUN PROFILE COMMANDS \n',
+                       'gdt':'\n MISC COMMANDS \n'
+                     }
         rspStr = ''
         for k,v in strToFunctDict.items():
-            if k == 'or':
-                rspStr += ' RELAY COMMANDS \n'
-            elif k == 'mp':
-                rspStr += '\n MANAGE PROFILE COMMANDS \n'
-            elif k == 'rp':
-                rspStr += '\n RUN PROFILE COMMANDS \n'
-            elif k == 'gdt':
-                rspStr += '\n MISC COMMANDS \n'
-
+            if k in rspStrDict:
+                rspStr += rspStrDict[k]
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
         return rspStr               # return to srvr for forwarding to clnt.
 
