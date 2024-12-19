@@ -34,7 +34,6 @@ Command gap: Calls function getAP (getActiveProfile).
 Command sap: Calls function setAP (setActiveProfile).
 '''
 
-import time
 import pickle
 import threading
 import pprint as pp
@@ -132,7 +131,6 @@ def setAP( parmLst ):
         stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
         sapState  = 1, profNames = ks)
         rspStr += ' sv sapState = 1'
-        time.sleep(.05)
     ########################################
 
     # Get idx of desired profile to make active.
@@ -142,7 +140,7 @@ def setAP( parmLst ):
     ########################################
 
     # Error check idx of desired active profile to make active
-    # desired profile index will have been updated in dict by client.
+    # desired profile index will have been sent in by client.
     if state == 2:
         # Get the index of the desired profle from pickle.
         idxStr = dsrdProfIdx[0]
@@ -151,18 +149,15 @@ def setAP( parmLst ):
         except ValueError:
             if idxStr == 'q':
                 stateMachInfo = initSapStateMachineInfo()
-                rspStr = ' Quiting sap. Resetting sapStateMachine.\n'
-                rspStr += ' sv sapState = 0'
+                rspStr= ' Quit sap. Reset sapStateMachine.\n sv sapState = 0'
             else:
                 stateMachInfo = updateSapStateMachineInfo( stateMachInfo,
                                                            sapState=1 )
-                rspStr = ' Invalid entry. Must be an integer. Try again.'
-                rspStr += ' sv sapState = 1'
+                rspStr = ' Invalid entry. Not an integer. Try again.\n sv sapState = 1'
         else: # There was no exception.
             if idx > len(pDict)-1:
                 updateSapStateMachineInfo(stateMachInfo,sapState=1)
-                rspStr = ' Invalid entry. Integer out of range. Try again.'
-                rspStr += ' sv sapState = 1'
+                rspStr = ' Invalid entry. Int out of range. Try again.\n sv sapState = 1'
             else:
                 stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
                 sapState  = 3)
@@ -185,13 +180,6 @@ def setAP( parmLst ):
         stateMachInfo = initSapStateMachineInfo()
         rspStr = ' sv sapState = 0 \n'
         rspStr += ' Active profile set.'
-    ########################################
-
-    # Should never get here, but jusr in case ...
-    if 0 > state > 3:
-        stateMachInfo = initSapStateMachineInfo()
-        rspStr  = ' ERROR. Invalid sapState. Resetting sapStateMachine.\n'
-        rspStr += ' sv sapState = 0'
     ########################################
 
     #print('\n sapStateMachineInfo on exit:')

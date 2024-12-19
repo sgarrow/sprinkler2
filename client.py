@@ -11,7 +11,8 @@ google server.
 '''
 
 try:
-    import readline
+    import readline         # So up arrow will recall last entered command.
+    print(readline.backend) # This line just to eliminate a pylint error.
 except ModuleNotFoundError:
     print(' exception importing readline. ok to continue.')
 
@@ -31,6 +32,7 @@ def printSocketInfo(cSocket):
 
 def getUserInput( mainToUiQ, uiToMainQ, aLock ):
 
+    userInput = ''
     while True:
         with aLock:
             try:
@@ -60,8 +62,8 @@ if __name__ == '__main__':
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
     #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
-    #port =
-    clientSocket.connect((connectDict[connectType],  port))#same machine.
+    #PORT =
+    clientSocket.connect((connectDict[connectType], PORT ))#same machine.
 
     printSocketInfo(clientSocket)
     threadLock  = threading.Lock()
@@ -94,13 +96,13 @@ if __name__ == '__main__':
                     readyToRead,_, _=select.select([clientSocket],[],[],.25)
                 print('\n{}'.format(rspStr))
 
-                sapSte = 0
+                SAP_STE = 0
                 if 'sapState = ' in rspStr:
                     idxStart = rspStr.index('sapState = ')
                     idxEnd   = idxStart + len('sapState = ')
-                    sapSte = rspStr[idxEnd]
-                    main2UiQ.put(sapSte)
-                #print(' mn sapState = ', sapSte)
+                    SAP_STE = rspStr[idxEnd]
+                    main2UiQ.put(SAP_STE)
+                #print(' mn sapState = ', SAP_STE)
 
         if message == 'close' or 'RE: ks' in rspStr:
             break

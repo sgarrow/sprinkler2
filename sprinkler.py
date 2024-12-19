@@ -38,11 +38,11 @@ gpioDict  = None
 rlyObjLst = None
 uiCmdQ = queue.Queue() # These queues are used by the rp, qp qnd sp commands.
 uiRspQ = queue.Queue() # These commands (run/query/stop active profile) are
-wkCmdQ = queue.Queue() # run in various threads and these queues serve as 
+wkCmdQ = queue.Queue() # run in various threads and these queues serve as
 wkRspQ = queue.Queue() # communication vehicles to/from these threads.
 #############################################################################
 
-def killSrvr(): # The ks cmd is handled directly in the handleClient 
+def killSrvr(): # The ks cmd is handled directly in the handleClient
     return      # function so doesn't need a "worker" function.  However,
                 # because of the way the menu/vectoring is done a function
                 # needs to at least exist.  This function is never called.
@@ -50,7 +50,7 @@ def killSrvr(): # The ks cmd is handled directly in the handleClient
 
 def sprinkler(inputStr): # called from handleClient. inputStr from client.
 
-    global gpioDict      # These global variables are 
+    global gpioDict      # These global variables are
     global rlyObjLst     # discussed in file initRoutines.py.
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()

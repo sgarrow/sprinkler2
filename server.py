@@ -16,7 +16,7 @@ all client sockets and then finally (3) exit it's infinite loop.
 
 The server can be automatically started at boot time by inserting the follow
 command in file crontab (open via crontab -e command):
-@reboot /bin/sleep 30; cd python/sprinkler2; nohup python3 server.py & >> /home/pi/mycronlog.txt 2>&1
+@reboot /bin/sleep 30;cd python/sprinkler2; nohup python3 server.py & >> /home/pi/mycronlog.txt 2>&1
 
 Function handleClient:
 Each client handler is it's own thread.  Multiple instantiations of client
@@ -39,8 +39,8 @@ import socket     # For creating and managing sockets.
 import threading  # For handling multiple clients concurrently.
 import queue      # For Killing Server.
 import time
-import sprinkler as sp # Contains vectors to "worker" functions 
-                       # associated with a recieved client command. 
+import sprinkler as sp # Contains vectors to "worker" functions
+                       # associated with a recieved client command.
 
 openSocketsLst = []    # Needed for processing the "ks" command only.
 #############################################################################
@@ -64,7 +64,7 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
     clientSocket.settimeout(3.0) # Sets the .recv timeout - ks processing.
 
-    # The condition within the while conditional is made false by 
+    # The condition within the while conditional is made false by
     # the "close" command and the "ks" command.
     while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:
 

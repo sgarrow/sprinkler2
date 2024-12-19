@@ -220,7 +220,6 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
         #print(' wkRQ.qsize = {}'.format(wkRQsize))
         if wkRQsize < 5:
             wkRQ.put('runApWrk = {}'.format(rspStr))
-        #time.sleep(5)
     return 0
 #############################################################################
 def checkDayMatch( rlyData, currDT ):
