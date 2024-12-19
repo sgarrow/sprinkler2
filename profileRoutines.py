@@ -105,7 +105,6 @@ def setAP( parmLst ):
     pDict       = parmLst[0]
     dsrdProfIdx = parmLst[1]
 
-    #kStart    = time.time()
     threadLst = [ t.name for t in threading.enumerate() ]
     if 'runApWrk' in threadLst:
         rspStr=' Can\'t sap while a profile is running. Issue sp and re-try.'
@@ -116,76 +115,100 @@ def setAP( parmLst ):
         stateMachInfo = pickle.load(handle)
     state     = stateMachInfo[ 'sapState'  ]
     profNms   = stateMachInfo[ 'profNames' ]
-    #print(' sapStateMachineInfo on entry:')
-    #print('',stateMachInfo,'\n')
-    ########################################
+
+    stateToFuncDict = { 0 : sapSte0, 1 : sapSte1, 2 : sapSte2, 3 : sapSte3 }
+
+    stateToParmDict = { 0 : [ pDict, stateMachInfo ],
+                        1 : [ stateMachInfo ],
+                        2 : [ pDict, dsrdProfIdx, stateMachInfo ],
+                        3 : [ pDict, dsrdProfIdx, profNms ] }
+
+    rspStr = stateToFuncDict[state](stateToParmDict[state])
+
+    return [rspStr]
+########################################
+
+def sapSte0(parmLst):
+
+    pDict         = parmLst[0]
+    stateMachInfo = parmLst[1]
 
     # Print a menu of available profiles.
-    if state == 0:
-        ks = [] # list of profile names
-        rspStr = ''
-        for ii,(profileKey,v) in enumerate(pDict.items()):
-            rspStr += ' {} - {} ({})\n'.format(ii,profileKey,v['about'])
-            ks.append(profileKey)
+    ks = [] # list of profile names
+    rspStr = ''
+    for ii,(profileKey,v) in enumerate(pDict.items()):
+        rspStr += ' {} - {} ({})\n'.format(ii,profileKey,v['about'])
+        ks.append(profileKey)
 
-        stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
-        sapState  = 1, profNames = ks)
-        rspStr += ' sv sapState = 1'
-    ########################################
+    stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
+    sapState  = 1, profNames = ks)
+    rspStr += ' sv sapState = 1'
+    return rspStr
+########################################
+
+def sapSte1(parmLst):
+
+    stateMachInfo = parmLst[0]
 
     # Get idx of desired profile to make active.
-    if state == 1:
-        stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
-        rspStr = ' sv sapState = 2'
-    ########################################
+    stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
+    rspStr = ' sv sapState = 2'
+    return rspStr
+########################################
+
+def sapSte2(parmLst):
+
+    pDict         = parmLst[0]
+    dsrdProfIdx   = parmLst[1]
+    stateMachInfo = parmLst[2]
 
     # Error check idx of desired active profile to make active
     # desired profile index will have been sent in by client.
-    if state == 2:
-        # Get the index of the desired profle from pickle.
-        idxStr = dsrdProfIdx[0]
-        try:
-            idx = int(idxStr)
-        except ValueError:
-            if idxStr == 'q':
-                stateMachInfo = initSapStateMachineInfo()
-                rspStr= ' Quit sap. Reset sapStateMachine.\n sv sapState = 0'
-            else:
-                stateMachInfo = updateSapStateMachineInfo( stateMachInfo,
-                                                           sapState=1 )
-                rspStr = ' Invalid entry. Not an integer. Try again.\n sv sapState = 1'
-        else: # There was no exception.
-            if idx > len(pDict)-1:
-                updateSapStateMachineInfo(stateMachInfo,sapState=1)
-                rspStr = ' Invalid entry. Int out of range. Try again.\n sv sapState = 1'
-            else:
-                stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
-                sapState  = 3)
-                rspStr = ' sv sapState = 3'
-    ########################################
+    # Get the index of the desired profle from pickle.
+    idxStr = dsrdProfIdx[0]
+    try:
+        idx = int(idxStr)
+    except ValueError:
+        if idxStr == 'q':
+            stateMachInfo = initSapStateMachineInfo()
+            rspStr= ' Quit sap. Reset sapStateMachine.\n sv sapState = 0'
+        else:
+            stateMachInfo = updateSapStateMachineInfo( stateMachInfo,
+                                                       sapState=1 )
+            rspStr = ' Invalid entry. Not an integer. Try again.\n sv sapState = 1'
+    else: # There was no exception.
+        if idx > len(pDict)-1:
+            updateSapStateMachineInfo(stateMachInfo,sapState=1)
+            rspStr = ' Invalid entry. Int out of range. Try again.\n sv sapState = 1'
+        else:
+            stateMachInfo = updateSapStateMachineInfo(stateMachInfo,
+            sapState  = 3)
+            rspStr = ' sv sapState = 3'
+    return rspStr
+########################################
+
+def sapSte3(parmLst):
+
+    pDict         = parmLst[0]
+    dsrdProfIdx   = parmLst[1]
+    profNms       = parmLst[2]
 
     # Set active profile.
     # Set all profiles to inactive, except selected profile is set to active.
-    if state == 3:
-        idxStr = dsrdProfIdx[0]
-        ap = profNms[int(idxStr)] # Name of the profile to set active.
-        for profileKey,profileValue in pDict.items():
-            for profKey in profileValue:
-                if profKey == 'active':
-                    if profileKey == ap:
-                        pDict[profileKey]['active'] = True
-                    else:
-                        pDict[profileKey]['active'] = False
-        makeProfSap(pDict) # new ap will be active on next start up as well.
-        stateMachInfo = initSapStateMachineInfo()
-        rspStr = ' sv sapState = 0 \n'
-        rspStr += ' Active profile set.'
-    ########################################
-
-    #print('\n sapStateMachineInfo on exit:')
-    #print('',stateMachInfo)
-    #print( ' state {} exeTime {:8.5f} sec'.format(state,time.time()-kStart))
-    return [rspStr,pDict]
+    idxStr = dsrdProfIdx[0]
+    ap = profNms[int(idxStr)] # Name of the profile to set active.
+    for profileKey,profileValue in pDict.items():
+        for profKey in profileValue:
+            if profKey == 'active':
+                if profileKey == ap:
+                    pDict[profileKey]['active'] = True
+                else:
+                    pDict[profileKey]['active'] = False
+    makeProfSap(pDict) # new ap will be active on next start up as well.
+    initSapStateMachineInfo()
+    rspStr = ' sv sapState = 0 \n'
+    rspStr += ' Active profile set.'
+    return rspStr
 #############################################################################
 
 def initSapStateMachineInfo():
