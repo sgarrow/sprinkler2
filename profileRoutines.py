@@ -150,7 +150,7 @@ def sapSte1(parmLst):
 
     stateMachInfo = parmLst[0]
 
-    # Get idx of desired profile to make active.
+    # Get idx of desired profile (from client) to make active.
     stateMachInfo = updateSapStateMachineInfo(stateMachInfo,sapState=2)
     rspStr = ' sv sapState = 2'
     return rspStr
@@ -164,7 +164,6 @@ def sapSte2(parmLst):
 
     # Error check idx of desired active profile to make active
     # desired profile index will have been sent in by client.
-    # Get the index of the desired profle from pickle.
     idxStr = dsrdProfIdx[0]
     try:
         idx = int(idxStr)

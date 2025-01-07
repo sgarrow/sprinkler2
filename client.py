@@ -2,18 +2,13 @@
 This is the user interface to the server.  All of the files in this project
 must be on the RPi except this one although it may/can also be on the RPi.
 
-If this file is on the RPi then both the server and the client may both be
-run on the RPi.  
-
-If this file is on, for example, a PC, the the client can be run on a PC.
-This is like how, for example, your Web Browser (a client) talks to the 
-google server.
+If this file can be run on the Rpi, a PC or a phone.
 '''
 
 try:
     import readline         # So up arrow will recall last entered command.
     print(readline.backend) # This line just to eliminate a pylint error.
-except ModuleNotFoundError:
+except (ModuleNotFoundError, AttributeError):
     print(' exception importing readline. ok to continue.')
 
 import socket
@@ -63,9 +58,11 @@ if __name__ == '__main__':
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
     #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
     #PORT =
-    clientSocket.connect((connectDict[connectType], PORT ))#same machine.
-
+    connectDict = {'s':'localhost','l':'000.000.0.000','i':'00.00.00.00'}
+    PORT =     
+    clientSocket.connect((connectDict[connectType], PORT ))
     printSocketInfo(clientSocket)
+
     threadLock  = threading.Lock()
     main2UiQ    = queue.Queue()
     Ui2MainQ    = queue.Queue()
