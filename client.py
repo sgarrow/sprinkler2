@@ -9,8 +9,9 @@ try:
     import readline         # So up arrow will recall last entered command.
     print(readline.backend) # This line just to eliminate a pylint error.
 except (ModuleNotFoundError, AttributeError):
-    print(' exception importing readline. ok to continue.')
+    print('\n Exception importing readline. ok to continue.\n')
 
+import sys
 import socket
 import time
 import select
@@ -56,11 +57,18 @@ if __name__ == '__main__':
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
-    #connectDict = {'s':'localhost','l':'lanAddr','i':'routerAddr'}
-    #PORT =
-    connectDict = {'s':'localhost','l':'000.000.0.000','i':'00.00.00.00'}
-    PORT =     
-    clientSocket.connect((connectDict[connectType], PORT ))
+    #             {'s':'localhost','l':'lanAddr','i':'routerAddr'}
+    connectDict = {'s':'localhost','l':'0.0.0.0','i':'00.00.00.00'}
+    PORT = 0000
+    try:
+        clientSocket.connect((connectDict[connectType], PORT ))
+    except ConnectionRefusedError:
+        print('\n ConnectionRefusedError.  Ensure server is running.\n')
+        sys.exit()
+    except socket.timeout:
+        print('\n TimeoutError.  Ensure server is running.\n')
+        sys.exit()
+
     printSocketInfo(clientSocket)
 
     threadLock  = threading.Lock()
