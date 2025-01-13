@@ -7,10 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-# CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VERSION = ' Version:  3.18'
-RELEASED = ' Released:  9-Jan-2025'
-# CLEAR IP AND PORTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ver = ' v3.18.1 - 12-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -38,10 +35,7 @@ def getTemp(prnEn = True):
 #############################################################################
 
 def getVer():
-    rspStr  = VERSION  + '\n'
-    rspStr += RELEASED
-    #print(rspStr)
-    return [rspStr]
+    return [ver]
 #############################################################################
 
 def getActiveThreads():
