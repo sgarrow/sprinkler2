@@ -7,7 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-ver = ' v3.19.0 - 14-Jan-2025'
+ver = ' v3.20.0 - 15-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -47,31 +47,47 @@ def getActiveThreads():
 
 def getLogFile(parmLst):
 
+    rspStr  = ''
     print('in  params = ', parmLst)
 
-    try:
-        numLinesToRtn = int(parmLst[0])
-    except ValueError:
-        return [' Invalid number of lines to read.' ]
-
-    lastIdx = 0
-    rspStr  = ''
-
-    #return(['quick return'])
-
+    # Get total Lines in file.
+    numLinesInFile = 0
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
         for line in f:
-            lastIdx += 1
-        rspStr += ' Last Lines Idx is {},  returning last {} lines.\n'.\
-            format(lastIdx, numLinesToRtn)
+            numLinesInFile += 1
+    rspStr += ' numLinesInFile = {:4}.\n'.format( numLinesInFile )
 
-    delta = lastIdx - numLinesToRtn
-    startIndexToReturn = delta if delta > 0 else 0
+    # Get/Calc number of lines to return.
+    try:
+        numLinesToRtnA = int(parmLst[0])
+    except ValueError:
+        return [' Invalid number of lines to read.' ]
+    numLinesToRtn = min( numLinesToRtnA, numLinesInFile )
+    numLinesToRtn = max( numLinesToRtn,  1 ) # can't read 0 lines.
+    rspStr += '  numLinesToRtn = {:4}.\n'.format( numLinesToRtn )
+
+    # Get/Calc startIdx.
+    if len(parmLst) > 1:
+        try:
+            startIdx = max(int(parmLst[1]),0)
+        except ValueError:
+            return [' Invalid startIdx.' ]
+        else:
+            if startIdx > numLinesInFile:
+                startIdx = max(numLinesInFile - numLinesToRtn, 0)
+    else:
+        startIdx = max(numLinesInFile - numLinesToRtn, 0)
+    rspStr += '       startIdx = {:4}.\n'.format( startIdx )
+
+    # Calc endIdx.
+    endIdx = max(startIdx + numLinesToRtn - 1, 0)
+    endIdx = min(endIdx, numLinesInFile-1)
+    rspStr += '         endIdx = {:4}.\n'.format( endIdx )
 
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
         for idx,line in enumerate(f):
-            if idx >= startIndexToReturn:
-                rspStr += line
+            if startIdx <= idx <= endIdx:
+                rspStr += '{:4} - {}'.format(idx,line)
 
     return [rspStr]
 #############################################################################
