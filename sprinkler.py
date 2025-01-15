@@ -124,7 +124,7 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
     'gat'  : { 'func' : ur.getActiveThreads,  'parm':None,
     'menu' :   'Get Active Threads'           },
 
-    'glf'  : { 'func' : ur.getLogFile,        'parm':None,
+    'glf'  : { 'func' : ur.getLogFile,        'parm':[5],
     'menu' :   'Get Log File'                 },
 
     'clf'  : { 'func' : ur.clearLogFile,      'parm':None,
@@ -156,6 +156,10 @@ def sprinkler(inputStr): # called from handleClient. inputStr from client.
         if choice in ['sap']:
             params    = strToFunctDict[choice]['parm'][:]
             params[1] = optArgsStr
+
+        if choice in ['glf']:
+            if len(optArgsStr) > 0:
+                params = optArgsStr
 
         if params is None:
             rsp = func()       # rsp[0] = rspStr. Vector to worker.

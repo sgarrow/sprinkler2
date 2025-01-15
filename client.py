@@ -79,6 +79,7 @@ if __name__ == '__main__':
                                     daemon = True )
     inputThread.start()
 
+    rspStr = ''
     while True:
         try:
             message = Ui2MainQ.get()

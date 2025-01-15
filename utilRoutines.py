@@ -7,7 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-ver = ' v3.18.1 - 12-Jan-2025'
+ver = ' v3.19.0 - 14-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -45,12 +45,34 @@ def getActiveThreads():
     return [rspStr]
 #############################################################################
 
-# Read last 25 lines.
-# Relay 7 closed at 2024-12-02T16:10:07 # 1024/37 = 27.7 lines.
-def getLogFile():
+def getLogFile(parmLst):
+
+    print('in  params = ', parmLst)
+
+    try:
+        numLinesToRtn = int(parmLst[0])
+    except ValueError:
+        return [' Invalid number of lines to read.' ]
+
+    lastIdx = 0
+    rspStr  = ''
+
+    #return(['quick return'])
+
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
-        lines = f.readlines()
-    rspStr = ' '.join(lines)
+        for line in f:
+            lastIdx += 1
+        rspStr += ' Last Lines Idx is {},  returning last {} lines.\n'.\
+            format(lastIdx, numLinesToRtn)
+
+    delta = lastIdx - numLinesToRtn
+    startIndexToReturn = delta if delta > 0 else 0
+
+    with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
+        for idx,line in enumerate(f):
+            if idx >= startIndexToReturn:
+                rspStr += line
+
     return [rspStr]
 #############################################################################
 

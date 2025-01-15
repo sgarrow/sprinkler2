@@ -1,12 +1,13 @@
 
-import socket           # For creating and managing sockets.
-import threading        # For handling multiple clients concurrently.
-import queue            # For Killing Server.
-import time             # For Killing Server and listThreads.
-import pprint     as pp
-import sprinkler as sp  # Contains vectors to "worker" functions.
+import socket             # For creating and managing sockets.
+import threading          # For handling multiple clients concurrently.
+import queue              # For Killing Server.
+import time               # For Killing Server and listThreads.
+import pprint       as pp
+import timeRoutines as tr
+import sprinkler    as sp # Contains vectors to "worker" functions.
 
-openSocketsLst = []     # Needed for processing close and ks commands.
+openSocketsLst = []       # Needed for processing close and ks commands.
 #############################################################################
 
 def listThreads():
@@ -39,7 +40,7 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
             # Breaks the loop. handler/thread stops. Connection closed.
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
-        except ConnectionAbortedError: # Test-NetConnection 192.168.1.110 -p 5211 throws this
+        except ConnectionAbortedError: # Test-NetConnection 000.000.0.000 -p 5211 throws this
             print(' handleClient {} ConnectAbtErr except in s.recv'.format(clientAddress))
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
@@ -100,6 +101,12 @@ def printSocketInfo(sSocket):
 #############################################################################
 
 def startServer():
+    rspLst = tr.getTimeDate(False)
+    curDT  = rspLst[1]
+    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
+    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+        f.write( 'Server started at {} \n'.format(cDT))
+
     host = '0.0.0.0'  # Listen on all available interfaces
     port = 0000
 
@@ -155,6 +162,11 @@ def startServer():
                                                format(clientAddress) )
             cThrd.start()
     print('Server breaking.')
+    rspLst = tr.getTimeDate(False)
+    curDT  = rspLst[1]
+    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
+    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+        f.write( 'Server stopped at {} \n'.format(cDT))
 #############################################################################
 
 if __name__ == '__main__':
