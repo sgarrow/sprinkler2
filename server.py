@@ -1,4 +1,3 @@
-
 import socket             # For creating and managing sockets.
 import threading          # For handling multiple clients concurrently.
 import queue              # For Killing Server.
@@ -12,7 +11,7 @@ openSocketsLst = []       # Needed for processing close and ks commands.
 
 def listThreads():
     while True:
-        time.sleep(30)
+        time.sleep(60*60*24*7) #Once a week.
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))

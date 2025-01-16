@@ -7,7 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-ver = ' v3.20.0 - 15-Jan-2025'
+ver = ' v3.20.1 - 15-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -47,47 +47,58 @@ def getActiveThreads():
 
 def getLogFile(parmLst):
 
-    rspStr  = ''
-    print('in  params = ', parmLst)
+    usage = ' Usage glf [ numLines [start ["matchStr]] ].'
 
     # Get total Lines in file.
-    numLinesInFile = 0
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
-        for line in f:
-            numLinesInFile += 1
-    rspStr += ' numLinesInFile = {:4}.\n'.format( numLinesInFile )
+        numLinesInFile = sum(1 for line in f)
 
-    # Get/Calc number of lines to return.
+    # Get/Calc number of lines to return (parmLst[0]).
     try:
         numLinesToRtnA = int(parmLst[0])
     except ValueError:
-        return [' Invalid number of lines to read.' ]
+        return [ ' Invalid number of lines to read.\n' + usage ]
     numLinesToRtn = min( numLinesToRtnA, numLinesInFile )
     numLinesToRtn = max( numLinesToRtn,  1 ) # can't read 0 lines.
-    rspStr += '  numLinesToRtn = {:4}.\n'.format( numLinesToRtn )
 
-    # Get/Calc startIdx.
+    # Get/Calc startIdx (parmLst[1]).
     if len(parmLst) > 1:
         try:
             startIdx = max(int(parmLst[1]),0)
         except ValueError:
-            return [' Invalid startIdx.' ]
+            return [ ' Invalid startIdx.\n' + usage ]
         else:
             if startIdx > numLinesInFile:
                 startIdx = max(numLinesInFile - numLinesToRtn, 0)
     else:
         startIdx = max(numLinesInFile - numLinesToRtn, 0)
-    rspStr += '       startIdx = {:4}.\n'.format( startIdx )
 
     # Calc endIdx.
     endIdx = max(startIdx + numLinesToRtn - 1, 0)
     endIdx = min(endIdx, numLinesInFile-1)
+
+    # Build MatchStr.
+    matchStr = ''
+    if len(parmLst) > 2 and parmLst[2].startswith("\""):
+        for el in parmLst[2:]:
+            matchStr += (' ' + el) # Adds a starting space, remove below.
+            if el.endswith("\""):
+                break
+        matchStr = matchStr[1:].replace('\"', '') # [:1] Removes.
+
+    rspStr  = ' numLinesInFile = {:4}.\n'.format( numLinesInFile )
+    rspStr += '  numLinesToRtn = {:4}.\n'.format( numLinesToRtn )
+    rspStr += '       startIdx = {:4}.\n'.format( startIdx )
     rspStr += '         endIdx = {:4}.\n'.format( endIdx )
+    rspStr += '       matchStr = {}.\n'.format( matchStr )
 
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
         for idx,line in enumerate(f):
             if startIdx <= idx <= endIdx:
-                rspStr += '{:4} - {}'.format(idx,line)
+                if matchStr != '' and matchStr in line:
+                    rspStr += ' {:4} - {}'.format(idx,line)
+                elif matchStr == '':
+                    rspStr += ' {:4} - {}'.format(idx,line)
 
     return [rspStr]
 #############################################################################
