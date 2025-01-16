@@ -16,7 +16,7 @@
 # a wise person will read this example carefully before editing this file.
 ############################################
 profile0:
-  about:       Just relay 1, 3 times per day for 1 min.
+  about:       Just relay 1, 1 time per day (at 8:30 AM)for 1.5 min.
   active:      True
   relay1:
     About:     Back Yard Mstr Bed Side 
@@ -64,8 +64,8 @@ profile1:
   about:       A comprehensive example profile.
   #relay1:
   #  About:     Describe which sprinkler this relay is connected to.
-  #  Days:      [even]          # Legal values: even, odd, all or a
-  #                             # list-of-specific-days.
+  #  Days:      [even]          # Legal values: even, odd,
+  #                             # a list-of-specific-days or None.
   #
   #  Times:     [910,1030,1105] # Time(s) of day the relay will close.
   #                             # 24-hour military time format HHMM or HMM. No leading zeros.
@@ -73,12 +73,12 @@ profile1:
   #  durations: [1,2,3]         # How long the relay will be closed. Units = minutes. 
   #                             # Decimals ok, i.e. 1.5 = 90 seconds.  
   #                             # Number of 'Times' must equal number of 'durations'.  
-  #                             # The first duration corresponds to hte first Time, etc.
+  #                             # The first duration corresponds to the first Time, etc.
   #relay2:
   #  About:     Describe which sprinkler this relay is connected to.
   #  Days:      [odd]
   #  Times:     [1800,1801]     # These periods overlap, that's ok.
-  #  durations: [1.5,1]         # Handled as on @ 1800 off at 1702. Relay will not glitch.  
+  #  durations: [1.5,1]         # Handled as on @ 1800 off at 1802. Relay will not glitch.  
   #
   #relay3:
   #  About:     Describe which sprinkler this relay is connected to.

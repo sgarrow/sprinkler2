@@ -2,7 +2,6 @@ import socket             # For creating and managing sockets.
 import threading          # For handling multiple clients concurrently.
 import queue              # For Killing Server.
 import time               # For Killing Server and listThreads.
-import pprint       as pp
 import timeRoutines as tr
 import sprinkler    as sp # Contains vectors to "worker" functions.
 
@@ -134,10 +133,8 @@ def startServer():
         else:
             if cmd == 'ks':
                 threadLst = [ t.name for t in threading.enumerate() ]
-                #pp.pprint(threadLst)
                 while any(el.startswith('handleClient-') for el in threadLst):
                     threadLst = [ t.name for t in threading.enumerate() ]
-                    #pp.pprint(threadLst)
                     time.sleep(.1)
                 break
 

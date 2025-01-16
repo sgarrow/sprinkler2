@@ -7,7 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-ver = ' v3.20.1 - 15-Jan-2025'
+VER = ' v3.20.1 - 15-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -35,7 +35,7 @@ def getTemp(prnEn = True):
 #############################################################################
 
 def getVer():
-    return [ver]
+    return [VER]
 #############################################################################
 
 def getActiveThreads():
@@ -58,8 +58,9 @@ def getLogFile(parmLst):
         numLinesToRtnA = int(parmLst[0])
     except ValueError:
         return [ ' Invalid number of lines to read.\n' + usage ]
+
     numLinesToRtn = min( numLinesToRtnA, numLinesInFile )
-    numLinesToRtn = max( numLinesToRtn,  1 ) # can't read 0 lines.
+    numLinesToRtn = max( numLinesToRtn,  1 ) # Don't allow reading 0 lines.
 
     # Get/Calc startIdx (parmLst[1]).
     if len(parmLst) > 1:
@@ -67,9 +68,9 @@ def getLogFile(parmLst):
             startIdx = max(int(parmLst[1]),0)
         except ValueError:
             return [ ' Invalid startIdx.\n' + usage ]
-        else:
-            if startIdx > numLinesInFile:
-                startIdx = max(numLinesInFile - numLinesToRtn, 0)
+
+        if startIdx > numLinesInFile:
+            startIdx = max(numLinesInFile - numLinesToRtn, 0)
     else:
         startIdx = max(numLinesInFile - numLinesToRtn, 0)
 
@@ -79,18 +80,18 @@ def getLogFile(parmLst):
 
     # Build MatchStr.
     matchStr = ''
-    if len(parmLst) > 2 and parmLst[2].startswith("\""):
+    if len(parmLst) > 2 and parmLst[2].startswith('\"'):
         for el in parmLst[2:]:
             matchStr += (' ' + el) # Adds a starting space, remove below.
-            if el.endswith("\""):
+            if el.endswith('\"'):
                 break
         matchStr = matchStr[1:].replace('\"', '') # [:1] Removes.
 
     rspStr  = ' numLinesInFile = {:4}.\n'.format( numLinesInFile )
-    rspStr += '  numLinesToRtn = {:4}.\n'.format( numLinesToRtn )
-    rspStr += '       startIdx = {:4}.\n'.format( startIdx )
-    rspStr += '         endIdx = {:4}.\n'.format( endIdx )
-    rspStr += '       matchStr = {}.\n'.format( matchStr )
+    rspStr += '  numLinesToRtn = {:4}.\n'.format( numLinesToRtn  )
+    rspStr += '       startIdx = {:4}.\n'.format( startIdx       )
+    rspStr += '         endIdx = {:4}.\n'.format( endIdx         )
+    rspStr += '       matchStr = {}.\n\n'.format( matchStr       )
 
     with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
         for idx,line in enumerate(f):
@@ -106,7 +107,7 @@ def getLogFile(parmLst):
 def clearLogFile():
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
-    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
+    cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
     with open('sprinklerLog.txt', 'w',encoding='utf-8') as f:
         f.write( 'File cleared on {} \n'.format(cDT))
     return [' sprinklerLog.txt file cleared.']
