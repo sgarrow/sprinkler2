@@ -74,7 +74,9 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
         # Process a "ks" message and send response back to other client(s).
         elif data.decode() == 'ks':
             # Client sending ks has to be terminated first, I don't know why.
-            rspStr = ' handleClient {} set loop break for self RE: ks'.format(clientAddress)
+            # Also stop and running profiles so no dangling threads left behind.
+            rspStr  = sp.sprinkler('sp') # Can take upto 5 sec to return.
+            rspStr += '\n handleClient {} set loop break for self RE: ks'.format(clientAddress)
             clientSocket.send(rspStr.encode()) # sends all even if > 1024.
             time.sleep(1) # Required so .send happens before socket closed.
             print(rspStr)
