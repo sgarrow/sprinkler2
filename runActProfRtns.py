@@ -65,6 +65,7 @@ def strtTwoThrds( parmLst ): # Called from sprinkler.py (rp).
                                         )
         runApWrkThrd.start()
         startRsp += ' runApWrk thread started'
+
     #######################
 
     #print(' {}'.format(startRsp))
@@ -164,6 +165,12 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     apName      = rtnLst[1]
     apDict      = pDict[apName]
 
+    rspLst = tr.getTimeDate(False)
+    curDT  = rspLst[1]
+    cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
+    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+        f.write( 'Profile {} started at {} \n'.format(apName,cDT))
+
     while True:
 
         try:
@@ -220,6 +227,13 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
         #print(' wkRQ.qsize = {}'.format(wkRQsize))
         if wkRQsize < 5:
             wkRQ.put('runApWrk = {}'.format(rspStr))
+
+    rspLst = tr.getTimeDate(False)
+    curDT  = rspLst[1]
+    cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
+    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+        f.write( 'Profile {} stopped at {} \n'.format(apName,cDT))
+
     return 0
 #############################################################################
 def checkDayMatch( rlyData, currDT ):

@@ -27,16 +27,16 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     # Validate password
     data = clientSocket.recv(1024)
     if data.decode() == 'pwd':
-        pwdIsOk = True
-        rspStr  = ' Accepted connection from: {}'.format(clientAddress)
+        passwordIsOk = True
+        rspStr = ' Accepted connection from: {}'.format(clientAddress)
     else:
-        pwdIsOk = False
-        rspStr  = ' Rejected connection from: {}'.format(clientAddress)
+        passwordIsOk = False
+        rspStr = ' Rejected connection from: {}'.format(clientAddress)
 
     print(rspStr)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
 
-    if pwdIsOk:
+    if passwordIsOk:
         clientSocket.settimeout(3.0)   # Sets the .recv timeout - ks processing.
         openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
 
