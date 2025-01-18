@@ -23,9 +23,22 @@ def listThreads():
 
 def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     global openSocketsLst
-    print(' Accepted connection from: {}'.format(clientAddress))
-    openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
-    clientSocket.settimeout(3.0) # Sets the .recv timeout - ks processing.
+
+    # Validate password
+    data = clientSocket.recv(1024)
+    if data.decode() == 'pwd':
+        pwdIsOk = True
+        rspStr  = ' Accepted connection from: {}'.format(clientAddress)
+    else:
+        pwdIsOk = False
+        rspStr  = ' Rejected connection from: {}'.format(clientAddress)
+
+    print(rspStr)
+    clientSocket.send(rspStr.encode()) # sends all even if >1024.
+
+    if pwdIsOk:
+        clientSocket.settimeout(3.0)   # Sets the .recv timeout - ks processing.
+        openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
 
     # The while condition is made false by the close and ks command.
     while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:

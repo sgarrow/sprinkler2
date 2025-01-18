@@ -98,22 +98,22 @@ profile1:
   #  Times:     [None]
   #  durations: [None]
   #
-  relay6:
-    About:     NC so use to test w/o turning on a sprinkler 
-    Days:      [all]
-    Times:     [2042,2043,2044]
-    durations: [1,.5,1]
-
-  relay7:
-    About:     NC so use to test w/o turning on a sprinkler 
-    Days:      [Tuesday]
-    Times:     [2043,2044,2045]
-    durations: [.5,.1,1]
+  #relay6:
+  #  About:     NC so use to test w/o turning on a sprinkler 
+  #  Days:      [all]
+  #  Times:     [2042,2043,2044]
+  #  durations: [1,.5,1]
+  #
+  #relay7:
+  #  About:     NC so use to test w/o turning on a sprinkler 
+  #  Days:      [Tuesday]
+  #  Times:     [2043,2044,2045]
+  #  durations: [.5,.1,1]
 
   relay8:
     About:     NC so use to test w/o turning on a sprinkler
     Days:      [odd]
-    Times:     [2044,2045,2046]
-    durations: [1,2,1]
+    Times:     [1055]
+    durations: [10]
 ############################################
 

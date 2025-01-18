@@ -71,6 +71,16 @@ if __name__ == '__main__':
 
     printSocketInfo(clientSocket)
 
+    # Validate password
+    pwd = input( ' Enter password -> ')
+    clientSocket.send(pwd.encode())
+    time.sleep(.5)
+    response = clientSocket.recv(1024)
+    rspStr   = response.decode()
+    print('\n{}'.format(rspStr))
+    pwdIsOk = 'Accepted' in rspStr
+    #######
+
     threadLock  = threading.Lock()
     main2UiQ    = queue.Queue()
     Ui2MainQ    = queue.Queue()
@@ -79,8 +89,7 @@ if __name__ == '__main__':
                                     daemon = True )
     inputThread.start()
 
-    rspStr = ''
-    while True:
+    while pwdIsOk:
         try:
             message = Ui2MainQ.get()
         except queue.Empty:
