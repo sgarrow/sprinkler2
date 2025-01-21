@@ -84,7 +84,7 @@ def init():
         rlyGPIoObjLst.append( gpiozero.OutputDevice(
             relayGpioNum,
             active_high   = False,
-            initial_value = False ))
+            initial_value = False )) # <-- All relays will be opened at startup.
     #################################################
 
     # Ok, after all that return the only two things

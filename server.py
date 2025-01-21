@@ -8,9 +8,9 @@ import sprinkler    as sp # Contains vectors to "worker" functions.
 openSocketsLst = []       # Needed for processing close and ks commands.
 #############################################################################
 
-def listThreads():
+def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
     while True:
-        time.sleep(60*60*24*7) #Once a week.
+        time.sleep(60*60*24*7) # Once a week.
         print(' Active Threads: ')
         for t in threading.enumerate():
             print('   {}'.format(t.name))
@@ -19,6 +19,41 @@ def listThreads():
         for openS in openSocketsLst:
             print('   {}'.format(openS['ca']))
         print(' ##################')
+#############################################################################
+def processCloseCmd(clientSocket, clientAddress):
+    global openSocketsLst
+
+    rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
+    clientSocket.send(rspStr.encode()) # sends all even if >1024.
+    time.sleep(1) # Required so .send happens before socket closed.
+    print(rspStr)
+    # Breaks the loop, connection closes and thread stops.
+    openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+#############################################################################
+
+def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
+    global openSocketsLst
+
+    # Client sending ks has to be terminated first, I don't know why.
+    # Also stop and running profiles so no dangling threads left behind.
+    rspStr  = sp.sprinkler('sp') # Can take upto 5 sec to return.
+    rspStr += '\n\n' + sp.sprinkler('or 12345678') # Open all relays.
+    rspStr += '\n handleClient {} set loop break for self RE: ks'.\
+              format(clientAddress)
+    clientSocket.send(rspStr.encode()) # sends all even if > 1024.
+    time.sleep(1.5) # Required so .send happens before socket closed.
+
+    # Breaks the ALL loops, ALL connections close and ALL thread stops.
+    for el in openSocketsLst:
+        if el['ca'] != clientAddress:
+            rspStr = ' handleClient {} set loop break for {} RE: ks'.\
+                format(clientAddress, el['ca'])
+            el['cs'].send(rspStr.encode()) # sends all even if > 1024.
+            time.sleep(1) # Required so .send happens before socket closed.
+            print(rspStr)
+    openSocketsLst = []
+    client2ServerCmdQ.put('ks')
+    return 0
 #############################################################################
 
 def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
@@ -64,32 +99,11 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
 
         # Process a "close" message and send response back to the local client.
         if data.decode() == 'close':
-            rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
-            clientSocket.send(rspStr.encode()) # sends all even if >1024.
-            time.sleep(1) # Required so .send happens before socket closed.
-            print(rspStr)
-            # Breaks the loop, connection closes and thread stops.
-            openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+            processCloseCmd(clientSocket, clientAddress)
 
         # Process a "ks" message and send response back to other client(s).
         elif data.decode() == 'ks':
-            # Client sending ks has to be terminated first, I don't know why.
-            # Also stop and running profiles so no dangling threads left behind.
-            rspStr  = sp.sprinkler('sp') # Can take upto 5 sec to return.
-            rspStr += '\n handleClient {} set loop break for self RE: ks'.format(clientAddress)
-            clientSocket.send(rspStr.encode()) # sends all even if > 1024.
-            time.sleep(1) # Required so .send happens before socket closed.
-            print(rspStr)
-            # Breaks the ALL loops, ALL connections close and ALL thread stops.
-            for el in openSocketsLst:
-                if el['ca'] != clientAddress:
-                    rspStr = ' handleClient {} set loop break for {} RE: ks'.\
-                        format(clientAddress, el['ca'])
-                    el['cs'].send(rspStr.encode()) # sends all even if > 1024.
-                    time.sleep(1) # Required so .send happens before socket closed.
-                    print(rspStr)
-            openSocketsLst = []
-            client2ServerCmdQ.put('ks')
+            processKsCmd(clientSocket, clientAddress, client2ServerCmdQ)
 
         # Process a "standard" msg and send response back to the client,
         # (and look (try) for UNEXPECTED EVENT).
