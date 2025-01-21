@@ -17,7 +17,7 @@ Command mp: Calls function makeProfile.
             binary file named schedDict.pickle.
 
             schedDict.pickle is loaded automatically when the main script
-            (sprinkler.py) is started (from the RPi command line).
+            (cmdVectors.py) is started (from the RPi command line).
 
             Note: It's easier to edit config.yml on a PC.  To then make the
             pickle file on the PC type "python profileRoutines.py" at a

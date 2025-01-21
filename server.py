@@ -3,7 +3,7 @@ import threading          # For handling multiple clients concurrently.
 import queue              # For Killing Server.
 import time               # For Killing Server and listThreads.
 import timeRoutines as tr
-import sprinkler    as sp # Contains vectors to "worker" functions.
+import cmdVectors   as cv # Contains vectors to "worker" functions.
 
 openSocketsLst = []       # Needed for processing close and ks commands.
 #############################################################################
@@ -20,6 +20,7 @@ def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
             print('   {}'.format(openS['ca']))
         print(' ##################')
 #############################################################################
+
 def processCloseCmd(clientSocket, clientAddress):
     global openSocketsLst
 
@@ -36,8 +37,8 @@ def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
 
     # Client sending ks has to be terminated first, I don't know why.
     # Also stop and running profiles so no dangling threads left behind.
-    rspStr  = sp.sprinkler('sp') # Can take upto 5 sec to return.
-    rspStr += '\n\n' + sp.sprinkler('or 12345678') # Open all relays.
+    rspStr  = cv.vector('sp') # Can take upto 5 sec to return.
+    rspStr += '\n\n' + cv.vector('or 12345678') # Open all relays.
     rspStr += '\n handleClient {} set loop break for self RE: ks'.\
               format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if > 1024.
@@ -80,13 +81,13 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
 
         # Recieve msg from the client (and look (try) for UNEXPECTED EVENT).
         try: # In case user closed client window (x) instead of by close cmd.
-            data = clientSocket.recv(1024)
+            data = clientSocket.recv(1024) # Broke if any msg from client > 1024.
         except ConnectionResetError: # Windows throws this on (x).
             print(' handleClient {} ConnectRstErr except in s.recv'.format(clientAddress))
             # Breaks the loop. handler/thread stops. Connection closed.
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
-        except ConnectionAbortedError: # Test-NetConnection 000.000.0.000 -p 5211 throws this
+        except ConnectionAbortedError: # Test-NetConnection xxx.xxx.x.xxx -p xxxx throws this
             print(' handleClient {} ConnectAbtErr except in s.recv'.format(clientAddress))
             openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
@@ -108,7 +109,7 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
         # Process a "standard" msg and send response back to the client,
         # (and look (try) for UNEXPECTED EVENT).
         else:
-            response = sp.sprinkler(data.decode())
+            response = cv.vector(data.decode())
             try: # In case user closed client window (x) instead of by close cmd.
                 clientSocket.send(response.encode())
             except BrokenPipeError:      # RPi throws this on (x).
@@ -195,5 +196,5 @@ def startServer():
 #############################################################################
 
 if __name__ == '__main__':
-    #sp.sprinkler('rp')
+    #cv.vector('rp')
     startServer()

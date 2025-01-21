@@ -7,7 +7,7 @@ import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-VER = ' v3.20.1 - 15-Jan-2025'
+ver = ' v3.20.7 - 21-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):

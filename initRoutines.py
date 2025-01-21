@@ -1,6 +1,6 @@
 '''
 The only function in this file is named "init".  It is called automatically,
-if required, when function sprinkler (in file sprinkler.py) is called.
+if required, when function vector (in file cmdVectors.py) is called.
 
 The init routine creates two things:
 

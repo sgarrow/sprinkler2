@@ -2,7 +2,7 @@
 '''
 When a client enters a command those commands are received by function 
 handleClient in file server.py.  The command (string) is forwarded to
-function "sprinkler" (in this file) and the appropriate "worker" function
+function "vector" (in this file) and the appropriate "worker" function
 is then vectored to.
 
 This project cannot be run on a PC, it has to be run on an RPi with the
@@ -48,7 +48,7 @@ def killSrvr(): # The ks cmd is handled directly in the handleClient
                 # needs to at least exist.  This function is never called.
 #############################################################################
 
-def sprinkler(inputStr): # called from handleClient. inputStr from client.
+def vector(inputStr): # called from handleClient. inputStr from client.
 
     global gpioDict      # These global variables are
     global rlyObjLst     # discussed in file initRoutines.py.

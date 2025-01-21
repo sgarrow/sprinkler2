@@ -29,7 +29,7 @@ RED = '[31m'
 TERMINATE = '[0m'
 #############################################################################
 
-def strtTwoThrds( parmLst ): # Called from sprinkler.py (rp).
+def strtTwoThrds( parmLst ): # Called from cmdVectors.py (rp).
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
@@ -72,7 +72,7 @@ def strtTwoThrds( parmLst ): # Called from sprinkler.py (rp).
     return [startRsp]
 #############################################################################
 
-def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
+def queryViaTwoThrds( parmLst ):  # Called from vector (qp).
 
     uiCQ = parmLst[0]
     uiRQ = parmLst[1]
@@ -96,7 +96,7 @@ def queryViaTwoThrds( parmLst ):  # Called from sprinkler (qp).
     return [queryRsp]
 #############################################################################
 
-def stopTwoThrd( parmLst ): # Called from sprinkler (sp).
+def stopTwoThrd( parmLst ): # Called from vector (sp).
 
     uiCQ = parmLst[0]
 
