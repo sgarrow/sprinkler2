@@ -2,12 +2,13 @@
 A collection of misc routines for getting version, temp, active threads and
 verifying relay args.
 '''
+import sys
 import threading
 import subprocess
 import gpiozero
 import timeRoutines  as tr
 
-VER = ' v3.20.12 - 21-Jan-2025'
+VER = ' v3.20.13 - 21-Jan-2025'
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -45,12 +46,12 @@ def getActiveThreads():
     return [rspStr]
 #############################################################################
 
-def getLogFile(parmLst):
+def readFile(parmLst, inFile):
 
-    usage = ' Usage glf [ numLines [start ["matchStr]] ].'
+    usage = ' Usage rlf [ numLines [start ["matchStr"]] ].'
 
     # Get total Lines in file.
-    with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
+    with open( inFile, 'r',encoding='utf-8') as f:
         numLinesInFile = sum(1 for line in f)
 
     # Get/Calc number of lines to return (parmLst[0]).
@@ -78,7 +79,7 @@ def getLogFile(parmLst):
     endIdx = max(startIdx + numLinesToRtn - 1, 0)
     endIdx = min(endIdx, numLinesInFile-1)
 
-    # Build MatchStr.
+    # Build matchStr.
     matchStr = ''
     if len(parmLst) > 2 and parmLst[2].startswith('\"'):
         for el in parmLst[2:]:
@@ -93,7 +94,7 @@ def getLogFile(parmLst):
     rspStr += '         endIdx = {:4}.\n'.format( endIdx         )
     rspStr += '       matchStr = {}.\n\n'.format( matchStr       )
 
-    with open('sprinklerLog.txt', 'r',encoding='utf-8') as f:
+    with open( inFile, 'r',encoding='utf-8') as f:
         for idx,line in enumerate(f):
             if startIdx <= idx <= endIdx:
                 if matchStr != '' and matchStr in line:
@@ -101,14 +102,44 @@ def getLogFile(parmLst):
                 elif matchStr == '':
                     rspStr += ' {:4} - {}'.format(idx,line)
 
-    return [rspStr]
+    return rspStr
 #############################################################################
 
-def clearLogFile():
+def clearFile(inFile):
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('sprinklerLog.txt', 'w',encoding='utf-8') as f:
+    with open(inFile, 'w',encoding='utf-8') as f:
         f.write( 'File cleared on {} \n'.format(cDT))
-    return [' sprinklerLog.txt file cleared.']
+    return ' {} file cleared.'.format(inFile)
 #############################################################################
+
+def readSprinklerLogFile(parmLst):     # rsl
+    sys.stdout.flush()
+    rspStr = readFile(parmLst, 'sprinklerLog.txt')
+    return [rspStr]
+
+def readServerPrintsFile(parmLst):     # rsp
+    sys.stdout.flush()
+    rspStr = readFile(parmLst, 'serverPrints.txt')
+    return [rspStr]
+
+def readServerExceptionsFile(parmLst): # rse
+    sys.stdout.flush()
+    rspStr = readFile(parmLst, 'serverExceptions.txt')
+    return [rspStr]
+
+def clearSprinklerLogFile():           # csl
+    sys.stdout.flush()
+    rspStr = clearFile('sprinklerLog.txt')
+    return [rspStr]
+
+def clearServerPrintsFile():           # csp
+    sys.stdout.flush()
+    rspStr = clearFile('serverPrints.txt')
+    return [rspStr]
+
+def clearServerExceptionsFile():       # cse
+    sys.stdout.flush()
+    rspStr = clearFile('serverExceptions.txt')
+    return [rspStr]

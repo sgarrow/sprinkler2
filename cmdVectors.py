@@ -72,66 +72,102 @@ def vector(inputStr): # called from handleClient. inputStr from client.
 
     ## RELAY ###############################
 
-    'or'   : { 'func' : rr.openRly,           'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Open    Relay'                },
+    'or' : { 'func' : rr.openRly,           
+             'parm' : [rlyObjLst,gpioDict,None],
+             'menu' : 'Open    Relay'                },
 
-    'cr'   : { 'func' : rr.closeRly,          'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Close   Relay'                },
+    'cr' : { 'func' : rr.closeRly,          
+             'parm' : [rlyObjLst,gpioDict,None],
+             'menu' : 'Close   Relay'                },
 
-    'tr'   : { 'func' : rr.toggleRly,         'parm':[rlyObjLst,gpioDict,None   ],
-    'menu' :   'Toggle  Relay'                },
+    'tr' : { 'func' : rr.toggleRly,         
+             'parm' : [rlyObjLst,gpioDict,None],
+             'menu' : 'Toggle  Relay'                },
 
-    'rr'   : { 'func' : rr.readRly,           'parm':[rlyObjLst,gpioDict,allRlys],
-    'menu' :   'Read    Relay'                },
+    'rr' : { 'func' : rr.readRly,           
+             'parm' : [rlyObjLst,gpioDict,allRlys],
+             'menu' : 'Read    Relay'                },
 
     ## PROFILE MGMT ########################
 
-    'mp'   : { 'func' : pr.makeProf,          'parm':None,
-    'menu' :   'Make    Profiles'             },
+    'mp' : { 'func' : pr.makeProf,          
+             'parm' : None,
+             'menu' : 'Make    Profiles'             },
 
-    'lp'   : { 'func' : pr.listProfs,         'parm':profDict,
-    'menu' :   'List    Profiles'             },
+    'lp' : { 'func' : pr.listProfs,         
+             'parm' : profDict,
+             'menu' : 'List    Profiles'             },
 
-    'gap'  : { 'func' : pr.getAP,             'parm':profDict,
-    'menu' :   'Get Act Profile'              },
+    'gap': { 'func' : pr.getAP,             
+             'parm' : profDict,
+             'menu' : 'Get Act Profile'              },
 
-    'sap'  : { 'func' : pr.setAP,             'parm':[profDict,None],
-    'menu' :   'Set Act Profile'              },
+    'sap': { 'func' : pr.setAP,             
+             'parm' : [profDict,None],
+             'menu' : 'Set Act Profile'              },
 
     ## PROFILE RUN #########################
 
-    'rp'   : { 'func' : rap.strtTwoThrds,     'parm':[rlyObjLst,gpioDict,profDict,
-                                                      uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
-    'menu' :   'Run   Active  Profile'        },
+    'rp' : { 'func' : rap.strtTwoThrds,     
+             'parm' : [rlyObjLst,gpioDict,profDict,
+                       uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
+             'menu' : 'Run   Active  Profile'        },
 
-    'sp'   : { 'func' : rap.stopTwoThrd,      'parm':[uiCmdQ],
-    'menu' :   'Stop  Running Profile'        },
+    'sp' : { 'func' : rap.stopTwoThrd,      
+             'parm' : [uiCmdQ],
+             'menu' : 'Stop  Running Profile'        },
 
-    'qp'   : { 'func' : rap.queryViaTwoThrds, 'parm':[uiCmdQ,uiRspQ],
-    'menu' :   'Query Running Profile'        },
+    'qp' : { 'func' : rap.queryViaTwoThrds, 
+             'parm' : [uiCmdQ,uiRspQ],
+             'menu' : 'Query Running Profile'        },
 
     ## MISC ################################
 
-    'gdt'  : { 'func' : tr.getTimeDate,       'parm':None,
-    'menu' :   'Get Date/Time'                },
+    'gdt': { 'func' : tr.getTimeDate,
+             'parm' : None,
+             'menu' : 'Get Date/Time'                },
 
-    'gt'   : { 'func' : ur.getTemp,           'parm':None,
-    'menu' :   'Get CPU Temp'                 },
+    'gt' : { 'func' : ur.getTemp,
+             'parm' : None,
+             'menu' : 'Get CPU Temp'                 },
 
-    'gv'   : { 'func' : ur.getVer,            'parm':None,
-    'menu' :   'Get Version'                  },
+    'gv' : { 'func' : ur.getVer,
+             'parm' : None,
+             'menu' : 'Get Version'                  },
 
-    'gat'  : { 'func' : ur.getActiveThreads,  'parm':None,
-    'menu' :   'Get Active Threads'           },
+    'gat': { 'func' : ur.getActiveThreads,
+             'parm' : None,
+             'menu' : 'Get Active Threads'           },
 
-    'glf'  : { 'func' : ur.getLogFile,        'parm':[5],
-    'menu' :   'Get Log File'                 },
+    'ks' : { 'func' : killSrvr,
+             'parm' : None,
+             'menu' : 'Kill Server'                  },
 
-    'clf'  : { 'func' : ur.clearLogFile,      'parm':None,
-    'menu' :   'Clear Log File'               },
+    ## FILE ################################
 
-    'ks'   : { 'func' : killSrvr,             'parm':None,
-    'menu' :   'Kill Server'                  },
+    'rsl': { 'func' : ur.readSprinklerLogFile,
+             'parm' : [5],
+             'menu' : 'Read  Sprinkler Log File'     },
+
+    'csl': { 'func' : ur.clearSprinklerLogFile,
+             'parm' : None,
+             'menu' : 'Clear Sprinkler Log File'     },
+
+    'rsp': { 'func' : ur.readServerPrintsFile,
+             'parm' : [5],
+             'menu' : 'Read  Server Prints File'     },
+
+    'csp': { 'func' : ur.clearServerPrintsFile,
+             'parm' : None,
+             'menu' : 'Clear Server Prints File'     },
+
+    'rse': { 'func' : ur.readServerExceptionsFile,
+             'parm' : [5],
+             'menu' : 'Read  Server Expept File'     },
+
+    'cse': { 'func' : ur.clearServerExceptionsFile,
+             'parm' : None,
+             'menu' : 'Clear Server Expept File'     },
     }
 
     # Process the string (command) passed to this function via the call
@@ -157,22 +193,28 @@ def vector(inputStr): # called from handleClient. inputStr from client.
             params    = strToFunctDict[choice]['parm'][:]
             params[1] = optArgsStr
 
-        if choice in ['glf']:
+        if choice in ['rsl','rsp','rse']:
             if len(optArgsStr) > 0:
                 params = optArgsStr
 
-        if params is None:
-            rsp = func()       # rsp[0] = rspStr. Vector to worker.
-            return rsp[0]      # return to srvr for forwarding to clnt.
+        try:
+            if params is None:
+                rsp = func()   # rsp[0] = rspStr. Vector to worker.
+                return rsp[0]  # return to srvr for forwarding to clnt.
 
-        rsp = func(params)     # rsp[0] = rspStr. Vector to worker.
-        return rsp[0]          # Return to srvr for forwarding to clnt.
+            rsp = func(params) # rsp[0] = rspStr. Vector to worker.
+            return rsp[0]      # Return to srvr for forwarding to clnt.
+        except:
+            rsp = ' Command {} generated an exception'.format(choice)
+            print(rsp)
+            return rsp
 
     if choice == 'm':
-        rspStrDict = { 'or':' RELAY COMMANDS \n',
-                       'mp':'\n MANAGE PROFILE COMMANDS \n',
-                       'rp':'\n RUN PROFILE COMMANDS \n',
-                       'gdt':'\n MISC COMMANDS \n'
+        rspStrDict = { 'or'  : ' RELAY COMMANDS \n',
+                       'mp'  : '\n MANAGE PROFILE COMMANDS \n',
+                       'rp'  : '\n RUN PROFILE COMMANDS \n',
+                       'gdt' : '\n MISC COMMANDS \n',
+                       'rsl' : '\n FILE COMMANDS \n'
                      }
         rspStr = ''
         for k,v in strToFunctDict.items():

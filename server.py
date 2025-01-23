@@ -95,7 +95,6 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
             continue           # loop if another client has issued a ks cmd.
 
         # Getting here means a command has been received.
-        print('*********************************')
         print(' handleClient {} received: {}'.format(clientAddress, data.decode()))
 
         # Process a "close" message and send response back to the local client.
