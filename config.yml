@@ -16,13 +16,13 @@
 # a wise person will read this example carefully before editing this file.
 ############################################
 profile0:
-  about:       Just relay 1, 1 time per day (at 8:30 AM)for 1.5 min (.3 gal).
+  about:       Just relay 1, 1 time per day (at 8:30 AM)for 1.75 min (.35 gal).
   active:      True
   relay1:
     About:     Back Yard Mstr Bed Side 
     Days:      [all]
     Times:     [830]
-    durations: [1.5]
+    durations: [1.75]
   #relay2:
   #  About:     Back Yard Spa Side 
   #  Days:      [None]

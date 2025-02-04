@@ -48,6 +48,10 @@ def killSrvr(): # The ks cmd is handled directly in the handleClient
                 # needs to at least exist.  This function is never called.
 #############################################################################
 
+def getVer():
+    VER = ' v3.20.14 - 4-Feb-2025'
+    return [VER]
+#############################################################################
 def vector(inputStr): # called from handleClient. inputStr from client.
 
     global gpioDict      # These global variables are
@@ -131,7 +135,7 @@ def vector(inputStr): # called from handleClient. inputStr from client.
              'parm' : None,
              'menu' : 'Get CPU Temp'                 },
 
-    'gv' : { 'func' : ur.getVer,
+    'gv' : { 'func' : getVer,
              'parm' : None,
              'menu' : 'Get Version'                  },
 

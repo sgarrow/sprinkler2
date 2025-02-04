@@ -35,10 +35,6 @@ def getTemp(prnEn = True):
     return [rspStr, cpu]
 #############################################################################
 
-def getVer():
-    return [VER]
-#############################################################################
-
 def getActiveThreads():
     rspStr = ' Active Threads:'
     for t in threading.enumerate():

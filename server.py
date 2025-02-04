@@ -35,9 +35,10 @@ def processCloseCmd(clientSocket, clientAddress):
 def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
     global openSocketsLst
 
+    rspStr = ''
     # Client sending ks has to be terminated first, I don't know why.
     # Also stop and running profiles so no dangling threads left behind.
-    rspStr  = cv.vector('sp') # Can take upto 5 sec to return.
+    rspStr += cv.vector('sp') # Can take upto 5 sec to return.
     rspStr += '\n\n' + cv.vector('or 12345678') # Open all relays.
     rspStr += '\n handleClient {} set loop break for self RE: ks'.\
               format(clientAddress)
