@@ -4,6 +4,7 @@ import queue              # For Killing Server.
 import time               # For Killing Server and listThreads.
 import timeRoutines as tr
 import cmdVectors   as cv # Contains vectors to "worker" functions.
+import spkCfg as sc
 
 openSocketsLst = []       # Needed for processing close and ks commands.
 #############################################################################
@@ -62,8 +63,9 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     global openSocketsLst
 
     # Validate password
+    cfgDict = sc.getSpkCfgDict()
     data = clientSocket.recv(1024)
-    if data.decode() == 'pwd':
+    if data.decode() == cfgDict['myPwd']:
         passwordIsOk = True
         rspStr = ' Accepted connection from: {}'.format(clientAddress)
     else:
@@ -136,7 +138,8 @@ def startServer():
         f.write( 'Server started at {} \n'.format(cDT))
 
     host = '0.0.0.0'  # Listen on all available interfaces
-    port = 0000
+    cfgDict = sc.getSpkCfgDict()
+    port = int(cfgDict['myPort'])
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serverSocket.bind((host, port))

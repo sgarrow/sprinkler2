@@ -49,7 +49,7 @@ def killSrvr(): # The ks cmd is handled directly in the handleClient
 #############################################################################
 
 def getVer():
-    VER = ' v3.20.15 - 14-May-2025'
+    VER = ' v3.21.0 - 03-Jun-2025'
     return [VER]
 #############################################################################
 def vector(inputStr): # called from handleClient. inputStr from client.

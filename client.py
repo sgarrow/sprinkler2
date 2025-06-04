@@ -17,6 +17,7 @@ import time
 import select
 import threading
 import queue
+import spkCfg as sc
 #############################################################################
 
 def printSocketInfo(cSocket):
@@ -55,13 +56,21 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
 
 if __name__ == '__main__':
 
+    cfgDict = sc.getSpkCfgDict()
+    if cfgDict is None:
+        print('  Client could not connect to server.')
+        print('  Missing or malformed spk.cfg file.')
+        sys.exit()
+
     # Each client will connect to the server with a new address.
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     connectType = input(' ssh, lan, internet (s,l,i) -> ')
+    #connectType = 'l' # pylint: disable=C0103
+
     #             {'s':'localhost','l':'lanAddr','i':'routerAddr'}
-    connectDict = {'s':'localhost','l':'0.0.0.0','i':'00.00.00.00'}
-    PORT = 0000
+    connectDict = {'s':'localhost','l':cfgDict['myLan'],'i':cfgDict['myIP']}
+    PORT = int(cfgDict['myPort'])
     try:
         clientSocket.connect((connectDict[connectType], PORT ))
     except ConnectionRefusedError:
@@ -74,7 +83,7 @@ if __name__ == '__main__':
     printSocketInfo(clientSocket)
 
     # Validate password
-    pwd = input( ' Enter password -> ')
+    pwd = cfgDict['myPwd']
     clientSocket.send(pwd.encode())
     time.sleep(.5)
     response = clientSocket.recv(1024)
