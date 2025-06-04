@@ -17,7 +17,7 @@ from kivy.utils import platform
 from kivy.clock import Clock
 from kivy.app import App
 
-import spkCfg as cc
+import cfg
 #############################################################################
 
 class ClientApp(App):
@@ -153,7 +153,7 @@ class ClientLayout(BoxLayout):
     def start_connection(self):
         # Make/ Get Config and Connection Info (IP, PORT, ... from text file
         # ckl.cfg).  Note that server also has access to the cfgDict.
-        cfgDict = cc.getSpkCfgDict()
+        cfgDict = cfg.getCfgDict()
         if cfgDict is None:
             print('  Client could not connect to server.')
             print('  Missing or malformed clk.cfg file.')

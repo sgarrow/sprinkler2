@@ -17,7 +17,7 @@ import time
 import select
 import threading
 import queue
-import spkCfg as sc
+import cfg
 #############################################################################
 
 def printSocketInfo(cSocket):
@@ -56,7 +56,7 @@ def getUserInput( mainToUiQ, uiToMainQ, aLock ):
 
 if __name__ == '__main__':
 
-    cfgDict = sc.getSpkCfgDict()
+    cfgDict = cfg.getCfgDict()
     if cfgDict is None:
         print('  Client could not connect to server.')
         print('  Missing or malformed spk.cfg file.')
