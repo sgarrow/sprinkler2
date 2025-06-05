@@ -206,9 +206,11 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
                 rspStr   += rspLst[0]
                 timeMatch = rspLst[1]
 
-            rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
+            #rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
+            rspStr += '   day  match = {} \n'.format( dayMatch )
             if dayMatch:
-                rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
+                #rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
+                rspStr +=  '   time match = {} \n'.format(timeMatch)
 
             rtnLst  = rr.readRly([relayObjLst,gpioDic,relayNum])
             #rspStr += rtnLst[0]

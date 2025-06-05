@@ -186,14 +186,13 @@ class ClientLayout(BoxLayout):
         # "close" or "ks" command then this method disables the GUI.
         self.output.text += f'\n{text}'
 
-        if 'RELAY COMMANDS' in text:
+        if 'COMMANDS' in text:
             menu_lines = text.splitlines()
             for line in menu_lines:
                 match = re.match(r'\s*(\w+)\s*-\s*(.+)', line)
                 if match:
                     cmd, desc = match.groups()
                     self.add_command_button(cmd, desc)
-
 
         if 'Server killed' in text or 'Disconnected' in text:
             self.input.disabled = True

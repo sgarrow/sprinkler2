@@ -48,8 +48,13 @@ def killSrvr(): # The ks cmd is handled directly in the handleClient
                 # needs to at least exist.  This function is never called.
 #############################################################################
 
+def disconnect():  # Handled directly in the handleClient func so it
+    return         # doesn't need a wrk funct, but because of way vectoring
+                   # is done a func needs to exist. Func never called/runs.
+#############################################################################
+
 def getVer():
-    VER = ' v3.21.1 - 04-Jun-2025'
+    VER = ' v3.21.2 - 04-Jun-2025'
     return [VER]
 #############################################################################
 def vector(inputStr): # called from handleClient. inputStr from client.
@@ -78,11 +83,11 @@ def vector(inputStr): # called from handleClient. inputStr from client.
 
     'or' : { 'func' : rr.openRly,           
              'parm' : [rlyObjLst,gpioDict,None],
-             'menu' : 'Open    Relay'                },
+             'menu' : 'Set Relay To Open'            }, # Open Relay
 
     'cr' : { 'func' : rr.closeRly,          
              'parm' : [rlyObjLst,gpioDict,None],
-             'menu' : 'Close   Relay'                },
+             'menu' : 'Set Relay To Closed'          }, # Close Relay 
 
     'tr' : { 'func' : rr.toggleRly,         
              'parm' : [rlyObjLst,gpioDict,None],
@@ -90,17 +95,17 @@ def vector(inputStr): # called from handleClient. inputStr from client.
 
     'rr' : { 'func' : rr.readRly,           
              'parm' : [rlyObjLst,gpioDict,allRlys],
-             'menu' : 'Read    Relay'                },
+             'menu' : 'Get All Relay States'         }, # Read Relay
 
     ## PROFILE MGMT ########################
 
     'mp' : { 'func' : pr.makeProf,          
              'parm' : None,
-             'menu' : 'Make    Profiles'             },
+             'menu' : 'Make Profiles'                },
 
     'lp' : { 'func' : pr.listProfs,         
              'parm' : profDict,
-             'menu' : 'List    Profiles'             },
+             'menu' : 'Get All Profiles'             }, # List Profiles
 
     'gap': { 'func' : pr.getAP,             
              'parm' : profDict,
@@ -115,63 +120,67 @@ def vector(inputStr): # called from handleClient. inputStr from client.
     'rp' : { 'func' : rap.strtTwoThrds,     
              'parm' : [rlyObjLst,gpioDict,profDict,
                        uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
-             'menu' : 'Run   Active  Profile'        },
+             'menu' : 'Run Active Profile'             },
 
     'sp' : { 'func' : rap.stopTwoThrd,      
              'parm' : [uiCmdQ],
-             'menu' : 'Stop  Running Profile'        },
+             'menu' : 'Stop Running Profile'           },
 
     'qp' : { 'func' : rap.queryViaTwoThrds, 
              'parm' : [uiCmdQ,uiRspQ],
-             'menu' : 'Query Running Profile'        },
+             'menu' : 'Get Profile Status'             }, # Query Running Profile
 
     ## MISC ################################
 
     'gdt': { 'func' : tr.getTimeDate,
              'parm' : None,
-             'menu' : 'Get Date/Time'                },
+             'menu' : 'Get Date/Time'                  },
 
     'gt' : { 'func' : ur.getTemp,
              'parm' : None,
-             'menu' : 'Get CPU Temp'                 },
+             'menu' : 'Get CPU Temp'                   },
 
     'gv' : { 'func' : getVer,
              'parm' : None,
-             'menu' : 'Get Version'                  },
+             'menu' : 'Get Version'                    },
 
     'gat': { 'func' : ur.getActiveThreads,
              'parm' : None,
-             'menu' : 'Get Active Threads'           },
+             'menu' : 'Get Active Threads'             },
 
     'ks' : { 'func' : killSrvr,
              'parm' : None,
-             'menu' : 'Kill Server'                  },
+             'menu' : 'Kill Server'                    },
 
     ## FILE ################################
 
     'rsl': { 'func' : ur.readSprinklerLogFile,
              'parm' : [5],
-             'menu' : 'Read  Sprinkler Log File'     },
+             'menu' : 'Get (Read) Sprinkler Log File'  },
 
     'csl': { 'func' : ur.clearSprinklerLogFile,
              'parm' : None,
-             'menu' : 'Clear Sprinkler Log File'     },
+             'menu' : 'Set (Clear) Sprinkler Log File' },
 
     'rsp': { 'func' : ur.readServerPrintsFile,
              'parm' : [5],
-             'menu' : 'Read  Server Prints File'     },
+             'menu' : 'Get (Read) Server Prints File'  },
 
     'csp': { 'func' : ur.clearServerPrintsFile,
              'parm' : None,
-             'menu' : 'Clear Server Prints File'     },
+             'menu' : 'Set (Clear) Server Prints File' },
 
     'rse': { 'func' : ur.readServerExceptionsFile,
              'parm' : [5],
-             'menu' : 'Read  Server Expept File'     },
+             'menu' : 'Get (Read) Server Expept File'  },
 
     'cse': { 'func' : ur.clearServerExceptionsFile,
              'parm' : None,
-             'menu' : 'Clear Server Expept File'     },
+             'menu' : 'Set (Clear) Server Expept File' },
+
+    'close':{'fun'  : disconnect,
+             'prm'  : None,
+             'menu' : 'close'                          },
     }
 
     # Process the string (command) passed to this function via the call
