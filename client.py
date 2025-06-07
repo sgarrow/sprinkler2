@@ -6,10 +6,10 @@ This file can be run on the Rpi, a PC or a phone.
 '''
 
 try:
-    import readline         # So up arrow will recall last entered command.
-    print(readline.backend) # This line just to eliminate a pylint error.
+    import readline  # pylint: disable=W0611
 except (ModuleNotFoundError, AttributeError):
-    print('\n Exception importing readline. ok to continue.\n')
+    pass
+    #print('\n Exception importing readline. ok to continue.\n')
 
 import sys
 import socket
@@ -30,7 +30,9 @@ def printSocketInfo(cSocket):
 def getUserInput( uiToMainQ, aLock ):
     userInput = ''
     while True:
-        with aLock:
+        with aLock:  # If I take just this out then after a command I get a
+                     # get a prompt printed, then the rsp printed then need
+                     # an extra return to get a prompt again.
             prompt = '\n Choice (m=menu, close) -> '
             userInput = input( prompt )
             uiToMainQ.put(userInput)
@@ -42,7 +44,7 @@ if __name__ == '__main__':
     cfgDict = cfg.getCfgDict()
     if cfgDict is None:
         print('  Client could not connect to server.')
-        print('  Missing or malformed spk.cfg file.')
+        print('  Missing or malformed cfg file.')
         sys.exit()
 
     # Each client will connect to the server with a new address.
