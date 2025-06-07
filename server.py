@@ -4,11 +4,9 @@ import queue                 # For Killing Server.
 import time                  # For Killing Server and listThreads.
 import multiprocessing as mp # For Getting Multi Proc Shared Dict.
 import datetime        as dt # For logging server start/stop times.
-
 import cmdVectors      as cv # Contains vectors to "worker" functions.
-import timeRoutines    as tr
-import cfg
-openSocketsLst = []       # Needed for processing close and ks commands.
+import cfg                   # For port, pwd. 
+openSocketsLst = []          # Needed for processing close and ks commands.
 #############################################################################
 
 def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
@@ -149,10 +147,9 @@ def printSocketInfo(sSocket):
 #############################################################################
 
 def startServer():
-    rspLst = tr.getTimeDate(False)
-    curDT  = rspLst[1]
-    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+    now = dt.datetime.now()
+    cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
+    with open('log.txt', 'a',encoding='utf-8') as f:
         f.write( 'Server started at {} \n'.format(cDT))
 
     host = '0.0.0.0'  # Listen on all available interfaces
@@ -220,10 +217,10 @@ def startServer():
                                                format(clientAddress) )
             cThrd.start()
     print('Server breaking.')
-    rspLst = tr.getTimeDate(False)
-    curDT  = rspLst[1]
-    cDT = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+    serverSocket.close()
+    now = dt.datetime.now()
+    cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
+    with open('log.txt', 'a',encoding='utf-8') as f:
         f.write( 'Server stopped at {} \n'.format(cDT))
 #############################################################################
 

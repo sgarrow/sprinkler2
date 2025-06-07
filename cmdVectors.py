@@ -54,7 +54,7 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.5 - 06-Jun-2025'
+    VER = ' v3.21.6 - 07-Jun-2025'
     return [VER]
 #############################################################################
 def vector(inputStr): # called from handleClient. inputStr from client.
