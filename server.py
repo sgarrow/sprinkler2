@@ -1,20 +1,26 @@
-import socket             # For creating and managing sockets.
-import threading          # For handling multiple clients concurrently.
-import queue              # For Killing Server.
-import time               # For Killing Server and listThreads.
-import timeRoutines as tr
-import cmdVectors   as cv # Contains vectors to "worker" functions.
-import cfg
+import socket                # For creating and managing sockets.
+import threading             # For handling multiple clients concurrently.
+import queue                 # For Killing Server.
+import time                  # For Killing Server and listThreads.
+import multiprocessing as mp # For Getting Multi Proc Shared Dict.
+import datetime        as dt # For logging server start/stop times.
 
+import cmdVectors      as cv # Contains vectors to "worker" functions.
+import timeRoutines    as tr
+import cfg
 openSocketsLst = []       # Needed for processing close and ks commands.
 #############################################################################
 
 def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
     while True:
-        time.sleep(60*60*24*7) # Once a week.
+        time.sleep(60*60*24*7)
+        print(' ##################')
         print(' Active Threads: ')
         for t in threading.enumerate():
-            print('   {}'.format(t.name))
+            print('   Name: {:11}  Daemon: {}'.format( t.name, t.daemon))
+            #print('   Name: {} Daemon: {} ID: {} Target: {}'.\
+            #    format( t.name, t.daemon, t.ident,
+            #            getattr(t, '_target', None)))
         print(' ##################')
         print(' Open Sockets: ')
         for openS in openSocketsLst:
@@ -22,9 +28,23 @@ def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
         print(' ##################')
 #############################################################################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+#############################################################################
+
 def processCloseCmd(clientSocket, clientAddress):
     global openSocketsLst
-
     rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
     time.sleep(1) # Required so .send happens before socket closed.
@@ -35,7 +55,6 @@ def processCloseCmd(clientSocket, clientAddress):
 
 def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
     global openSocketsLst
-
     rspStr = ''
     # Client sending ks has to be terminated first, I don't know why.
     # Also stop and running profiles so no dangling threads left behind.
@@ -61,7 +80,6 @@ def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
 
 def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     global openSocketsLst
-
     # Validate password
     cfgDict = cfg.getCfgDict()
     data = clientSocket.recv(1024)
@@ -76,7 +94,7 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
 
     if passwordIsOk:
-        clientSocket.settimeout(3.0)   # Sets the .recv timeout - ks processing.
+        clientSocket.settimeout(3.0)   # Set .recv timeout - ks processing.
         openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
 
     # The while condition is made false by the close and ks command.
@@ -142,6 +160,18 @@ def startServer():
     port = int(cfgDict['myPort'])
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # This line makes it so you can kill the server and then restart it right
+    # away.  Without this you get an error until the socket eventually is
+    # complete closed by th os. Here's the error you get without this:
+    #
+    #  File "/home/pi/python/spiClock/server.py", line 204, in <module>
+    #  startServer()
+    #  File "/home/pi/python/spiClock/server.py", line 145, in startServer
+    #  serverSocket.bind((host, port))
+    #  OSError: [Errno 98] Address already in use
+    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
     serverSocket.bind((host, port))
     serverSocket.listen(5)
     serverSocket.settimeout(3.0) # Sets the .accept timeout - ks processing.
@@ -170,7 +200,6 @@ def startServer():
                     threadLst = [ t.name for t in threading.enumerate() ]
                     time.sleep(.1)
                 break
-
 
         # See if any new clients are trying to connect.
         try:
