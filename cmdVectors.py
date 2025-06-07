@@ -54,7 +54,7 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.2 - 04-Jun-2025'
+    VER = ' v3.21.3 - 06-Jun-2025'
     return [VER]
 #############################################################################
 def vector(inputStr): # called from handleClient. inputStr from client.
@@ -64,15 +64,6 @@ def vector(inputStr): # called from handleClient. inputStr from client.
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()
 
-    try:
-        with open('pickle/schedDict.pickle', 'rb') as f:
-            profDict = pickle.load(f)
-    except FileNotFoundError:
-        print('\n Could not open pickle/schedDict.pickle.')
-        print(' Generating it now ...\n')
-        pr.makeProf()
-        with open('pickle/schedDict.pickle', 'rb') as f:
-            profDict = pickle.load(f)
 
     allRlys  = ['12345678']
 
@@ -104,21 +95,21 @@ def vector(inputStr): # called from handleClient. inputStr from client.
              'menu' : 'Make Profiles'                },
 
     'lp' : { 'func' : pr.listProfs,         
-             'parm' : profDict,
+             'parm' : None,
              'menu' : 'Get All Profiles'             }, # List Profiles
 
     'gap': { 'func' : pr.getAP,             
-             'parm' : profDict,
+             'parm' : None,
              'menu' : 'Get Act Profile'              },
 
     'sap': { 'func' : pr.setAP,             
-             'parm' : [profDict,None],
+             'parm' : None,
              'menu' : 'Set Act Profile'              },
 
     ## PROFILE RUN #########################
 
     'rp' : { 'func' : rap.strtTwoThrds,     
-             'parm' : [rlyObjLst,gpioDict,profDict,
+             'parm' : [rlyObjLst,gpioDict,
                        uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
              'menu' : 'Run Active Profile'             },
 
@@ -203,24 +194,23 @@ def vector(inputStr): # called from handleClient. inputStr from client.
             params[2] = optArgsStr
 
         if choice in ['sap']:
-            params    = strToFunctDict[choice]['parm'][:]
-            params[1] = optArgsStr
+            params = optArgsStr
 
         if choice in ['rsl','rsp','rse']:
             if len(optArgsStr) > 0:
                 params = optArgsStr
 
-        try:
-            if params is None:
-                rsp = func()   # rsp[0] = rspStr. Vector to worker.
-                return rsp[0]  # return to srvr for forwarding to clnt.
+        #try:
+        if params is None:
+            rsp = func()   # rsp[0] = rspStr. Vector to worker.
+            return rsp[0]  # return to srvr for forwarding to clnt.
 
-            rsp = func(params) # rsp[0] = rspStr. Vector to worker.
-            return rsp[0]      # Return to srvr for forwarding to clnt.
-        except:
-            rsp = ' Command {} generated an exception'.format(choice)
-            print(rsp)
-            return rsp
+        rsp = func(params) # rsp[0] = rspStr. Vector to worker.
+        return rsp[0]      # Return to srvr for forwarding to clnt.
+        #except:
+        rsp = ' Command {} generated an exception'.format(choice)
+        print(rsp)
+        return rsp
 
     if choice == 'm':
         rspStrDict = { 'or'  : ' RELAY COMMANDS \n',

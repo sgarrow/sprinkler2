@@ -23,21 +23,16 @@ import relayRoutines   as rr
 import timeRoutines    as tr
 import utilRoutines    as ur
 import profileRoutines as pr
-
-ESC = '\x1b'
-RED = '[31m'
-TERMINATE = '[0m'
 #############################################################################
 
 def strtTwoThrds( parmLst ): # Called from cmdVectors.py (rp).
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
-    pDict       = parmLst[2] # profile dict
-    uiCQ        = parmLst[3] # For com between handleClient thread and
-    uiRQ        = parmLst[4] # runApUi thread (started below).
-    wkCQ        = parmLst[5]
-    wkRQ        = parmLst[6]
+    uiCQ        = parmLst[2] # For com between handleClient thread and
+    uiRQ        = parmLst[3] # runApUi thread (started below).
+    wkCQ        = parmLst[4]
+    wkRQ        = parmLst[5]
 
     threadLst = [ t.name for t in threading.enumerate() ]
 
@@ -58,7 +53,7 @@ def strtTwoThrds( parmLst ): # Called from cmdVectors.py (rp).
         startRsp += ' runApWrk thread already started'
         #print(' {}'.format(startRsp))
     else:
-        prmLst = [relayObjLst,gpioDic,pDict,wkCQ,wkRQ]
+        prmLst = [relayObjLst,gpioDic,wkCQ,wkRQ]
         runApWrkThrd = threading.Thread( target = runApWrk,
                                          name   = 'runApWrk',
                                          args   = (prmLst,)
@@ -157,13 +152,13 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
 
     relayObjLst = parmLst[0] # For access to relay methods.
     gpioDic     = parmLst[1] # For print Statements (pin, gpio, .. )
-    pDict       = parmLst[2] # profile dict
-    wkCQ        = parmLst[3]
-    wkRQ        = parmLst[4]
+    wkCQ        = parmLst[2]
+    wkRQ        = parmLst[3]
 
-    rtnLst      = pr.getAP( pDict )
-    apName      = rtnLst[1]
-    apDict      = pDict[apName]
+    pDict  = pr.loadProf()
+    rtnLst = pr.getAP()
+    apName = rtnLst[1]
+    apDict = pDict[apName]
 
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
@@ -206,10 +201,8 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
                 rspStr   += rspLst[0]
                 timeMatch = rspLst[1]
 
-            #rspStr += '   day  match = {}{}{} \n'.format( ESC+RED, dayMatch, ESC+TERMINATE )
             rspStr += '   day  match = {} \n'.format( dayMatch )
             if dayMatch:
-                #rspStr +=  '   time match = {}{}{} \n'.format(ESC+RED,timeMatch,ESC+TERMINATE)
                 rspStr +=  '   time match = {} \n'.format(timeMatch)
 
             rtnLst  = rr.readRly([relayObjLst,gpioDic,relayNum])
