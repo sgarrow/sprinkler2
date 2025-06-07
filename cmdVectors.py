@@ -31,7 +31,7 @@ import timeRoutines    as tr
 import relayRoutines   as rr
 import profileRoutines as pr
 import runActProfRtns  as rap
-import utilRoutines    as ur
+import utils           as ut
 #############################################################################
 
 gpioDict  = None
@@ -127,7 +127,7 @@ def vector(inputStr): # called from handleClient. inputStr from client.
              'parm' : None,
              'menu' : 'Get Date/Time'                  },
 
-    'gt' : { 'func' : ur.getTemp,
+    'gt' : { 'func' : ut.getTemp,
              'parm' : None,
              'menu' : 'Get CPU Temp'                   },
 
@@ -135,7 +135,7 @@ def vector(inputStr): # called from handleClient. inputStr from client.
              'parm' : None,
              'menu' : 'Get Version'                    },
 
-    'gat': { 'func' : ur.getActiveThreads,
+    'gat': { 'func' : ut.getActiveThreads,
              'parm' : None,
              'menu' : 'Get Active Threads'             },
 
@@ -145,27 +145,27 @@ def vector(inputStr): # called from handleClient. inputStr from client.
 
     ## FILE ################################
 
-    'rsl': { 'func' : ur.readSprinklerLogFile,
+    'rsl': { 'func' : ut.readSprinklerLogFile,
              'parm' : [5],
              'menu' : 'Get (Read) Sprinkler Log File'  },
 
-    'csl': { 'func' : ur.clearSprinklerLogFile,
+    'csl': { 'func' : ut.clearSprinklerLogFile,
              'parm' : None,
              'menu' : 'Set (Clear) Sprinkler Log File' },
 
-    'rsp': { 'func' : ur.readServerPrintsFile,
+    'rsp': { 'func' : ut.readServerPrintsFile,
              'parm' : [5],
              'menu' : 'Get (Read) Server Prints File'  },
 
-    'csp': { 'func' : ur.clearServerPrintsFile,
+    'csp': { 'func' : ut.clearServerPrintsFile,
              'parm' : None,
              'menu' : 'Set (Clear) Server Prints File' },
 
-    'rse': { 'func' : ur.readServerExceptionsFile,
+    'rse': { 'func' : ut.readServerExceptionsFile,
              'parm' : [5],
              'menu' : 'Get (Read) Server Expept File'  },
 
-    'cse': { 'func' : ur.clearServerExceptionsFile,
+    'cse': { 'func' : ut.clearServerExceptionsFile,
              'parm' : None,
              'menu' : 'Set (Clear) Server Expept File' },
 
