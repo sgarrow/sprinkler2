@@ -22,7 +22,6 @@ import datetime        as dt
 import relayRoutines   as rr
 import timeRoutines    as tr
 import utils           as ut
-import utilRoutines    as ur
 import profileRoutines as pr
 #############################################################################
 

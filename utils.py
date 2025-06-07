@@ -7,6 +7,7 @@ import threading
 import subprocess
 import gpiozero
 import timeRoutines  as tr
+openSocketsLst = []     # Needed for processing close and ks commands.
 
 VER = ' v3.20.13 - 21-Jan-2025'
 #############################################################################

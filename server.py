@@ -6,7 +6,7 @@ import multiprocessing as mp # For Getting Multi Proc Shared Dict.
 import datetime        as dt # For logging server start/stop times.
 import cmdVectors      as cv # Contains vectors to "worker" functions.
 import cfg                   # For port, pwd. 
-openSocketsLst = []          # Needed for processing close and ks commands.
+import utils           as ut # For access to openSocketsLst[].
 #############################################################################
 
 def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
@@ -21,63 +21,62 @@ def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
             #            getattr(t, '_target', None)))
         print(' ##################')
         print(' Open Sockets: ')
-        for openS in openSocketsLst:
+        for openS in ut.openSocketsLst:
             print('   {}'.format(openS['ca']))
         print(' ##################')
 #############################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+def getMultiProcSharedDict():
+    manager = mp.Manager()
+    styleDict = manager.dict({
+        'tbd1' : 'tbd1',
+        'tbd2' : 'tbd2',
+        'tbd3' : 'tbd3',
+        'tbd4' : 'tbd4',
+        'tbd5' : 'tbd5',
+        'tbd6' : 'tbd6',
+    })
+    styleDictLock = mp.Lock()
+    return styleDict, styleDictLock
 #############################################################################
 
 def processCloseCmd(clientSocket, clientAddress):
-    global openSocketsLst
+
     rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
     time.sleep(1) # Required so .send happens before socket closed.
     print(rspStr)
     # Breaks the loop, connection closes and thread stops.
-    openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+    ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 #############################################################################
 
-def processKsCmd(clientSocket, clientAddress, client2ServerCmdQ):
-    global openSocketsLst
+def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock ):
+
     rspStr = ''
     # Client sending ks has to be terminated first, I don't know why.
     # Also stop and running profiles so no dangling threads left behind.
-    rspStr += cv.vector('sp') # Can take upto 5 sec to return.
-    rspStr += '\n\n' + cv.vector('or 12345678') # Open all relays.
+    rspStr += cv.vector('sp',  styleDict, styleDictLock)+'\n'
+    rspStr += '\n\n' + cv.vector('or 12345678',styleDict, styleDictLock)+'\n'
     rspStr += '\n handleClient {} set loop break for self RE: ks'.\
               format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if > 1024.
     time.sleep(1.5) # Required so .send happens before socket closed.
 
     # Breaks the ALL loops, ALL connections close and ALL thread stops.
-    for el in openSocketsLst:
+    for el in ut.openSocketsLst:
         if el['ca'] != clientAddress:
             rspStr = ' handleClient {} set loop break for {} RE: ks'.\
                 format(clientAddress, el['ca'])
             el['cs'].send(rspStr.encode()) # sends all even if > 1024.
             time.sleep(1) # Required so .send happens before socket closed.
             print(rspStr)
-    openSocketsLst = []
+    ut.openSocketsLst.clear()
     client2ServerCmdQ.put('ks')
     return 0
 #############################################################################
 
-def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
-    global openSocketsLst
+def handleClient( clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock ):
+
     # Validate password
     cfgDict = cfg.getCfgDict()
     data = clientSocket.recv(1024)
@@ -93,10 +92,10 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
 
     if passwordIsOk:
         clientSocket.settimeout(3.0)   # Set .recv timeout - ks processing.
-        openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
+        ut.openSocketsLst.append({'cs':clientSocket,'ca':clientAddress})
 
     # The while condition is made false by the close and ks command.
-    while {'cs':clientSocket,'ca':clientAddress} in openSocketsLst:
+    while {'cs':clientSocket,'ca':clientAddress} in ut.openSocketsLst:
 
         # Recieve msg from the client (and look (try) for UNEXPECTED EVENT).
         try: # In case user closed client window (x) instead of by close cmd.
@@ -104,11 +103,11 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
         except ConnectionResetError: # Windows throws this on (x).
             print(' handleClient {} ConnectRstErr except in s.recv'.format(clientAddress))
             # Breaks the loop. handler/thread stops. Connection closed.
-            openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+            ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except ConnectionAbortedError: # Test-NetConnection xxx.xxx.x.xxx -p xxxx throws this
             print(' handleClient {} ConnectAbtErr except in s.recv'.format(clientAddress))
-            openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+            ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except socket.timeout: # Can't block on recv - won't be able to break
             continue           # loop if another client has issued a ks cmd.
@@ -122,18 +121,18 @@ def handleClient(clientSocket, clientAddress, client2ServerCmdQ):
 
         # Process a "ks" message and send response back to other client(s).
         elif data.decode() == 'ks':
-            processKsCmd(clientSocket, clientAddress, client2ServerCmdQ)
+            processKsCmd(clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock)
 
         # Process a "standard" msg and send response back to the client,
         # (and look (try) for UNEXPECTED EVENT).
         else:
-            response = cv.vector(data.decode())
+            response = cv.vector(data.decode(),styleDict, styleDictLock)
             try: # In case user closed client window (x) instead of by close cmd.
                 clientSocket.send(response.encode())
             except BrokenPipeError:      # RPi throws this on (x).
                 print(' handleClient {} BrokePipeErr except in s.send'.format(clientAddress))
                 # Breaks the loop. handler/thread stops. Connection closed.
-                openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+                ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 
     print(' handleClient {} closing socket and breaking loop'.format(clientAddress))
     clientSocket.close()
@@ -151,6 +150,9 @@ def startServer():
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
     with open('log.txt', 'a',encoding='utf-8') as f:
         f.write( 'Server started at {} \n'.format(cDT))
+
+    styleDict, styleDictLock = getMultiProcSharedDict()
+    #print('startServer', styleDict, styleDictLock)
 
     host = '0.0.0.0'  # Listen on all available interfaces
     cfgDict = cfg.getCfgDict()
@@ -180,9 +182,8 @@ def startServer():
                                daemon = True )
     thread.start()
 
-    printSocketInfo(serverSocket)
-
     print('Server listening on: {} {}'.format(host, port))
+    printSocketInfo(serverSocket)
     while True:
 
         # See if any client has requested the server to halt (ks command).
@@ -211,7 +212,9 @@ def startServer():
 
                                       args = ( clientSocket,
                                                clientAddress,
-                                               clientToServerCmdQ ),
+                                               clientToServerCmdQ,
+                                               styleDict,
+                                               styleDictLock ),
 
                                       name =   'handleClient-{}'.\
                                                format(clientAddress) )

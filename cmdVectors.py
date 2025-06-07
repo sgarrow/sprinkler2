@@ -54,10 +54,11 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.6 - 07-Jun-2025'
+    VER = ' v3.21.7 - 07-Jun-2025'
     return [VER]
 #############################################################################
-def vector(inputStr): # called from handleClient. inputStr from client.
+
+def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     global gpioDict      # These global variables are
     global rlyObjLst     # discussed in file initRoutines.py.

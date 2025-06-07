@@ -46,7 +46,7 @@ def loadProf():
     except FileNotFoundError:
         print('\n Could not open pickle/schedDict.pickle.')
         print(' Generating it now ...\n')
-        pr.makeProf()
+        makeProf()
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
     return profDict
