@@ -5,6 +5,7 @@ Not needed now that the "ks" command is working.
 '''
 
 import subprocess
+#############################################################################
 
 def killSrvr():
     # Get all processes.
@@ -16,7 +17,7 @@ def killSrvr():
     # Get all processes that are running the python server.
     pythonServerLines = []
     for line in lines:
-        if 'python' and 'server' in line:
+        if 'server' in line:
             pythonServerLines.append(line)
 
     # Get all pids of processes that are running the python server.
@@ -33,7 +34,7 @@ def killSrvr():
                                   text   = True,
                                   check  = False
                                )
-#############################################################################
+############################################################################
 
 if __name__ == '__main__':
     killSrvr()

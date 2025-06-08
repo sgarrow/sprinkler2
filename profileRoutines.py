@@ -122,12 +122,12 @@ def setAP( parmLst ):
         try:
             idx = int(idxStr)
         except ValueError:
-                rspStr = ' Invalid entry. Not an integer. Try one of these (enter index number):\n'
-                rspStr += ''.join( '  {} - {}\n'.format(ii,k) for ii,k in enumerate(pDict.keys()))
+            rspStr = ' Invalid entry. Not an integer. Try one of these (enter index number):\n'
+            rspStr += ''.join( '  {} - {}\n'.format(ii,k) for ii,k in enumerate(pDict.keys()))
         else: # There was no exception.
             if idx > len(pDict)-1:
-                rspStr = ' Invalid entry. Int out of range. Try one of these (enter index number):\n'
-                rspStr += ''.join( '  {} - {}\n'.format(ii,k) for ii,k in enumerate(pDict.keys()))
+                rspStr= ' Invalid entry. Int out of range. Try one of these (enter index number):\n'
+                rspStr+= ''.join( '  {} - {}\n'.format(ii,k) for ii,k in enumerate(pDict.keys()))
 
     if rspStr == '':
         threadLst = [ t.name for t in threading.enumerate() ]

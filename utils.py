@@ -1,15 +1,40 @@
-'''
-A collection of misc routines for getting version, temp, active threads and
-verifying relay args.
-'''
 import sys
-import threading
+import multiprocessing as mp
+import threading       as th
 import subprocess
 import gpiozero
-import timeRoutines  as tr
-openSocketsLst = []     # Needed for processing close and ks commands.
+import timeRoutines as tr
+openSocketsLst = []       # Needed for processing close and ks commands.
+#############################################################################
 
-VER = ' v3.20.13 - 21-Jan-2025'
+def getMultiProcSharedDict():
+    manager = mp.Manager()
+    styleDict = manager.dict({
+        'tbd1' : 'tbd1',
+        'tbd2' : 'tbd2',
+        'tbd3' : 'tbd3',
+        'tbd4' : 'tbd4',
+        'tbd5' : 'tbd5',
+        'tbd6' : 'tbd6',
+    })
+    styleDictLock = mp.Lock()
+    return styleDict, styleDictLock
+#############################################################################
+
+def getActiveThreads():
+    rspStr = ' Running Threads:\n'
+    for t in th.enumerate():
+        rspStr += '   {}\n'.format(t.name)
+
+    rspStr += '\n Open Sockets:\n'
+    for openS in openSocketsLst:
+        rspStr += '   {}\n'.format(openS['ca'])
+
+    #rspStr += '\n Running Processes:\n'
+    #for k,v in cr.procPidDict.items():
+    #    if v is not None:
+    #        rspStr += '   {}\n'.format(k)
+    return [rspStr]
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -36,12 +61,6 @@ def getTemp(prnEn = True):
     return [rspStr, cpu]
 #############################################################################
 
-def getActiveThreads():
-    rspStr = ' Active Threads:'
-    for t in threading.enumerate():
-        rspStr += '\n   {}'.format(t.name)
-    return [rspStr]
-#############################################################################
 
 def readFile(parmLst, inFile):
 

@@ -2,7 +2,7 @@
 #############################################################################
 
 def getCfgDict():
-    required_keys = ['myLan', 'myIP', 'myPort', 'myPwd']
+    requiredKeys = ['myLan', 'myIP', 'myPort', 'myPwd']
     cfgDict = {}
     try:
         with open('cfg.cfg', 'r', encoding='utf-8') as f:
@@ -13,9 +13,8 @@ def getCfgDict():
                         cfgDict[lSplit[0]] = lSplit[-1]
     except FileNotFoundError:
         return None
-    else:
-        if not all(key in cfgDict for key in required_keys):
-            return None
+
+    if not all(key in cfgDict for key in requiredKeys):
+        return None
     return cfgDict
 #############################################################################
-

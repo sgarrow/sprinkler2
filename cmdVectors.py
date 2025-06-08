@@ -22,7 +22,6 @@ After reading the doc-strings perusing the comments will also be helpful.
 '''
 
 # Import standard python libraries.
-import pickle
 import queue
 
 # Import other source files that are in the same directory as this file.
@@ -54,7 +53,7 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.7 - 07-Jun-2025'
+    VER = ' v3.21.8 - 07-Jun-2025'
     return [VER]
 #############################################################################
 
@@ -65,6 +64,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()
 
+    if styleDic and styleLk: pass # Not used, generates pylint error.
 
     allRlys  = ['12345678']
 
@@ -132,9 +132,9 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
              'parm' : None,
              'menu' : 'Get CPU Temp'                   },
 
-    'gv' : { 'func' : getVer,
+    'gvn': { 'func' : getVer,
              'parm' : None,
-             'menu' : 'Get Version'                    },
+             'menu' : 'Get Version Number'             },
 
     'gat': { 'func' : ut.getActiveThreads,
              'parm' : None,
@@ -201,17 +201,17 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
             if len(optArgsStr) > 0:
                 params = optArgsStr
 
-        #try:
-        if params is None:
-            rsp = func()   # rsp[0] = rspStr. Vector to worker.
-            return rsp[0]  # return to srvr for forwarding to clnt.
+        try:
+            if params is None:
+                rsp = func()   # rsp[0] = rspStr. Vector to worker.
+                return rsp[0]  # return to srvr for forwarding to clnt.
 
-        rsp = func(params) # rsp[0] = rspStr. Vector to worker.
-        return rsp[0]      # Return to srvr for forwarding to clnt.
-        #except:
-        rsp = ' Command {} generated an exception'.format(choice)
-        print(rsp)
-        return rsp
+            rsp = func(params) # rsp[0] = rspStr. Vector to worker.
+            return rsp[0]      # Return to srvr for forwarding to clnt.
+        except: # pylint: disable=W0702
+            rsp = ' Command {} generated an exception'.format(choice)
+            print(rsp)
+            return rsp
 
     if choice == 'm':
         rspStrDict = { 'or'  : ' RELAY COMMANDS \n',
