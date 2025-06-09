@@ -27,8 +27,10 @@ def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
 
 def ksCleanup(styleDict, styleDictLock):
     rspStr  = ''
-    rspStr += cv.vector('sp',  styleDict, styleDictLock)+'\n'
-    rspStr += '\n\n' + cv.vector('or 12345678',styleDict, styleDictLock)+'\n'
+### START KS CODE REMOVE ###
+    rspStr += cv.vector('sp',  styleDict, styleDictLock) + '\n' 
+    rspStr += '\n\n' + cv.vector('or 12345678', styleDict, styleDictLock) + '\n' 
+### END KS CODE REMOVE ###
     return rspStr
 #############################################################################
 
@@ -218,4 +220,6 @@ def startServer():
 #############################################################################
 
 if __name__ == '__main__':
+### START MN CODE REMOVE ###
+### END MN CODE REMOVE ###
     startServer()
