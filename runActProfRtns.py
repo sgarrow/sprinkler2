@@ -163,7 +163,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+    with open('appLog.txt', 'a',encoding='utf-8') as f:
         f.write( 'Profile {} started at {} \n'.format(apName,cDT))
 
     while True:
@@ -226,7 +226,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+    with open('appLog.txt', 'a',encoding='utf-8') as f:
         f.write( 'Profile {} stopped at {} \n'.format(apName,cDT))
 
     return 0

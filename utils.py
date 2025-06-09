@@ -132,12 +132,12 @@ def clearFile(inFile):
 
 def readSprinklerLogFile(parmLst):     # rsl
     sys.stdout.flush()
-    rspStr = readFile(parmLst, 'sprinklerLog.txt')
+    rspStr = readFile(parmLst, 'appLog.txt')
     return [rspStr]
 
 def readServerPrintsFile(parmLst):     # rsp
     sys.stdout.flush()
-    rspStr = readFile(parmLst, 'serverPrints.txt')
+    rspStr = readFile(parmLst, 'serverLog.txt')
     return [rspStr]
 
 def readServerExceptionsFile(parmLst): # rse
@@ -147,12 +147,12 @@ def readServerExceptionsFile(parmLst): # rse
 
 def clearSprinklerLogFile():           # csl
     sys.stdout.flush()
-    rspStr = clearFile('sprinklerLog.txt')
+    rspStr = clearFile('appLog.txt')
     return [rspStr]
 
 def clearServerPrintsFile():           # csp
     sys.stdout.flush()
-    rspStr = clearFile('serverPrints.txt')
+    rspStr = clearFile('serverLog.txt')
     return [rspStr]
 
 def clearServerExceptionsFile():       # cse

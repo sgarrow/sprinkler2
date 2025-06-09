@@ -11,7 +11,7 @@ The 5th function (relayOCTR) is a driver for or,cr,tr,rr.  Those 4 functions
 relayOCTR.
 
 Any time a relay is open or closed that fact, along with a timestamp is
-written to file sprinklerLog.txt.
+written to file appLog.txt.
 '''
 
 import inspect
@@ -67,7 +67,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             rspStr +=' Opening relay {} ({:6} on pin {}).\n'.\
             format(relayNum, gpioStr, pinNum)
             relay.off()
-            with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+            with open('appLog.txt', 'a',encoding='utf-8') as f:
                 f.write( 'Relay {} opened at {} \n'.\
                     format(relayNum,cDT))
 
@@ -75,7 +75,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             rspStr +=' Closing relay {} ({:6} on pin {}).\n'.\
                 format(relayNum, gpioStr, pinNum)
             relay.on()
-            with open('sprinklerLog.txt', 'a',encoding='utf-8') as f:
+            with open('appLog.txt', 'a',encoding='utf-8') as f:
                 f.write( 'Relay {} closed at {} \n'.\
                     format(relayNum,cDT))
 

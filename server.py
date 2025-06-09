@@ -140,7 +140,7 @@ def printSocketInfo(sSocket):
 def startServer():
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
-    with open('log.txt', 'a',encoding='utf-8') as f:
+    with open('serverLog.txt', 'a',encoding='utf-8') as f:
         f.write( 'Server started at {} \n'.format(cDT))
 
     styleDict, styleDictLock = ut.getMultiProcSharedDict()
@@ -215,7 +215,7 @@ def startServer():
     serverSocket.close()
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
-    with open('log.txt', 'a',encoding='utf-8') as f:
+    with open('serverLog.txt', 'a',encoding='utf-8') as f:
         f.write( 'Server stopped at {} \n'.format(cDT))
 #############################################################################
 
