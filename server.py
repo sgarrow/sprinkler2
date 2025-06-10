@@ -35,12 +35,12 @@ def ksCleanup(styleDict, styleDictLock):
 #############################################################################
 
 def processCloseCmd(clientSocket, clientAddress):
-    rspStr = ' handleClient {} set loop break RE: close'.format(clientAddress)
+    rspStr = ' handleClient {} set loop break RE: close \n'.format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
     time.sleep(1) # Required so .send happens before socket closed.
-    print(rspStr)
     # Breaks the loop, connection closes and thread stops.
     ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
+    return rspStr
 #############################################################################
 
 def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ,
@@ -48,7 +48,7 @@ def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ,
     rspStr = ''
     # Client sending ks has to be terminated first, I don't know why.
     rspStr += ksCleanup(styleDict, styleDictLock)
-    rspStr += '\n handleClient {} set loop break for self RE: ks'.\
+    rspStr += '\n handleClient {} set loop break for self RE: ks \n'.\
               format(clientAddress)
     clientSocket.send(rspStr.encode()) # sends all even if > 1024.
     time.sleep(1.5) # Required so .send happens before socket closed.
@@ -56,30 +56,33 @@ def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ,
     # Breaks the ALL loops, ALL connections close and ALL thread stops.
     for el in ut.openSocketsLst:
         if el['ca'] != clientAddress:
-            rspStr = ' handleClient {} set loop break for {} RE: ks'.\
+            rspStr += ' handleClient {} set loop break for {} RE: ks \n'.\
                 format(clientAddress, el['ca'])
             el['cs'].send(rspStr.encode()) # sends all even if > 1024.
             time.sleep(1) # Required so .send happens before socket closed.
-            print(rspStr)
+
     ut.openSocketsLst.clear()
     client2ServerCmdQ.put('ks')
-    return 0
+
+    return rspStr
 #############################################################################
 
 def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
                   styleDict, styleDictLock ):
 
+    rspStr = ''
     # Validate password
     cfgDict = cfg.getCfgDict()
     data = clientSocket.recv(1024)
     if data.decode() == cfgDict['myPwd']:
         passwordIsOk = True
-        rspStr = ' Accepted connection from: {}'.format(clientAddress)
+        rspStr += ' Accepted connection from: {}\n'.format(clientAddress)
     else:
         passwordIsOk = False
-        rspStr = ' Rejected connection from: {}'.format(clientAddress)
+        rspStr += ' Rejected connection from: {}\n'.format(clientAddress)
 
-    print(rspStr)
+    ut.writeFile('serverLog.txt', rspStr)
+    #print(rspStr)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
 
     if passwordIsOk:
@@ -89,31 +92,32 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
     # The while condition is made false by the close and ks command.
     while {'cs':clientSocket,'ca':clientAddress} in ut.openSocketsLst:
 
+        logStr = ''
         # Recieve msg from the client (and look (try) for UNEXPECTED EVENT).
         try: # In case user closed client window (x) instead of by close cmd.
             data = clientSocket.recv(1024) # Broke if any msg from client > 1024.
         except ConnectionResetError: # Windows throws this on (x).
-            print(' handleClient {} ConnectRstErr except in s.recv'.format(clientAddress))
+            logStr += ' handleClient {} ConnectRstErr except in s.recv\n'.format(clientAddress)
             # Breaks the loop. handler/thread stops. Connection closed.
             ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except ConnectionAbortedError: # Test-NetConnection xxx.xxx.x.xxx -p xxxx throws this
-            print(' handleClient {} ConnectAbtErr except in s.recv'.format(clientAddress))
+            logStr += ' handleClient {} ConnectAbtErr except in s.recv\n'.format(clientAddress)
             ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
             break
         except socket.timeout: # Can't block on recv - won't be able to break
             continue           # loop if another client has issued a ks cmd.
 
         # Getting here means a command has been received.
-        print(' handleClient {} received: {}'.format(clientAddress, data.decode()))
+        logStr = ' handleClient {} received: {}\n'.format(clientAddress, data.decode())
 
         # Process a "close" message and send response back to the local client.
         if data.decode() == 'close':
-            processCloseCmd(clientSocket, clientAddress)
+            logStr += processCloseCmd(clientSocket, clientAddress)
 
         # Process a "ks" message and send response back to other client(s).
         elif data.decode() == 'ks':
-            processKsCmd(clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock)
+            logStr += processKsCmd(clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock)
 
         # Process a "standard" msg and send response back to the client,
         # (and look (try) for UNEXPECTED EVENT).
@@ -122,26 +126,33 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
             try: # In case user closed client window (x) instead of by close cmd.
                 clientSocket.send(response.encode())
             except BrokenPipeError:      # RPi throws this on (x).
-                print(' handleClient {} BrokePipeErr except in s.send'.format(clientAddress))
+                logStr += ' handleClient {} BrokePipeErr except in s.send\n'.format(clientAddress)
                 # Breaks the loop. handler/thread stops. Connection closed.
                 ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 
-    print(' handleClient {} closing socket and breaking loop'.format(clientAddress))
+        if logStr != '':
+            ut.writeFile('serverLog.txt', logStr)
+            #print(logStr)
+
+    logStr = ' handleClient {} closing socket and breaking loop\n'.format(clientAddress)
+    ut.writeFile('serverLog.txt', logStr)
+    #print(logStr)
     clientSocket.close()
 #############################################################################
 
 def printSocketInfo(sSocket):
     sndBufSize = sSocket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
     rcvBufSize = sSocket.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-    print('sndBufSize',sndBufSize) # 64K
-    print('rcvBufSize',rcvBufSize) # 64K
+    rspStr = ' sndBufSize = {} \n rcvBufSize = {}\n'.format(sndBufSize,rcvBufSize)
+    return rspStr # 64K
 #############################################################################
 
 def startServer():
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
-    with open('serverLog.txt', 'a',encoding='utf-8') as f:
-        f.write( 'Server started at {} \n'.format(cDT))
+    logStr =  'Server started at {} \n'.format(cDT)
+    ut.writeFile('serverLog.txt', logStr)
+    #print(logStr)
 
     styleDict, styleDictLock = ut.getMultiProcSharedDict()
     #print('startServer', styleDict, styleDictLock)
@@ -174,10 +185,13 @@ def startServer():
                                daemon = True )
     thread.start()
 
-    print('Server listening on: {} {}'.format(host, port))
-    printSocketInfo(serverSocket)
-    while True:
+    logStr  = 'Server listening on: {} {}\n'.format(host, port)
+    logStr += printSocketInfo(serverSocket)
+    ut.writeFile('serverLog.txt', logStr)
+    #print(logStr)
 
+    while True:
+        logStr = ''
         # See if any client has requested the server to halt (ks command).
         try:
             cmd = clientToServerCmdQ.get(timeout=.1)
@@ -198,7 +212,7 @@ def startServer():
             continue           # break loop if a client has issued a ks cmd.
         else:
             # Yes, create a new thread to handle the new client.
-            print('Starting a new client handler thread.')
+            logStr += 'Starting a new client handler thread.\n'
 
             cThrd = threading.Thread( target=handleClient,
 
@@ -211,12 +225,19 @@ def startServer():
                                       name =   'handleClient-{}'.\
                                                format(clientAddress) )
             cThrd.start()
-    print('Server breaking.')
+
+        if logStr != '':
+            ut.writeFile('serverLog.txt', logStr)
+            #print(logStr)
+
+    logStr = 'Server breaking.\n'
     serverSocket.close()
+
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
-    with open('serverLog.txt', 'a',encoding='utf-8') as f:
-        f.write( 'Server stopped at {} \n'.format(cDT))
+    logStr += 'Server stopped at {} \n'.format(cDT)
+    ut.writeFile('serverLog.txt', logStr)
+    #print(logStr)
 #############################################################################
 
 if __name__ == '__main__':

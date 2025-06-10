@@ -44,8 +44,12 @@ def loadProf():
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
     except FileNotFoundError:
-        print('\n Could not open pickle/schedDict.pickle.')
-        print(' Generating it now ...\n')
+        logStr  = ' Could not open pickle/schedDict.pickle.\n'
+        logStr += ' Generating it now ...\n'
+        with open('serverLog.txt', 'a',encoding='utf-8') as f:
+            f.write( logStr )
+        print( logStr )
+
         makeProf()
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
@@ -131,7 +135,6 @@ def setAP( parmLst ):
 
     if rspStr == '':
         threadLst = [ t.name for t in threading.enumerate() ]
-        print(threadLst)
         if 'runApWrk' in threadLst:
             rspStr = ' Can\'t sap while a profile is running. Issue sp and re-try.'
 

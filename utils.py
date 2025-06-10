@@ -62,19 +62,21 @@ def getTemp(prnEn = True):
 #############################################################################
 
 
-def readFile(parmLst, inFile):
-
+def readFileWrk(parmLst, inFile):
     usage = ' Usage rlf [ numLines [start ["matchStr"]] ].'
 
     # Get total Lines in file.
-    with open( inFile, 'r',encoding='utf-8') as f:
-        numLinesInFile = sum(1 for line in f)
+    try:
+        with open( inFile, 'r',encoding='utf-8') as f:
+            numLinesInFile = sum(1 for line in f)
+    except:
+        return ' Could not open file {} for reading'.format(inFile)
 
     # Get/Calc number of lines to return (parmLst[0]).
     try:
         numLinesToRtnA = int(parmLst[0])
     except ValueError:
-        return [ ' Invalid number of lines to read.\n' + usage ]
+        return ' Invalid number of lines to read.\n' + usage
 
     numLinesToRtn = min( numLinesToRtnA, numLinesInFile )
     numLinesToRtn = max( numLinesToRtn,  1 ) # Don't allow reading 0 lines.
@@ -84,7 +86,7 @@ def readFile(parmLst, inFile):
         try:
             startIdx = max(int(parmLst[1]),0)
         except ValueError:
-            return [ ' Invalid startIdx.\n' + usage ]
+            return ' Invalid startIdx.\n' + usage
 
         if startIdx > numLinesInFile:
             startIdx = max(numLinesInFile - numLinesToRtn, 0)
@@ -121,7 +123,7 @@ def readFile(parmLst, inFile):
     return rspStr
 #############################################################################
 
-def clearFile(inFile):
+def clearFileWrk(inFile):
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
@@ -130,32 +132,21 @@ def clearFile(inFile):
     return ' {} file cleared.'.format(inFile)
 #############################################################################
 
-def readSprinklerLogFile(parmLst):     # rsl
+def readFile(parmLst):
+    fName = parmLst[0]
+    linesToRead = parmLst[1]
     sys.stdout.flush()
-    rspStr = readFile(parmLst, 'appLog.txt')
+    rspStr = readFileWrk(linesToRead, fName)
     return [rspStr]
 
-def readServerPrintsFile(parmLst):     # rsp
+def clearFile(parmLst):
+    fName = parmLst[0]
     sys.stdout.flush()
-    rspStr = readFile(parmLst, 'serverLog.txt')
+    rspStr = clearFileWrk(fName)
     return [rspStr]
 
-def readServerExceptionsFile(parmLst): # rse
-    sys.stdout.flush()
-    rspStr = readFile(parmLst, 'serverExceptions.txt')
-    return [rspStr]
+def writeFile(fName, inStr):
+    with open(fName, 'a', encoding='utf-8') as f:
+        f.write( inStr )
+        f.flush()
 
-def clearSprinklerLogFile():           # csl
-    sys.stdout.flush()
-    rspStr = clearFile('appLog.txt')
-    return [rspStr]
-
-def clearServerPrintsFile():           # csp
-    sys.stdout.flush()
-    rspStr = clearFile('serverLog.txt')
-    return [rspStr]
-
-def clearServerExceptionsFile():       # cse
-    sys.stdout.flush()
-    rspStr = clearFile('serverExceptions.txt')
-    return [rspStr]

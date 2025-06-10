@@ -53,7 +53,7 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.10 - 08-Jun-2025'
+    VER = ' v3.21.11 - 09-Jun-2025'
     return [VER]
 #############################################################################
 
@@ -146,29 +146,29 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     ## FILE ################################
 
-    'rsl': { 'func' : ut.readSprinklerLogFile,
-             'parm' : [5],
-             'menu' : 'Get (Read) Sprinkler Log File'  },
+    'ral': { 'func' : ut.readFile,
+             'parm' : ['appLog.txt',[5]],
+             'menu' : 'Read App Log File'        },
 
-    'csl': { 'func' : ut.clearSprinklerLogFile,
-             'parm' : None,
-             'menu' : 'Set (Clear) Sprinkler Log File' },
+    'rsl': { 'func' : ut.readFile,
+             'parm' : ['serverLog.txt',[5]],
+             'menu' : 'Read Server Log File'     },
 
-    'rsp': { 'func' : ut.readServerPrintsFile,
-             'parm' : [5],
-             'menu' : 'Get (Read) Server Prints File'  },
+    'rse': { 'func' : ut.readFile,
+             'parm' : ['serverException.txt',[5]],
+             'menu' : 'Read Server Except File'  },
 
-    'csp': { 'func' : ut.clearServerPrintsFile,
-             'parm' : None,
-             'menu' : 'Set (Clear) Server Prints File' },
+    'cal': { 'func' : ut.clearFile,
+             'parm' : ['appLog.txt'],
+             'menu' : 'Set (Clear) App Log File'       },
 
-    'rse': { 'func' : ut.readServerExceptionsFile,
-             'parm' : [5],
-             'menu' : 'Get (Read) Server Expept File'  },
+    'csl': { 'func' : ut.clearFile,
+             'parm' : ['serverLog.txt'],
+             'menu' : 'Set (Clear) Server Log File'    },
 
-    'cse': { 'func' : ut.clearServerExceptionsFile,
-             'parm' : None,
-             'menu' : 'Set (Clear) Server Expept File' },
+    'cse': { 'func' : ut.clearFile,
+             'parm' : ['serverException.txt'],
+             'menu' : 'Set (Clear) Server Except File' },
 
     'close':{'fun'  : disconnect,
              'prm'  : None,
@@ -197,15 +197,16 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
         if choice in ['sap']:
             params = optArgsStr
 
-        if choice in ['rsl','rsp','rse']:
+        if choice in ['ral','rsl','rse']:
             if len(optArgsStr) > 0:
-                params = optArgsStr
+                params[1] = optArgsStr
 
+        # crontab @reboot /bin/sleep 30; cd python/sprinkler2; nohup python3 server.py > serverException.txt $
         try:
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-
+         
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except: # pylint: disable=W0702
@@ -218,7 +219,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
                        'mp'  : '\n MANAGE PROFILE COMMANDS \n',
                        'rp'  : '\n RUN PROFILE COMMANDS \n',
                        'gdt' : '\n MISC COMMANDS \n',
-                       'rsl' : '\n FILE COMMANDS \n'
+                       'ral' : '\n FILE COMMANDS \n'
                      }
         rspStr = ''
         for k,v in strToFunctDict.items():
