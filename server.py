@@ -63,8 +63,9 @@ def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ,
 
     ut.openSocketsLst.clear()
     client2ServerCmdQ.put('ks')
+    rspStrNew = rspStr.replace('ks','KS') # Keep client from breaking RE: rsl
 
-    return rspStr
+    return rspStrNew
 #############################################################################
 
 def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
@@ -72,7 +73,7 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
 
     rspStr = ''
     # Validate password
-    cfgDict = cfg.getCfgDict()
+    cfgDict = cfg.getCfgDict('spr')
     data = clientSocket.recv(1024)
     if data.decode() == cfgDict['myPwd']:
         passwordIsOk = True
@@ -158,7 +159,7 @@ def startServer():
     #print('startServer', styleDict, styleDictLock)
 
     host = '0.0.0.0'  # Listen on all available interfaces
-    cfgDict = cfg.getCfgDict()
+    cfgDict = cfg.getCfgDict('spr')
     port = int(cfgDict['myPort'])
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

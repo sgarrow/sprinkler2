@@ -41,10 +41,17 @@ def getUserInput( uiToMainQ, aLock ):
 
 if __name__ == '__main__':
 
-    cfgDict = cfg.getCfgDict()
+    arguments  = sys.argv
+    scriptName = arguments[0]
+    userArgs   = arguments[1:]
+    uut        = userArgs[0] 
+    cfgDict    = cfg.getCfgDict(uut)
+
     if cfgDict is None:
         print('  Client could not connect to server.')
-        print('  Missing or malformed cfg file.')
+        print('  Missing or (malformed) cfg file or missing cmd line arg')
+        print('  usage1: python client.py uut (uut = spr or clk).')
+        print('  usage2: python    gui.py uut (uut = spr or clk).')
         sys.exit()
 
     # Each client will connect to the server with a new address.

@@ -153,10 +153,18 @@ class ClientLayout(BoxLayout):
     def start_connection(self):
         # Make/ Get Config and Connection Info (IP, PORT, ... from text file
         # ckl.cfg).  Note that server also has access to the cfgDict.
-        cfgDict = cfg.getCfgDict()
+        #arguments  = sys.argv
+        #scriptName = arguments[0]
+        #userArgs   = arguments[1:]
+        #uut        = userArgs[0] 
+        #cfgDict    = cfg.getCfgDict(uut)
+        cfgDict    = cfg.getCfgDict('spr')
+
         if cfgDict is None:
             print('  Client could not connect to server.')
-            print('  Missing or malformed clk.cfg file.')
+            print('  Missing or (malformed) cfg file or missing cmd line arg')
+            print('  usage1: python client.py uut (uut = spr or clk).')
+            print('  usage2: python    gui.py uut (uut = spr or clk).')
             sys.exit()
 
         # Populate a connection dictionary based on cfgDict contents.
