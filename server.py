@@ -10,7 +10,7 @@ import utils           as ut # For access to openSocketsLst[].
 
 def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
     while True:
-        time.sleep(60*60*24*7)
+        time.sleep(60*60*24*365)
         print(' ##################')
         print(' Active Threads: ')
         for t in threading.enumerate():
@@ -118,7 +118,8 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
 
         # Process a "ks" message and send response back to other client(s).
         elif data.decode() == 'ks':
-            logStr += processKsCmd(clientSocket, clientAddress, client2ServerCmdQ, styleDict, styleDictLock)
+            logStr += processKsCmd( clientSocket, clientAddress,
+                                    client2ServerCmdQ, styleDict, styleDictLock )
 
         # Process a "standard" msg and send response back to the client,
         # (and look (try) for UNEXPECTED EVENT).

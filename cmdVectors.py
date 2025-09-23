@@ -53,7 +53,7 @@ def disconnect():  # Handled directly in the handleClient func so it
 #############################################################################
 
 def getVer():
-    VER = ' v3.21.12 - 10-Jun-2025'
+    VER = ' v3.21.13 - 22-Sep-2025'
     return [VER]
 #############################################################################
 
@@ -148,27 +148,27 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     'ral': { 'func' : ut.readFile,
              'parm' : ['appLog.txt',[5]],
-             'menu' : 'Read App Log File'        },
+             'menu' : 'Read App Log File'              },
 
     'rsl': { 'func' : ut.readFile,
              'parm' : ['serverLog.txt',[5]],
-             'menu' : 'Read Server Log File'     },
+             'menu' : 'Read Srvr Log File'             },
 
     'rse': { 'func' : ut.readFile,
              'parm' : ['serverException.txt',[5]],
-             'menu' : 'Read Server Except File'  },
+             'menu' : 'Read Srvr Except File'          },
 
     'cal': { 'func' : ut.clearFile,
              'parm' : ['appLog.txt'],
-             'menu' : 'Set (Clear) App Log File'       },
+             'menu' : 'Clear App Log File'             },
 
     'csl': { 'func' : ut.clearFile,
              'parm' : ['serverLog.txt'],
-             'menu' : 'Set (Clear) Server Log File'    },
+             'menu' : 'Clear Srvr Log File'            },
 
     'cse': { 'func' : ut.clearFile,
              'parm' : ['serverException.txt'],
-             'menu' : 'Set (Clear) Server Except File' },
+             'menu' : 'Clear Srvr Except File'         },
 
     'close':{'fun'  : disconnect,
              'prm'  : None,

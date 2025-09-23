@@ -59,8 +59,7 @@ def getTemp(prnEn = True):
         #print(rspStr)
 
     return [rspStr, cpu]
-#############################################################################
-
+##########################################t###################################
 
 def readFileWrk(parmLst, inFile):
     usage = ' Usage rlf [ numLines [start ["matchStr"]] ].'
@@ -149,4 +148,3 @@ def writeFile(fName, inStr):
     with open(fName, 'a', encoding='utf-8') as f:
         f.write( inStr )
         f.flush()
-

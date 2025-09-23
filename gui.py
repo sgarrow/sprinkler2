@@ -5,17 +5,17 @@ import sys
 from functools import partial
 
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.uix.popup import Popup
-from kivy.uix.label import Label
-from kivy.metrics import dp
-from kivy.utils import platform
-from kivy.clock import Clock
-from kivy.app import App
+from kivy.uix.gridlayout  import GridLayout
+from kivy.uix.scrollview  import ScrollView
+from kivy.uix.boxlayout   import BoxLayout
+from kivy.uix.textinput   import TextInput
+from kivy.uix.button      import Button
+from kivy.uix.popup       import Popup
+from kivy.uix.label       import Label
+from kivy.metrics         import dp
+from kivy.utils           import platform
+from kivy.clock           import Clock
+from kivy.app             import App
 
 import cfg
 #############################################################################
@@ -72,13 +72,13 @@ class ClientLayout(BoxLayout):
         # Create 2 TextInput widgets.  Both hidden by default.
         height = dp(60) if platform == 'android' else 40
 
-        self.input     = TextInput( hint_text = 'Enter cmd',   multiline = False,
-                                    size_hint_y = None, height = height )
-        self.set_input = TextInput( hint_text = 'Enter value', multiline = False,
-                                    size_hint_y = None, height = height )
+        self.dbg_input = TextInput( hint_text = 'Enter cmd and any required/optional parms',  
+                                    multiline = False, size_hint_y = None, height = height )
+        self.prm_input = TextInput( hint_text = 'Enter any required/optional parms',
+                                    multiline = False, size_hint_y = None, height = height )
 
-        self.input.opacity,  self.set_input.opacity  = 0, 0
-        self.input.disabled, self.set_input.disabled = True, True
+        self.dbg_input.opacity,  self.prm_input.opacity  = 0, 0
+        self.dbg_input.disabled, self.prm_input.disabled = True, True
 
         # Create 1 send Button widget.
         self.send_button = Button( text = 'Send' )
@@ -91,9 +91,10 @@ class ClientLayout(BoxLayout):
         output_scroll.add_widget(self.output)
 
         # Create 1 TabbedPanel widget.
-        self.tabbed_panel = TabbedPanel(do_default_tab=False)
+        width = dp(82) if platform == 'android' else 80
+        self.tabbed_panel = TabbedPanel(do_default_tab=False,tab_width = width)
 
-        # Create 4 tabs with contents.
+        # Create 6 tabs with contents.
         # Create GET tab and its content.
         self.get_tab_content = GridLayout(cols=3, spacing=5, size_hint_y=None)
         self.get_tab_content.bind(minimum_height=self.get_tab_content.setter('height'))
@@ -109,6 +110,22 @@ class ClientLayout(BoxLayout):
         set_scroll.add_widget(self.set_tab_content)
         self.set_tab = TabbedPanelItem(text='Set')
         self.set_tab.add_widget(set_scroll)
+
+        # Create FILE tab and its content.
+        self.fil_tab_content = GridLayout(cols=3, spacing=5, size_hint_y=None)
+        self.fil_tab_content.bind(minimum_height=self.fil_tab_content.setter('height'))
+        fil_scroll = ScrollView(size_hint=(1, 1))
+        fil_scroll.add_widget(self.fil_tab_content)
+        self.fil_tab = TabbedPanelItem(text='File')
+        self.fil_tab.add_widget(fil_scroll)
+
+        # Create TEST tab and its content.
+        self.tst_tab_content = GridLayout(cols=3, spacing=5, size_hint_y=None)
+        self.tst_tab_content.bind(minimum_height=self.tst_tab_content.setter('height'))
+        tst_scroll = ScrollView(size_hint=(1, 1))
+        tst_scroll.add_widget(self.tst_tab_content)
+        self.tst_tab = TabbedPanelItem(text='Test')
+        self.tst_tab.add_widget(tst_scroll)
 
         # Create OTHER tab and its content.
         self.oth_tab_content = GridLayout(cols=3, spacing=5, size_hint_y=None)
@@ -128,18 +145,20 @@ class ClientLayout(BoxLayout):
         self.debug_tab = TabbedPanelItem(text='Debug') # orig
         self.debug_tab.add_widget(debug_scroll)
 
-        # Add the 4 tabs to the panel.
+        # Add the 6 tabs to the panel.
         self.tabbed_panel.add_widget( self.get_tab )
         self.tabbed_panel.add_widget( self.set_tab )
+        self.tabbed_panel.add_widget( self.fil_tab )
         self.tabbed_panel.add_widget( self.oth_tab )
+        self.tabbed_panel.add_widget( self.tst_tab )
         self.tabbed_panel.add_widget( self.debug_tab )
 
         # Now that tabbed panel is fully constructed.
         self.tabbed_panel.bind( current_tab = self.on_tab_switch )
 
         # Add 4 widgets to final layout structure.
-        self.add_widget( self.input )
-        self.add_widget( self.set_input )
+        self.add_widget( self.dbg_input )
+        self.add_widget( self.prm_input )
         self.add_widget( self.tabbed_panel )
         self.add_widget( output_scroll )
     ###################
@@ -192,7 +211,8 @@ class ClientLayout(BoxLayout):
         # If the response is to the "m" command then this method also
         # populates buttons.  Furthermore is the response to to either the
         # "close" or "ks" command then this method disables the GUI.
-        self.output.text += f'\n{text}'
+        if 'COMMANDS' not in text:
+             self.output.text += f'\n{text}'
 
         if 'COMMANDS' in text:
             menu_lines = text.splitlines()
@@ -200,10 +220,17 @@ class ClientLayout(BoxLayout):
                 match = re.match(r'\s*(\w+)\s*-\s*(.+)', line)
                 if match:
                     cmd, desc = match.groups()
+
+                    if 'File' in desc: 
+                        words = desc.split()
+                        words.insert(2, '\n')
+                        desc = ' '.join(words)
+
                     self.add_command_button(cmd, desc)
 
         if 'Server killed' in text or 'Disconnected' in text:
-            self.input.disabled = True
+            self.dbg_input.disabled   = True
+            self.prm_input.disabled   = True
             self.send_button.disabled = True
             for tab_content in [self.get_tab_content, self.set_tab_content, self.oth_tab_content]:
                 for child in tab_content.children:
@@ -221,6 +248,10 @@ class ClientLayout(BoxLayout):
             self.get_tab_content.add_widget(btn)
         elif 'Set' in label:
             self.set_tab_content.add_widget(btn)
+        elif 'File' in label:
+            self.fil_tab_content.add_widget(btn)
+        elif 'Test' in label:
+            self.tst_tab_content.add_widget(btn)
         else:
             self.oth_tab_content.add_widget(btn)
     ###################
@@ -229,44 +260,45 @@ class ClientLayout(BoxLayout):
         # This method takes care of hiding one or both of the input
         # widgets depending upon which tab is active.
         if tab.text == 'Debug':
-            self.input.opacity = 1
-            self.input.disabled = False
-            self.set_input.opacity = 0
-            self.set_input.disabled = True
-        elif tab.text in ['Set', 'Other']:
-            self.input.opacity = 0
-            self.input.disabled = True
-            self.set_input.opacity = 1
-            self.set_input.disabled = False
+            self.dbg_input.opacity = 1
+            self.dbg_input.disabled = False
+            self.prm_input.opacity = 0
+            self.prm_input.disabled = True
+        elif tab.text in ['Set', 'File', 'Other']:
+            self.dbg_input.opacity = 0
+            self.dbg_input.disabled = True
+            self.prm_input.opacity = 1
+            self.prm_input.disabled = False
         else:  # 'Get' or unknown
-            self.input.opacity = 0
-            self.input.disabled = True
-            self.set_input.opacity = 0
-            self.set_input.disabled = True
+            self.dbg_input.opacity = 0
+            self.dbg_input.disabled = True
+            self.prm_input.opacity = 0
+            self.prm_input.disabled = True
     ###################
 
     def send_command(self, inText, instance):
         # This method constructs the command string to be sent to the server.
         # The srting is built from inText parm (button cmd) + any text from
         # an input widget (if not a Get).
+        #print('inText, instance = *{}*, *{}*'.format(inText.strip(), instance.text ))
+
         cmd = ''
-        if instance.text == 'Send':
-            if self.tabbed_panel.current_tab.text == 'Debug':
-                cmd = self.input.text.strip()
-            else:
-                cmd = self.set_input.text.strip()
-        else:
-            # Button-based command
+        if instance.text == 'Send':  # Debug-based command (manually typed command).
+            cmd = self.dbg_input.text.strip()
+            self.dbg_input.text = ''
+        else:                        # Button-based command.
             cmd = inText.strip()
-            if self.tabbed_panel.current_tab.text in ['Set', 'Other']:
-                param = self.set_input.text.strip()
+            if self.tabbed_panel.current_tab.text in ['Set', 'File', 'Other']:
+                param = self.prm_input.text.strip()
+                self.prm_input.text = ''
                 if param:
                     cmd += f' {param}'
+
         if not cmd:
             return
+
+        #print('cmd: ', cmd)
         self.conn.send_command(cmd)
-        self.input.text = ''
-        self.set_input.text = ''
 #############################################################################
 class ClientConnection:
     def __init__(self, ip, port, pwd, on_receive_callback):

@@ -36,6 +36,8 @@ def getUserInput( uiToMainQ, aLock ):
             prompt = '\n Choice (m=menu, close) -> '
             userInput = input( prompt )
             uiToMainQ.put(userInput)
+            if userInput in ['ks','close']:
+                break
         time.sleep(.01) # Gives 'main' a chance to run.
 #############################################################################
 
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     arguments  = sys.argv
     scriptName = arguments[0]
     userArgs   = arguments[1:]
-    uut        = userArgs[0] 
+    uut        = userArgs[0]
     cfgDict    = cfg.getCfgDict(uut)
 
     if cfgDict is None:
@@ -101,7 +103,10 @@ if __name__ == '__main__':
             clientSocket.send(message.encode())
 
         with threadLock:  # Same story.
-            readyToRead, _, _ = select.select([clientSocket], [], [], .6)
+            if any(word in message for word in ['mus', 'ks']):
+                readyToRead, _, _ = select.select([clientSocket], [], [], 1.6)
+            else:
+                readyToRead, _, _ = select.select([clientSocket], [], [], .6)
             if readyToRead:
                 rspStr = ''
                 while readyToRead:
