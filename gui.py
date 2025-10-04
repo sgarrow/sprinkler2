@@ -23,10 +23,28 @@ import cfg
 class ClientApp(App):
     def build(self):
         self.root_layout = BoxLayout()  # Temporary root
-        self.show_connection_popup()
+        self.show_uut_popup()
         return self.root_layout
 
-    def show_connection_popup(self):
+    def show_uut_popup(self):
+        layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        siz = (600,700) if platform == 'android' else (250,225)
+        popup = Popup(title='Choose UUT', size_hint=(None, None), size=siz)
+
+        def choose_uut(uut, *args):
+            popup.dismiss()
+            self.uut = uut
+            self.show_connection_popup(uut)  #  now show LAN/Internet/Localhost popup
+    
+        height = dp(60) if platform == 'android' else 40
+        for choice in ['spr', 'clk', 'clk2']:
+            layout.add_widget(Button(text=choice,  size_hint_y=None, height=height, 
+                                     on_press=partial(choose_uut, choice)))
+
+        popup.content = layout
+        popup.open()
+
+    def show_connection_popup(self, uut):
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
         siz = (600,700) if platform == 'android' else (250,225)
@@ -34,7 +52,7 @@ class ClientApp(App):
 
         def choose_and_start(connect_type, *args):
             popup.dismiss()
-            self.start_client(connect_type)
+            self.start_client(connect_type, uut)
 
         height = dp(60) if platform == 'android' else 40
         layout.add_widget(Button(
@@ -53,19 +71,20 @@ class ClientApp(App):
         popup.content = layout
         popup.open()
 
-    def start_client(self, connect_type):
-        layout = ClientLayout(connect_type)
+    def start_client(self, connect_type, uut):
+        layout = ClientLayout(connect_type, uut )
         self.root_layout.clear_widgets()
         self.root_layout.add_widget(layout)
 #############################################################################
 
 class ClientLayout(BoxLayout):
-    def __init__(self, connect_type, **kwargs):
+    def __init__(self, connect_type, uut, **kwargs):
         # This method creates the GUI then connects to server.
         super().__init__(orientation='vertical', **kwargs)
 
         self.connectType = connect_type
-        self.start_connection()
+        self.uut         = uut
+        self.start_connection(uut)
         self.build_ui() #####
 
     def build_ui(self):
@@ -169,22 +188,9 @@ class ClientLayout(BoxLayout):
         self.start_connection()
     ###################
 
-    def start_connection(self):
-        # Make/ Get Config and Connection Info (IP, PORT, ... from text file
-        # ckl.cfg).  Note that server also has access to the cfgDict.
-        #arguments  = sys.argv
-        #scriptName = arguments[0]
-        #userArgs   = arguments[1:]
-        #uut        = userArgs[0] 
-        #cfgDict    = cfg.getCfgDict(uut)
-        cfgDict    = cfg.getCfgDict('spr')
+    def start_connection(self,uut):
 
-        if cfgDict is None:
-            print('  Client could not connect to server.')
-            print('  Missing or (malformed) cfg file or missing cmd line arg')
-            print('  usage1: python client.py uut (uut = spr or clk).')
-            print('  usage2: python    gui.py uut (uut = spr or clk).')
-            sys.exit()
+        cfgDict = cfg.getCfgDict(uut)
 
         # Populate a connection dictionary based on cfgDict contents.
         connectDict = {
