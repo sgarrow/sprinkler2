@@ -1,13 +1,11 @@
-'''
-Run in a seperate RPi terminal.  Kills the server process and
-all of the threads it may have started.  Slightly hackish.
-Not needed now that the "ks" command is working.
-'''
-
 import subprocess
 #############################################################################
 
 def killSrvr():
+    # Run in a seperate RPi terminal.  Kills the server process and
+    # all of the threads it may have started.  Slightly hackish.
+    # Not needed/called now that the "ks" command is working.
+
     # Get all processes.
     result = subprocess.run(['ps','aux'],
              stdout=subprocess.PIPE,text=True, check = False)
@@ -34,6 +32,15 @@ def killSrvr():
                                   text   = True,
                                   check  = False
                                )
+############################################################################
+
+def rebootRpi():
+    return subprocess.run( [ 'sudo', 'sh', '-c', 'sleep 3 && reboot' ],
+                              stdout = subprocess.PIPE,
+                              text   = True,
+                              check  = False
+                           )
+    #return [' Rebooting in 3 seconds ...']
 ############################################################################
 
 if __name__ == '__main__':
