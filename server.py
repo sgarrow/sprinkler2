@@ -1,3 +1,4 @@
+import sys                   # For getting command line args.
 import socket                # For creating and managing sockets.
 import threading             # For handling multiple clients concurrently.
 import queue                 # For Killing Server.
@@ -69,11 +70,11 @@ def processKsCmd( clientSocket, clientAddress, client2ServerCmdQ,
 #############################################################################
 
 def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
-                  styleDict, styleDictLock ):
+                  styleDict, styleDictLock, uut ):
 
     rspStr = ''
     # Validate password
-    cfgDict = cfg.getCfgDict('spr')
+    cfgDict = cfg.getCfgDict(uut)
     data = clientSocket.recv(1024)
     if data.decode() == cfgDict['myPwd']:
         passwordIsOk = True
@@ -149,7 +150,7 @@ def printSocketInfo(sSocket):
     return rspStr # 64K
 #############################################################################
 
-def startServer():
+def startServer(uut):
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
     logStr =  'Server started at {} \n'.format(cDT)
@@ -160,7 +161,7 @@ def startServer():
     #print('startServer', styleDict, styleDictLock)
 
     host = '0.0.0.0'  # Listen on all available interfaces
-    cfgDict = cfg.getCfgDict('spr')
+    cfgDict = cfg.getCfgDict(uut)
     port = int(cfgDict['myPort'])
 
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -222,7 +223,8 @@ def startServer():
                                                clientAddress,
                                                clientToServerCmdQ,
                                                styleDict,
-                                               styleDictLock ),
+                                               styleDictLock,
+                                               uut ),
 
                                       name =   'handleClient-{}'.\
                                                format(clientAddress) )
@@ -243,6 +245,25 @@ def startServer():
 #############################################################################
 
 if __name__ == '__main__':
+
+    import spiRoutines as sr
+    arguments  = sys.argv
+    scriptName = arguments[0]
+    uut        = None
+    if len(arguments) >= 2:
+        userArgs   = arguments[1:]
+        uut        = userArgs[0]
+        cfgDict    = cfg.getCfgDict(uut)
+
+    if uut is None or cfgDict is None:
+        print('  Server not started.')
+        print('  Missing or (malformed) cfg file or')
+        print('  Missing or (malformed) cmd line arg')
+        print('  usage1: python server.py uut (uut = spr, clk, clk2).')
+        sys.exit()
+    else:
+        pass
 ### START MN CODE REMOVE ###
 ### END MN CODE REMOVE ###
-    startServer()
+
+    startServer(uut)
