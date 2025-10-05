@@ -1,5 +1,4 @@
 import sys
-import multiprocessing as mp
 import threading       as th
 
 import subprocess
@@ -8,20 +7,6 @@ import timeRoutines    as tr
 
 
 openSocketsLst = []       # Needed for processing close and ks commands.
-#############################################################################
-
-def getMultiProcSharedDict():
-    manager = mp.Manager()
-    styleDict = manager.dict({
-        'tbd1' : 'tbd1',
-        'tbd2' : 'tbd2',
-        'tbd3' : 'tbd3',
-        'tbd4' : 'tbd4',
-        'tbd5' : 'tbd5',
-        'tbd6' : 'tbd6',
-    })
-    styleDictLock = mp.Lock()
-    return styleDict, styleDictLock
 #############################################################################
 
 def getActThrds():

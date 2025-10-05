@@ -7,23 +7,21 @@ import datetime        as dt # For logging server start/stop times.
 import cmdVectors      as cv # Contains vectors to "worker" functions.
 import cfg                   # For port, pwd.
 import utils           as ut # For access to openSocketsLst[].
+import multiprocessing as mp
 #############################################################################
 
-def listThreads(): # Daemon to startServer, terminates w/ kill server (ks).
-    while True:
-        time.sleep(60*60*24*365)
-        print(' ##################')
-        print(' Active Threads: ')
-        for t in threading.enumerate():
-            print('   Name: {:11}  Daemon: {}'.format( t.name, t.daemon))
-            #print('   Name: {} Daemon: {} ID: {} Target: {}'.\
-            #    format( t.name, t.daemon, t.ident,
-            #            getattr(t, '_target', None)))
-        print(' ##################')
-        print(' Open Sockets: ')
-        for openS in ut.openSocketsLst:
-            print('   {}'.format(openS['ca']))
-        print(' ##################')
+def getMultiProcSharedDict():
+    manager = mp.Manager()
+    styleDict = manager.dict({
+        'tbd1' : 'tbd1',
+        'tbd2' : 'tbd2',
+        'tbd3' : 'tbd3',
+        'tbd4' : 'tbd4',
+        'tbd5' : 'tbd5',
+        'tbd6' : 'tbd6',
+    })
+    styleDictLock = mp.Lock()
+    return styleDict, styleDictLock
 #############################################################################
 
 def ksCleanup(styleDict, styleDictLock):
@@ -182,11 +180,6 @@ def startServer(uut):
     serverSocket.settimeout(3.0) # Sets the .accept timeout - ks processing.
 
     clientToServerCmdQ = queue.Queue() # So client can tell server to stop.
-
-    thread = threading.Thread( target = listThreads,
-                               name   = 'listThreads',
-                               daemon = True )
-    thread.start()
 
     logStr  = 'Server listening on: {} {}\n'.format(host, port)
     logStr += printSocketInfo(serverSocket)
