@@ -246,7 +246,7 @@ def startServer(uut):
 
 if __name__ == '__main__':
 
-    import spiRoutines as sr
+    #import spiRoutines as sr
     arguments  = sys.argv
     scriptName = arguments[0]
     uut        = None
