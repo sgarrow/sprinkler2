@@ -29,6 +29,7 @@ import initRoutines    as ir
 import timeRoutines    as tr
 import relayRoutines   as rr
 import profileRoutines as pr
+import fileIO          as fio
 import runActProfRtns  as rap
 import utils           as ut
 #############################################################################
@@ -128,7 +129,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
              'parm' : None,
              'menu' : 'Get Date/Time'                  },
 
-    'gt' : { 'func' : ut.getTemp,
+    'gt' : { 'func' : rap.getTemp,
              'parm' : None,
              'menu' : 'Get CPU Temp'                   },
 
@@ -136,7 +137,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
              'parm' : None,
              'menu' : 'Get Version Number'             },
 
-    'gat': { 'func' : ut.getActiveThreads,
+    'gat': { 'func' : ut.getActThrds,
              'parm' : None,
              'menu' : 'Get Active Threads'             },
 
@@ -146,27 +147,27 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     ## FILE ################################
 
-    'ral': { 'func' : ut.readFile,
+    'ral': { 'func' : fio.readFile,
              'parm' : ['appLog.txt',[5]],
              'menu' : 'Read App Log File'              },
 
-    'rsl': { 'func' : ut.readFile,
+    'rsl': { 'func' : fio.readFile,
              'parm' : ['serverLog.txt',[5]],
              'menu' : 'Read Srvr Log File'             },
 
-    'rse': { 'func' : ut.readFile,
+    'rse': { 'func' : fio.readFile,
              'parm' : ['serverException.txt',[5]],
              'menu' : 'Read Srvr Except File'          },
 
-    'cal': { 'func' : ut.clearFile,
+    'cal': { 'func' : fio.clearFile,
              'parm' : ['appLog.txt'],
              'menu' : 'Clear App Log File'             },
 
-    'csl': { 'func' : ut.clearFile,
+    'csl': { 'func' : fio.clearFile,
              'parm' : ['serverLog.txt'],
              'menu' : 'Clear Srvr Log File'            },
 
-    'cse': { 'func' : ut.clearFile,
+    'cse': { 'func' : fio.clearFile,
              'parm' : ['serverException.txt'],
              'menu' : 'Clear Srvr Except File'         },
 
@@ -201,12 +202,11 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
             if len(optArgsStr) > 0:
                 params[1] = optArgsStr
 
-        # crontab @reboot /bin/sleep 30; cd python/sprinkler2; nohup python3 server.py > serverException.txt $
         try:
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-         
+
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except: # pylint: disable=W0702

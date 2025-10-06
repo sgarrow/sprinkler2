@@ -1,40 +1,14 @@
 import sys                   # For getting command line args.
 import socket                # For creating and managing sockets.
-import threading             # For handling multiple clients concurrently.
+import threading       as th # For handling multiple clients concurrently.
 import queue                 # For Killing Server.
 import time                  # For Killing Server and listThreads.
+import multiprocessing as mp
 import datetime        as dt # For logging server start/stop times.
 import cmdVectors      as cv # Contains vectors to "worker" functions.
 import cfg                   # For port, pwd.
+import fileIO          as fio
 import utils           as ut # For access to openSocketsLst[].
-import multiprocessing as mp
-openSocketsLst = []    # Needed for processing close and ks commands.
-#############################################################################
-
-def getActThrds():
-    rspStr = ' Running Threads:\n'
-    for t in th.enumerate():
-        rspStr += '   {}\n'.format(t.name)
-
-    rspStr += '\n Open Sockets:\n'
-    for ii,openS in enumerate(openSocketsLst):
-
-        rspStr+='   Socket {} Object Information \n'.format(ii)
-        rspStr+='     Remote Addr, Port: {}\n'.format(openS['cs'].getpeername())
-        rspStr+='      Local Addr, Port: {}\n'.format(openS['cs'].getsockname())
-        rspStr+='       File descriptor: {}\n'.format(openS['cs'].fileno()     )
-        rspStr+='              Protocol: {}\n'.format(openS['cs'].proto        )
-        rspStr+='                Family: {}\n'.format(openS['cs'].family       )
-        rspStr+='                  Type: {}\n'.format(openS['cs'].type         )
-
-        rspStr+='   Socket {} Address Information \n'.format(ii)
-        rspStr+='               Address: {}\n\n'.format(openS['ca'])
-
-    rspStr += '\n Running Processes:\n'
-    for k,v in cr.procPidDict.items():
-        if v is not None:
-            rspStr += '   {}\n'.format(k)
-    return [rspStr]
 #############################################################################
 
 def getMultiProcSharedDict():
@@ -54,8 +28,8 @@ def getMultiProcSharedDict():
 def ksCleanup(styleDict, styleDictLock):
     rspStr  = ''
 ### START KS CODE REMOVE ###
-    rspStr += cv.vector('sp',  styleDict, styleDictLock) + '\n' 
-    rspStr += '\n\n' + cv.vector('or 12345678', styleDict, styleDictLock) + '\n' 
+    rspStr += cv.vector('sp',  styleDict, styleDictLock) + '\n'
+    rspStr += '\n\n' + cv.vector('or 12345678', styleDict, styleDictLock) + '\n'
 ### END KS CODE REMOVE ###
     return rspStr
 #############################################################################
@@ -108,7 +82,7 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
         passwordIsOk = False
         rspStr += ' Rejected connection from: {}\n'.format(clientAddress)
 
-    ut.writeFile('serverLog.txt', rspStr)
+    fio.writeFile('serverLog.txt', rspStr)
     #print(rspStr)
     clientSocket.send(rspStr.encode()) # sends all even if >1024.
 
@@ -159,11 +133,11 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
                 ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 
         if logStr != '':
-            ut.writeFile('serverLog.txt', logStr)
+            fio.writeFile('serverLog.txt', logStr)
             #print(logStr)
 
     logStr = ' handleClient {} closing socket and breaking loop\n'.format(clientAddress)
-    ut.writeFile('serverLog.txt', logStr)
+    fio.writeFile('serverLog.txt', logStr)
     #print(logStr)
     clientSocket.close()
 #############################################################################
@@ -179,10 +153,10 @@ def startServer(uut):
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
     logStr =  'Server started at {} \n'.format(cDT)
-    ut.writeFile('serverLog.txt', logStr)
+    fio.writeFile('serverLog.txt', logStr)
     #print(logStr)
 
-    styleDict, styleDictLock = ut.getMultiProcSharedDict()
+    styleDict, styleDictLock = getMultiProcSharedDict()
     #print('startServer', styleDict, styleDictLock)
 
     host = '0.0.0.0'  # Listen on all available interfaces
@@ -210,7 +184,7 @@ def startServer(uut):
 
     logStr  = 'Server listening on: {} {}\n'.format(host, port)
     logStr += printSocketInfo(serverSocket)
-    ut.writeFile('serverLog.txt', logStr)
+    fio.writeFile('serverLog.txt', logStr)
     #print(logStr)
 
     while True:
@@ -222,9 +196,9 @@ def startServer(uut):
             pass
         else:
             if cmd == 'ks':
-                threadLst = [ t.name for t in threading.enumerate() ]
+                threadLst = [ t.name for t in th.enumerate() ]
                 while any(el.startswith('handleClient-') for el in threadLst):
-                    threadLst = [ t.name for t in threading.enumerate() ]
+                    threadLst = [ t.name for t in th.enumerate() ]
                     time.sleep(.1)
                 break
 
@@ -237,7 +211,7 @@ def startServer(uut):
             # Yes, create a new thread to handle the new client.
             logStr += 'Starting a new client handler thread.\n'
 
-            cThrd = threading.Thread( target=handleClient,
+            cThrd = th.Thread( target=handleClient,
 
                                       args = ( clientSocket,
                                                clientAddress,
@@ -251,7 +225,7 @@ def startServer(uut):
             cThrd.start()
 
         if logStr != '':
-            ut.writeFile('serverLog.txt', logStr)
+            fio.writeFile('serverLog.txt', logStr)
             #print(logStr)
 
     logStr = 'Server breaking.\n'
@@ -260,7 +234,7 @@ def startServer(uut):
     now = dt.datetime.now()
     cDT = '{}'.format(now.isoformat( timespec = 'seconds' ))
     logStr += 'Server stopped at {} \n'.format(cDT)
-    ut.writeFile('serverLog.txt', logStr)
+    fio.writeFile('serverLog.txt', logStr)
     #print(logStr)
 #############################################################################
 
@@ -269,13 +243,14 @@ if __name__ == '__main__':
     #import spiRoutines as sr
     arguments  = sys.argv
     scriptName = arguments[0]
-    uut        = None
+    mnUut      = None            # pylint: disable=C0103
+    mnCfgDict  = None            # pylint: disable=C0103
     if len(arguments) >= 2:
         userArgs   = arguments[1:]
-        uut        = userArgs[0]
-        cfgDict    = cfg.getCfgDict(uut)
+        mnUut       = userArgs[0]
+        mnCfgDict   = cfg.getCfgDict(mnUut) # pylint: disable=C0103
 
-    if uut is None or cfgDict is None:
+    if mnUut is None or mnCfgDict is None:
         print('  Server not started.')
         print('  Missing or (malformed) cfg file or')
         print('  Missing or (malformed) cmd line arg')
@@ -286,4 +261,4 @@ if __name__ == '__main__':
 ### START MN CODE REMOVE ###
 ### END MN CODE REMOVE ###
 
-    startServer(uut)
+    startServer(mnUut)
