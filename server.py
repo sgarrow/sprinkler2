@@ -73,7 +73,9 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
         logStr = ''
         # Recieve msg from the client (and look (try) for UNEXPECTED EVENT).
         try: # In case user closed client window (x) instead of by close cmd.
-            data = clientSocket.recv(1024) # Broke if any msg from client > 1024.
+            data = clientSocket.recv(1024) # Broke if any msg > 1024.
+            #print(data.decode())
+            #print('**************')
         except ConnectionResetError: # Windows throws this on (x).
             logStr += ' handleClient {} ConnectRstErr except in s.recv\n'.format(clientAddress)
             # Breaks the loop. handler/thread stops. Connection closed.
@@ -87,25 +89,34 @@ def handleClient( clientSocket, clientAddress, client2ServerCmdQ,
             continue           # loop if another client has issued a ks cmd.
 
         # Getting here means a command has been received.
-        logStr = ' handleClient {} received: {}\n'.format(clientAddress, data.decode())
+        logStr = ' handleClient {} received: {}\n'.\
+            format(clientAddress, data.decode())
+        print(logStr)
 
-        # Process a "close" message and send response back to the local client.
-        if data.decode() == 'close':
+        # Process close special message & send response back to this client.
+        if data.decode() == 'close':  # Close this client's socket.
             logStr += processCloseCmd(clientSocket, clientAddress)
 
-        # Process a "ks" message and send response back to other client(s).
-        elif data.decode() == 'ks':
-            logStr += processKsCmd( clientSocket, clientAddress,
-                                    client2ServerCmdQ, styleDict, styleDictLock )
+        # Process a ks special message & send response back to all clients.
+        elif data.decode() == 'ks': # Close all client sockets.
+            logStr += processKsCmd(clientSocket, clientAddress,
+                                   client2ServerCmdQ,styleDict,styleDictLock)
 
-        # Process a "standard" msg and send response back to the client,
+        # Process up special message and send response back to this client.
+        elif data.decode().split()[0] in sc.specialCmds: # up fPath numBytes
+            inParms  = data.decode().split()
+            response = sc.specialCmdHndlr( inParms, clientSocket )
+            clientSocket.send(response.encode())
+
+        # Process a normal message and send response back to this client.
         # (and look (try) for UNEXPECTED EVENT).
         else:
             response = cv.vector(data.decode(),styleDict, styleDictLock)
-            try: # In case user closed client window (x) instead of by close cmd.
+            try: # If user closed client window (x) instead of by close cmd.
                 clientSocket.send(response.encode())
             except BrokenPipeError:      # RPi throws this on (x).
-                logStr += ' handleClient {} BrokePipeErr except in s.send\n'.format(clientAddress)
+                logStr +=' handleClient {} BrokePipeErr except in s.send\n'.\
+                    format(clientAddress)
                 # Breaks the loop. handler/thread stops. Connection closed.
                 ut.openSocketsLst.remove({'cs':clientSocket,'ca':clientAddress})
 
@@ -163,6 +174,8 @@ def startServer(uut):
     logStr += printSocketInfo(serverSocket)
     fio.writeFile('serverLog.txt', logStr)
     #print(logStr)
+    # sndBufSize =  16,384  # 0.25 * 64K
+    # rcvBufSize = 131,072  # 2.00 * 64K
 
     while True:
         logStr = ''

@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import cmdVectors      as cv # Contains vectors to "worker" functions.
-
+specialCmds = ['dummy']
 #############################################################################
 
 def getMultiProcSharedDict():
@@ -26,3 +26,10 @@ def ksCleanup(styleDict, styleDictLock):
 
 def hwInit():
     print('No HW Init to do.')
+#############################################################################
+
+def specialCmdHndlr(inParms, clientSocket):
+    response = 'done'
+    return response
+
+

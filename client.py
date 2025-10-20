@@ -18,6 +18,7 @@ import select
 import threading
 import queue
 import cfg
+import clientCustomize as cc
 #############################################################################
 
 def printSocketInfo(cSocket):
@@ -39,6 +40,8 @@ def getUserInput( uiToMainQ, aLock ):
             if userInput in ['ks','close']:
                 break
         time.sleep(.01) # Gives 'main' a chance to run.
+        if 'up' in userInput:
+            time.sleep(1) # Gives 'main' a chance to run.
 #############################################################################
 
 if __name__ == '__main__':
@@ -59,12 +62,11 @@ if __name__ == '__main__':
     # Each client will connect to the server with a new address.
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    connectType = input(' ssh, lan, internet (s,l,i) -> ')
-    #connectType = 'i' # pylint: disable=C0103
+    #connectType = input(' ssh, lan, internet (s,l,i) -> ')
+    connectType  = 'l' # pylint: disable=C0103
+    connectDict  = {'s':'localhost','l':cfgDict['myLan'],'i':cfgDict['myIP']}
+    PORT         = int(cfgDict['myPort'])
 
-    #             {'s':'localhost','l':'lanAddr','i':'routerAddr'}
-    connectDict = {'s':'localhost','l':cfgDict['myLan'],'i':cfgDict['myIP']}
-    PORT = int(cfgDict['myPort'])
     try:
         clientSocket.connect((connectDict[connectType], PORT ))
     except ConnectionRefusedError:
@@ -93,33 +95,59 @@ if __name__ == '__main__':
                                     daemon = True )
     inputThread.start()
 
-    rspStr = ''
-    while pwdIsOk:
-        try:
-            message = Ui2MainQ.get()
-        except queue.Empty:
-            pass
-        else:
-            clientSocket.send(message.encode())
+    rspStr          = ''
+    specialDict     = { 'clk':['up'],           # Special cmds.
+                        'spr':['dummy'] }
+    longExeTimeMsgs = ['mus','ks','pc','up']    # Cmds that take long.
+    normWaitTime    = 0.6
+    longWaitTime    = 2.0
 
-        with threadLock:  # Same story.
-            if any(word in message for word in ['mus', 'ks']):
-                readyToRead, _, _ = select.select([clientSocket], [], [], 1.6)
-            else:
-                readyToRead, _, _ = select.select([clientSocket], [], [], .6)
+    while pwdIsOk:
+        
+        try:
+            message = Ui2MainQ.get()            # Get/send msg from Q.
+            waitTime = normWaitTime
+            if any(word in message for word in longExeTimeMsgs):
+                waitTime = longWaitTime
+        except queue.Empty:
+            print('q empty')
+            pass                                # No message to send.
+
+        else:                                       
+            msgLst = message.split()
+
+            if   uut.startswith('clk')  and \
+                 len(msgLst) > 0        and \
+                 msgLst[0].lstrip() in specialDict['clk']:
+                                                # Send special message.  
+                 print(cc.processSpecialCmd('uploadPic', 
+                                             clientSocket,
+                                             msgLst), end = '')
+
+            elif uut.startswith('spr') and \
+                 len(msgLst) > 0       and \
+                 msgLst[0].lstrip() in specialDict['spr']:
+                                                # Send special message.  
+                 print(cc.processSpecialCmd('dummy', 
+                                             clientSocket,
+                                             msgLst), end = '')
+
+            else:                               # Send normal message.
+                clientSocket.send(message.encode())
+
+        with threadLock:                        # Receive/print response. 
+            readyToRead, _, _ = select.select([clientSocket],[],[],waitTime)
             if readyToRead:
                 rspStr = ''
                 while readyToRead:
                     response = clientSocket.recv(1024)
                     rspStr += response.decode()
-
-                    if 'RE: ks' in rspStr:
+                    if 'RE: ks' in rspStr:          # Early exit on ks cmd.
                         break
-
                     readyToRead,_, _=select.select([clientSocket],[],[],.25)
-                print('\n{}'.format(rspStr))
+                print('\n{}'.format(rspStr),flush = True)
 
-        if message == 'close' or 'RE: ks' in rspStr:
+        if message=='close' or 'RE: ks' in rspStr:  # Exit on close or ks.
             break
 
     print('\n Client closing Socket')
