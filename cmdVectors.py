@@ -42,20 +42,21 @@ wkCmdQ = queue.Queue() # run in various threads and these queues serve as
 wkRspQ = queue.Queue() # communication vehicles to/from these threads.
 #############################################################################
 
-def killSrvr(): # The ks cmd is handled directly in the handleClient
-    return      # function so doesn't need a "worker" function.  However,
-                # because of the way the menu/vectoring is done a function
-                # needs to at least exist.  This function is never called.
+# Cmds close,ks,up,rbt are handled directly in the handleClient func so they
+# don't need a wrk funct, but because of way vectoring is done a func needs
+# to exist. This function is never called/runs.
+def dummy():
+    return
 #############################################################################
 
-def disconnect():  # Handled directly in the handleClient func so it
-    return         # doesn't need a wrk funct, but because of way vectoring
-                   # is done a func needs to exist. Func never called/runs.
-#############################################################################
-
+# Version number of the "app".
+# As opposed to the version number of the "server" which is in fileIO.py
+VER = ' v3.21.91 - 04-Jan-2026'
 def getVer():
-    VER = ' v3.21.90 - 21-Oct-2025'
-    return [VER]
+    appVer = VER
+    srvVer = fio.VER
+    rspStr = ' appVer = {} \n serVer = {}'.format(appVer, srvVer)
+    return [rspStr]
 #############################################################################
 
 def vector(inputStr,styleDic,styleLk): # called from handleClient.
@@ -141,7 +142,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
              'parm' : None,
              'menu' : 'Get Active Threads'             },
 
-    'ks' : { 'func' : killSrvr,
+    'ks' : { 'func' : dummy,
              'parm' : None,
              'menu' : 'Kill Server'                    },
 
@@ -171,7 +172,11 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
              'parm' : ['serverException.txt'],
              'menu' : 'Clear Srvr Except File'         },
 
-    'close':{'fun'  : disconnect,
+    'tmp': { 'func' : dummy,
+             'parm'  : None,
+             'menu' : 'Do Nothing'                     },
+
+    'close':{'fun'  : dummy,
              'prm'  : None,
              'menu' : 'close'                          },
     }
@@ -206,7 +211,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-
+    
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except: # pylint: disable=W0702
