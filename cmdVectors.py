@@ -32,6 +32,7 @@ import profileRoutines as pr
 import fileIO          as fio
 import runActProfRtns  as rap
 import utils           as ut
+import swUpdate        as su
 #############################################################################
 
 gpioDict  = None
@@ -51,7 +52,7 @@ def dummy():
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = ' v4.1.01 - 15-Feb-2026'
+VER = ' v4.1.02 - 15-Feb-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -141,6 +142,10 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
     'gat': { 'func' : ut.getActThrds,
              'parm' : None,
              'menu' : 'Get Active Threads'             },
+
+    'us' : { 'func' : su.updateSw,
+             'parm' : getVer(),
+             'menu' : 'Update SW'                      },
 
     'ks' : { 'func' : dummy,
              'parm' : None,
