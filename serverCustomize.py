@@ -3,24 +3,29 @@ import cmdVectors      as cv # Contains vectors to "worker" functions.
 specialCmds = ['tmp']
 #############################################################################
 
-def getMultiProcSharedDict():
+def getMultiProcSharedDictAndLock():
     manager = mp.Manager()
-    styleDict = manager.dict({
-        'tbd1' : 'tbd1',
-        'tbd2' : 'tbd2',
-        'tbd3' : 'tbd3',
-        'tbd4' : 'tbd4',
-        'tbd5' : 'tbd5',
-        'tbd6' : 'tbd6',
+    #styleDict = manager.dict({
+    mpSharedDict = manager.dict({
+        'activeDigitStyle': 'greyOnBlack', # This style cannot be deleted.
+        'dayDigitStyle'   : 'greyOnBlack',
+        'nightDigitStyle' : 'greyOnBlack',
+        'nightTime'       : [ 2, 1, 0, 0, 0, 0 ],
+        'dayTime'         : [ 0, 7, 0, 0, 0, 0 ],
+        'alarmTime'       : [ 0, 0, 0, 0, 0, 0 ],
+        'displayingPics'  : False
     })
-    styleDictLock = mp.Lock()
-    return styleDict, styleDictLock
+    #styleDictLock = mp.Lock()
+    mpSharedDictLock = mp.Lock()
+
+    #return styleDict, styleDictLock
+    return mpSharedDict, mpSharedDictLock
 #############################################################################
 
-def ksCleanup(styleDict, styleDictLock):
+def ksCleanup(mpSharedDict, mpSharedDictLock):
     rspStr  = ''
-    rspStr += cv.vector('sp',  styleDict, styleDictLock) + '\n'
-    rspStr += '\n\n' + cv.vector('or 12345678', styleDict, styleDictLock) + '\n'
+    rspStr += cv.vector('sp',  mpSharedDict, mpSharedDictLock) + '\n'
+    rspStr += '\n\n' + cv.vector('or 12345678', mpSharedDict, mpSharedDictLock) + '\n'
     return rspStr
 #############################################################################
 
@@ -37,14 +42,14 @@ def displayLanIp(inLanIp):
     srvVerStr = verLines[1]
 
     appVerSplit = appVerStr.split('=')
-    appVerName  = appVerSplit[0]
+    #appVerName  = appVerSplit[0]
     appVerNum   = appVerSplit[1].split(' - ')[0]
-    appVerDt    = appVerSplit[1].split(' - ')[1]
+    #appVerDt    = appVerSplit[1].split(' - ')[1]
 
     srvVerSplit = srvVerStr.split('=')
-    srvVerName  = srvVerSplit[0]
+    #srvVerName  = srvVerSplit[0]
     srvVerNum   = srvVerSplit[1].split(' - ')[0]
-    srvVerDt    = srvVerSplit[1].split(' - ')[1]
+    #srvVerDt    = srvVerSplit[1].split(' - ')[1]
 
     appV = [ x.strip() for x in appVerNum.split('.') ]
     srvV = [ x.strip() for x in srvVerNum.split('.') ]
@@ -59,7 +64,6 @@ def hwInit():
 #############################################################################
 
 def specialCmdHndlr(inParms, clientSocket):
+    if inParms and clientSocket: pass
     response = 'Nothing Done.'
     return response
-
-

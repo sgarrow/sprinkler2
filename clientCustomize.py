@@ -1,6 +1,7 @@
 def tmpWorker(clientSocket,cmd,optArgs):
+    if optArgs: pass
     clientSocket.send(cmd.encode())
-    return
+    return 0
 
 #############################################################################
 def processSpecialCmd(funcName, clientSocket, inMsgLst):

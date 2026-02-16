@@ -51,7 +51,7 @@ def dummy():
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = ' v3.21.95 - 09-Feb-2026'
+VER = ' v4.1.01 - 15-Feb-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -59,29 +59,29 @@ def getVer():
     return [rspStr]
 #############################################################################
 
-def vector(inputStr,styleDic,styleLk): # called from handleClient.
+def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
 
     global gpioDict      # These global variables are
     global rlyObjLst     # discussed in file initRoutines.py.
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()
 
-    if styleDic and styleLk: pass # Not used, generates pylint error.
+    if mpSharedDict and mpSharedDictLock: pass # Not used, generates pylint error.
 
     allRlys  = ['12345678']
 
-    # This dictionary embosies the worker function vector (and menu) info.
+    # This dictionary embodies the worker function vector (and menu) info.
     strToFunctDict = {
 
     ## RELAY ###############################
 
     'or' : { 'func' : rr.openRly,           
              'parm' : [rlyObjLst,gpioDict,None],
-             'menu' : 'Set Relay To Open'            }, # Open Relay
+             'menu' : 'Set Relay To Open'            },
 
     'cr' : { 'func' : rr.closeRly,          
              'parm' : [rlyObjLst,gpioDict,None],
-             'menu' : 'Set Relay To Closed'          }, # Close Relay 
+             'menu' : 'Set Relay To Closed'          },
 
     'tr' : { 'func' : rr.toggleRly,         
              'parm' : [rlyObjLst,gpioDict,None],
@@ -89,7 +89,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     'rr' : { 'func' : rr.readRly,           
              'parm' : [rlyObjLst,gpioDict,allRlys],
-             'menu' : 'Get All Relay States'         }, # Read Relay
+             'menu' : 'Get All Relay States'         },
 
     ## PROFILE MGMT ########################
 
@@ -99,7 +99,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     'lp' : { 'func' : pr.listProfs,         
              'parm' : None,
-             'menu' : 'Get All Profiles'             }, # List Profiles
+             'menu' : 'Get All Profiles'             },
 
     'gap': { 'func' : pr.getAP,             
              'parm' : None,
@@ -122,7 +122,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
 
     'qp' : { 'func' : rap.queryViaTwoThrds, 
              'parm' : [uiCmdQ,uiRspQ],
-             'menu' : 'Get Profile Status'             }, # Query Running Profile
+             'menu' : 'Get Profile Status'             },
 
     ## MISC ################################
 
@@ -211,7 +211,7 @@ def vector(inputStr,styleDic,styleLk): # called from handleClient.
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-    
+
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except: # pylint: disable=W0702
