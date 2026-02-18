@@ -25,7 +25,7 @@ def getMultiProcSharedDictAndLock():
 def ksCleanup(mpSharedDict, mpSharedDictLock):
     rspStr  = ''
     rspStr += cv.vector('sp',  mpSharedDict, mpSharedDictLock) + '\n'
-    rspStr += '\n\n' + cv.vector('or 12345678', mpSharedDict, mpSharedDictLock) + '\n'
+    rspStr += '\n\n' + cv.vector('sro 12345678', mpSharedDict, mpSharedDictLock) + '\n'
     return rspStr
 #############################################################################
 

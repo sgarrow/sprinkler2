@@ -4,27 +4,9 @@ When a client enters a command those commands are received by function
 handleClient in file server.py.  The command (string) is forwarded to
 function "vector" (in this file) and the appropriate "worker" function
 is then vectored to.
-
-This project cannot be run on a PC, it has to be run on an RPi with the
-exception of file client.py which may be run on a PC.
-
-Every file in this project has comments like this at the top.
-Comments like this (enclosed by three single quotes) are called doc-strings.
-doc-strings are like comments but ... different. Comments are proceeded by #.
-
-The recommended way to learn about this project is to read the comments at
-the top of the files in this order:
-  server.py, client.py,
-  initRoutines.py, timeRoutines.py, relayRoutines.py,
-  profileRoutines.py, runActProfRtns.py, config.yml.
-
-After reading the doc-strings perusing the comments will also be helpful.
 '''
 
-# Import standard python libraries.
 import queue
-
-# Import other source files that are in the same directory as this file.
 import initRoutines    as ir
 import timeRoutines    as tr
 import relayRoutines   as rr
@@ -52,7 +34,7 @@ def dummy():
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = ' v4.1.04 - 15-Feb-2026'
+VER = ' v4.1.05 - 17-Feb-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -72,87 +54,55 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
     allRlys  = ['12345678']
 
     # This dictionary embodies the worker function vector (and menu) info.
-    strToFunctDict = {
+    vectorDict = {
 
-    ## RELAY ###############################
+    # GET COMMANDS
+    'grs': { 'func' : rr.readRly,
+             'parm' : [rlyObjLst,gpioDict,allRlys],
+             'menu' : 'Get Relay States'             },
 
-    'or' : { 'func' : rr.openRly,           
+    'gp' : { 'func' : pr.listProfs,
+             'parm' : None,
+             'menu' : 'Get Profiles'                 },
+
+    'gap': { 'func' : pr.getAP,
+             'parm' : None,
+             'menu' : 'Get Act Profile'              },
+
+    'gps': { 'func' : rap.queryViaTwoThrds,
+             'parm' : [uiCmdQ,uiRspQ],
+             'menu' : 'Get Profile Status'           },
+
+    'gdt': { 'func' : tr.getTimeDate,
+             'parm' : None,
+             'menu' : 'Get Date/Time'                },
+
+    'gt' : { 'func' : rap.getTemp,
+             'parm' : None,
+             'menu' : 'Get CPU Temp'                 },
+
+    'gat': { 'func' : ut.getActThrds,
+             'parm' : None,
+             'menu' : 'Get Active Threads'           },
+
+    'gvn': { 'func' : getVer,
+             'parm' : None,
+             'menu' : 'Get Version Number'           },
+
+    # SET COMMANDS
+    'sro': { 'func' : rr.openRly,
              'parm' : [rlyObjLst,gpioDict,None],
              'menu' : 'Set Relay To Open'            },
 
-    'cr' : { 'func' : rr.closeRly,          
+    'src': { 'func' : rr.closeRly,          
              'parm' : [rlyObjLst,gpioDict,None],
              'menu' : 'Set Relay To Closed'          },
-
-    'tr' : { 'func' : rr.toggleRly,         
-             'parm' : [rlyObjLst,gpioDict,None],
-             'menu' : 'Toggle  Relay'                },
-
-    'rr' : { 'func' : rr.readRly,           
-             'parm' : [rlyObjLst,gpioDict,allRlys],
-             'menu' : 'Get All Relay States'         },
-
-    ## PROFILE MGMT ########################
-
-    'mp' : { 'func' : pr.makeProf,          
-             'parm' : None,
-             'menu' : 'Make Profiles'                },
-
-    'lp' : { 'func' : pr.listProfs,         
-             'parm' : None,
-             'menu' : 'Get All Profiles'             },
-
-    'gap': { 'func' : pr.getAP,             
-             'parm' : None,
-             'menu' : 'Get Act Profile'              },
 
     'sap': { 'func' : pr.setAP,             
              'parm' : None,
              'menu' : 'Set Act Profile'              },
 
-    ## PROFILE RUN #########################
-
-    'rp' : { 'func' : rap.strtTwoThrds,     
-             'parm' : [rlyObjLst,gpioDict,
-                       uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
-             'menu' : 'Run Active Profile'             },
-
-    'sp' : { 'func' : rap.stopTwoThrd,      
-             'parm' : [uiCmdQ],
-             'menu' : 'Stop Running Profile'           },
-
-    'qp' : { 'func' : rap.queryViaTwoThrds, 
-             'parm' : [uiCmdQ,uiRspQ],
-             'menu' : 'Get Profile Status'             },
-
-    ## MISC ################################
-
-    'gdt': { 'func' : tr.getTimeDate,
-             'parm' : None,
-             'menu' : 'Get Date/Time'                  },
-
-    'gt' : { 'func' : rap.getTemp,
-             'parm' : None,
-             'menu' : 'Get CPU Temp'                   },
-
-    'gvn': { 'func' : getVer,
-             'parm' : None,
-             'menu' : 'Get Version Number'             },
-
-    'gat': { 'func' : ut.getActThrds,
-             'parm' : None,
-             'menu' : 'Get Active Threads'             },
-
-    'us' : { 'func' : su.updateSw,
-             'parm' : [getVer(),'sprinkler2'],
-             'menu' : 'Update SW'                      },
-
-    'ks' : { 'func' : dummy,
-             'parm' : None,
-             'menu' : 'Kill Server'                    },
-
-    ## FILE ################################
-
+    # FILE COMMANDS
     'ral': { 'func' : fio.readFile,
              'parm' : ['appLog.txt',[5]],
              'menu' : 'Read App Log File'              },
@@ -177,14 +127,45 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
              'parm' : ['serverException.txt'],
              'menu' : 'Clear Srvr Except File'         },
 
-    'tmp': { 'func' : dummy,
-             'parm'  : None,
-             'menu' : 'Do Nothing'                     },
+    # OTHER COMMANDS
 
-    'close':{'fun'  : dummy,
-             'prm'  : None,
-             'menu' : 'close'                          },
+    'mp' : { 'func' : pr.makeProf,          
+             'parm' : None,
+             'menu' : 'Make Profiles'                },
+
+    'rp' : { 'func' : rap.strtTwoThrds,     
+             'parm' : [rlyObjLst,gpioDict,
+                       uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
+             'menu' : 'Run Active Profile'             },
+
+    'sp' : { 'func' : rap.stopTwoThrd,      
+             'parm' : [uiCmdQ],
+             'menu' : 'Stop Running Profile'           },
+
+    # OTHER COMMANDS
+    'us' : { 'func' : su.updateSw,
+             'parm' : [getVer(),'sprinkler2'],
+             'menu' : 'Update SW'                      },
+
+    'close':{'func' : dummy,
+             'parm' : None,
+             'menu' : 'Disconnect'                     },
+
+    'ks' : { 'func' : dummy,
+             'parm' : None,
+             'menu' : 'Kill Server'                    },
+
+    'rbt': { 'func' : dummy,
+             'parm' : None,
+             'menu' : 'Reboot RPi'                      },
+
+    # TEST COMMANDS
+    't1' : { 'func' : rr.toggleRly,
+             'parm' : [rlyObjLst,gpioDict,None],
+             'menu' : 'Test 1 - Toggle  Relay'       },
+
     }
+    #####################################################
 
     # Process the string (command) passed to this function via the call
     # from function handleClient in file server.py.
@@ -197,18 +178,18 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
     choice     = inputWords[0]
     optArgsStr = inputWords[1:]
 
-    if choice in strToFunctDict:
-        func   = strToFunctDict[choice]['func']
-        params = strToFunctDict[choice]['parm']
+    if choice in vectorDict:
+        func   = vectorDict[choice]['func']
+        params = vectorDict[choice]['parm']
 
         if choice in ['or','cr','tr']:
-            params    = strToFunctDict[choice]['parm'][:]
+            params    = vectorDict[choice]['parm'][:]
             params[2] = optArgsStr
 
-        if choice in ['sap']:
+        elif choice in ['sap']:
             params = optArgsStr
 
-        if choice in ['ral','rsl','rse']:
+        elif choice in ['ral','rsl','rse']:
             if len(optArgsStr) > 0:
                 params[1] = optArgsStr
 
@@ -219,22 +200,21 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
 
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
-        except: # pylint: disable=W0702
-            rsp = ' Command {} generated an exception'.format(choice)
-            print(rsp)
-            return rsp
+        except Exception as e: # pylint: disable = W0718
+            return str(e)
 
     if choice == 'm':
-        rspStrDict = { 'or'  : ' RELAY COMMANDS \n',
-                       'mp'  : '\n MANAGE PROFILE COMMANDS \n',
-                       'rp'  : '\n RUN PROFILE COMMANDS \n',
-                       'gdt' : '\n MISC COMMANDS \n',
-                       'ral' : '\n FILE COMMANDS \n'
-                     }
+        tmpDic = {
+        'grs' : '{}'.format(   ' === GET   COMMANDS === \n' ),
+        'sro' : '{}'.format( '\n === SET   COMMANDS === \n' ),
+        'ral' : '{}'.format( '\n === FILE  COMMANDS === \n' ),
+        'mp'  : '{}'.format( '\n === OTHER COMMANDS === \n' ),
+        't1'  : '{}'.format( '\n === TEST  COMMANDS === \n' ) }
+
         rspStr = ''
-        for k,v in strToFunctDict.items():
-            if k in rspStrDict:
-                rspStr += rspStrDict[k]
+        for k,v in vectorDict.items():
+            if k in tmpDic:
+                rspStr += tmpDic[k]
             rspStr += ' {:4} - {}\n'.format(k, v['menu'] )
         return rspStr          # Return to srvr for forwarding to clnt.
 
