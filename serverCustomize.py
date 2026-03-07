@@ -5,7 +5,6 @@ specialCmds = ['tmp']
 
 def getMultiProcSharedDictAndLock():
     manager = mp.Manager()
-    #styleDict = manager.dict({
     mpSharedDict = manager.dict({
         'activeDigitStyle': 'greyOnBlack', # This style cannot be deleted.
         'dayDigitStyle'   : 'greyOnBlack',
@@ -15,7 +14,6 @@ def getMultiProcSharedDictAndLock():
         'alarmTime'       : [ 0, 0, 0, 0, 0, 0 ],
         'displayingPics'  : False
     })
-    #styleDictLock = mp.Lock()
     mpSharedDictLock = mp.Lock()
 
     #return styleDict, styleDictLock
