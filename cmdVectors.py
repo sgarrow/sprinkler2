@@ -34,7 +34,7 @@ def dummy():
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = 'v4.1.6 - 06-Mar-2026'
+VER = 'v4.1.7 - 15-Mar-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -182,7 +182,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
         func   = vectorDict[choice]['func']
         params = vectorDict[choice]['parm']
 
-        if choice in ['or','cr','tr']:
+        if choice in [ 'sro', 'src', 't1' ]:
             params    = vectorDict[choice]['parm'][:]
             params[2] = optArgsStr
 
@@ -197,7 +197,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-
+    
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except Exception as e: # pylint: disable = W0718
