@@ -35,24 +35,35 @@ Command sap: Calls function setAP (setActiveProfile).
 '''
 
 import pickle
+import logging
 import threading
 import pprint as pp
 import yaml
+lg = logging.getLogger(__name__)
+#############################################################################
+#############################################################################
 
 def loadProf():
+
+    profDict = {}
+
     try:
+        #1/0 # For testing.
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
-    except FileNotFoundError:
+
+    except FileNotFoundError as e:
         logStr  = ' Could not open pickle/schedDict.pickle.\n'
         logStr += ' Generating it now ...\n'
-        with open('serverLog.txt', 'a',encoding='utf-8') as f:
-            f.write( logStr )
+        lg.exception('%s \n $s', logStr, str(e))
         print( logStr )
-
         makeProf()
         with open('pickle/schedDict.pickle', 'rb') as f:
             profDict = pickle.load(f)
+
+    except ZeroDivisionError as e: # For testing.
+        lg.exception('    ** Test log exc      msg:\n %s\n', str(e))
+
     return profDict
 #############################################################################
 
@@ -65,10 +76,8 @@ def makeProf():
 
     with open('pickle/schedDict.pickle', 'rb') as handle:
         sd = pickle.load(handle)
-
     rspStr = pp.pformat(sd)
 
-    #print(rspStr)
     return [rspStr]
 #############################################################################
 
@@ -88,7 +97,8 @@ def listProfs():
                 rspStr += '          Days: {}, Times: {}, Durations: {}\n'.\
                     format(data['Days'], data['Times'], data['durations'])
 
-    #print(rspStr)
+    if pDict == {}:
+        return ['Unable to load profiles']
     return [rspStr]
 #############################################################################
 
@@ -157,4 +167,5 @@ def setAP( parmLst ):
 #############################################################################
 
 if __name__ == '__main__':
-    makeProf()
+    rspString = makeProf()
+    print(rspString)

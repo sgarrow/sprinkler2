@@ -17,8 +17,8 @@ import utils           as ut
 import swUpdate        as su
 #############################################################################
 
-gpioDict  = None
-rlyObjLst = None
+gpioDict  = None       # pylint: disable=C0103
+rlyObjLst = None       # pylint: disable=C0103
 uiCmdQ = queue.Queue() # These queues are used by the rp, qp qnd sp commands.
 uiRspQ = queue.Queue() # These commands (run/query/stop active profile) are
 wkCmdQ = queue.Queue() # run in various threads and these queues serve as
@@ -29,12 +29,12 @@ wkRspQ = queue.Queue() # communication vehicles to/from these threads.
 # don't need a wrk funct, but because of way vectoring is done a func needs
 # to exist. This function is never called/runs.
 def dummy():
-    return
+    return ['close, ks, up or rbt command processed']
 #############################################################################
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = 'v4.1.8 - 15-Mar-2026'
+VER = 'v4.2.0 - 30-Jul-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -44,8 +44,8 @@ def getVer():
 
 def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
 
-    global gpioDict      # These global variables are
-    global rlyObjLst     # discussed in file initRoutines.py.
+    global gpioDict  # These global variables are    pylint: disable=W0603
+    global rlyObjLst # discussed in initRoutines.py. pylint: disable=W0603
     if gpioDict is None:
         gpioDict, rlyObjLst = ir.init()
 
@@ -103,29 +103,21 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
              'menu' : 'Set Act Profile'              },
 
     # FILE COMMANDS
-    'ral': { 'func' : fio.readFile,
-             'parm' : ['appLog.txt',[5]],
-             'menu' : 'Read App Log File'              },
+    'rlf': { 'func' : fio.readFile,
+             'parm' : ['logFile.txt',[5]],
+             'menu' : 'Read Log File'                }, # Written by logger.
 
-    'rsl': { 'func' : fio.readFile,
-             'parm' : ['serverLog.txt',[5]],
-             'menu' : 'Read Srvr Log File'             },
+    'ref': { 'func' : fio.readFile,
+             'parm' : ['exceptionFile.txt',[5]],
+             'menu' : 'Read Exception File'          }, # Written by file redirect (cron)
 
-    'rse': { 'func' : fio.readFile,
-             'parm' : ['serverException.txt',[5]],
-             'menu' : 'Read Srvr Except File'          },
+    'clf': { 'func' : fio.clearFile,
+             'parm' : ['logFile.txt'],
+             'menu' : 'Clear Log File'               },
 
-    'cal': { 'func' : fio.clearFile,
-             'parm' : ['appLog.txt'],
-             'menu' : 'Clear App Log File'             },
-
-    'csl': { 'func' : fio.clearFile,
-             'parm' : ['serverLog.txt'],
-             'menu' : 'Clear Srvr Log File'            },
-
-    'cse': { 'func' : fio.clearFile,
-             'parm' : ['serverException.txt'],
-             'menu' : 'Clear Srvr Except File'         },
+    'cef': { 'func' : fio.clearFile,
+             'parm' : ['exceptionFile.txt'],
+             'menu' : 'Clear Exception File'         },
 
     # OTHER COMMANDS
 
@@ -189,7 +181,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
         elif choice in ['sap']:
             params = optArgsStr
 
-        elif choice in ['ral','rsl','rse']:
+        elif choice in ['rlf','ref']:
             if len(optArgsStr) > 0:
                 params[1] = optArgsStr
 
@@ -197,7 +189,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
             if params is None:
                 rsp = func()   # rsp[0] = rspStr. Vector to worker.
                 return rsp[0]  # return to srvr for forwarding to clnt.
-    
+
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except Exception as e: # pylint: disable = W0718
@@ -207,7 +199,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
         tmpDic = {
         'grs' : '{}'.format(   ' === GET   COMMANDS === \n' ),
         'sro' : '{}'.format( '\n === SET   COMMANDS === \n' ),
-        'ral' : '{}'.format( '\n === FILE  COMMANDS === \n' ),
+        'rlf' : '{}'.format( '\n === FILE  COMMANDS === \n' ),
         'mp'  : '{}'.format( '\n === OTHER COMMANDS === \n' ),
         't1'  : '{}'.format( '\n === TEST  COMMANDS === \n' ) }
 

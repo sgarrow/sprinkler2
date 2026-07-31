@@ -22,7 +22,7 @@ other than that there is no real functionality.
 # not part of a standard python installation but already downloaded and
 # installed on an RPi. Lots of data on the gpiozero here:
 # https://gpiozero.readthedocs.io/en/latest/
-import gpiozero
+import gpiozero # pylint: disable=E0401
 
 def init():
 
@@ -60,14 +60,14 @@ def init():
 
     # From the relay board datasheet.
     # https://www.waveshare.com/wiki/RPi_Relay_Board_(B)
-    RELAY_1_GPIO = 5
-    RELAY_2_GPIO = 6
-    RELAY_3_GPIO = 13
-    RELAY_4_GPIO = 16
-    RELAY_5_GPIO = 19
-    RELAY_6_GPIO = 20
-    RELAY_7_GPIO = 21
-    RELAY_8_GPIO = 26
+    RELAY_1_GPIO = 5     # pylint: disable=C0103
+    RELAY_2_GPIO = 6     # pylint: disable=C0103
+    RELAY_3_GPIO = 13    # pylint: disable=C0103
+    RELAY_4_GPIO = 16    # pylint: disable=C0103
+    RELAY_5_GPIO = 19    # pylint: disable=C0103
+    RELAY_6_GPIO = 20    # pylint: disable=C0103
+    RELAY_7_GPIO = 21    # pylint: disable=C0103
+    RELAY_8_GPIO = 26    # pylint: disable=C0103
     #################################################
 
     # A list of nums used in creating (below) a second list - of relay objs.

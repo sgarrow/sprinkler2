@@ -17,13 +17,15 @@ with the program at large via two command/response queue pairs.
 
 import time
 import queue
+import logging
 import threading
 import subprocess
 import datetime        as dt
-import gpiozero
+import gpiozero        # pylint: disable=E0401
 import relayRoutines   as rr
 import timeRoutines    as tr
 import profileRoutines as pr
+lg = logging.getLogger(__name__)
 #############################################################################
 
 def getTemp(prnEn = True):
@@ -188,8 +190,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('appLog.txt', 'a',encoding='utf-8') as f:
-        f.write( 'Profile {} started at {} \n'.format(apName,cDT))
+    lg.info('Profile %s started at %s', apName,cDT)
 
     while True:
 
@@ -225,6 +226,8 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
                 rspLst    = checkTimeMatch( relayData, curDT )
                 rspStr   += rspLst[0]
                 timeMatch = rspLst[1]
+            else:
+                timeMatch = False
 
             rspStr += '   day  match = {} \n'.format( dayMatch )
             if dayMatch:
@@ -251,8 +254,7 @@ def runApWrk( parmLst ): # Runs in thread started br startTwo...
     rspLst = tr.getTimeDate(False)
     curDT  = rspLst[1]
     cDT    = '{}'.format(curDT['now'].isoformat( timespec = 'seconds' ))
-    with open('appLog.txt', 'a',encoding='utf-8') as f:
-        f.write( 'Profile {} stopped at {} \n'.format(apName,cDT))
+    lg.info('Profile %s stopped at %s', apName,cDT)
 
     return 0
 #############################################################################
