@@ -43,10 +43,10 @@ def init():
                  'desc': 'Hill Below Driveway'      },
 
                  'GPIO16': { 'pin': 36, 'relay': 4,
-                 'desc': 'Hill Above Driveway'      },
+                 'desc': 'Hill Above Driveway - NOT RR Ties' },
 
                  'GPIO19': { 'pin': 35, 'relay': 5,
-                 'desc': 'Front Yard Planter Strip' },
+                 'desc': 'Hill Above Driveway - RR Ties'     },
 
                  'GPIO20': { 'pin': 38, 'relay': 6,
                  'desc': 'NC - 24V Ready'           },

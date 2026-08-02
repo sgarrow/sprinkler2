@@ -6,6 +6,8 @@ function "vector" (in this file) and the appropriate "worker" function
 is then vectored to.
 '''
 
+import sys
+import logging
 import queue
 import initRoutines    as ir
 import timeRoutines    as tr
@@ -15,6 +17,7 @@ import fileIO          as fio
 import runActProfRtns  as rap
 import utils           as ut
 import swUpdate        as su
+lg = logging.getLogger(__name__)
 #############################################################################
 
 gpioDict  = None       # pylint: disable=C0103
@@ -34,7 +37,7 @@ def dummy():
 
 # Version number of the "app".
 # As opposed to the version number of the "server" which is in fileIO.py
-VER = 'v4.2.0 - 30-Jul-2026'
+VER = 'v4.3.0 - 01-Aug-2026'
 def getVer():
     appVer = VER
     srvVer = fio.VER
@@ -98,7 +101,7 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
              'parm' : [rlyObjLst,gpioDict,None],
              'menu' : 'Set Relay To Closed'          },
 
-    'sap': { 'func' : pr.setAP,             
+    'sap': { 'func' : pr.setAP,
              'parm' : None,
              'menu' : 'Set Act Profile'              },
 
@@ -121,40 +124,44 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
 
     # OTHER COMMANDS
 
-    'mp' : { 'func' : pr.makeProf,          
+    'mp' : { 'func' : pr.makeProf,
              'parm' : None,
              'menu' : 'Make Profiles'                },
 
-    'rp' : { 'func' : rap.strtTwoThrds,     
+    'rp' : { 'func' : rap.strtTwoThrds,
              'parm' : [rlyObjLst,gpioDict,
                        uiCmdQ,uiRspQ,wkCmdQ,wkRspQ],
-             'menu' : 'Run Active Profile'             },
+             'menu' : 'Run Active Profile'           },
 
-    'sp' : { 'func' : rap.stopTwoThrd,      
+    'sp' : { 'func' : rap.stopTwoThrd,
              'parm' : [uiCmdQ],
-             'menu' : 'Stop Running Profile'           },
+             'menu' : 'Stop Running Profile'         },
 
     # OTHER COMMANDS
     'us' : { 'func' : su.updateSw,
              'parm' : [getVer(),'sprinkler2'],
-             'menu' : 'Update SW'                      },
+             'menu' : 'Update SW'                    },
 
     'close':{'func' : dummy,
              'parm' : None,
-             'menu' : 'Disconnect'                     },
+             'menu' : 'Disconnect'                   },
 
     'ks' : { 'func' : dummy,
              'parm' : None,
-             'menu' : 'Kill Server'                    },
+             'menu' : 'Kill Server'                  },
 
     'rbt': { 'func' : dummy,
              'parm' : None,
-             'menu' : 'Reboot RPi'                      },
+             'menu' : 'Reboot RPi'                   },
 
     # TEST COMMANDS
     't1' : { 'func' : rr.toggleRly,
              'parm' : [rlyObjLst,gpioDict,None],
              'menu' : 'Test 1 - Toggle  Relay'       },
+
+    'ge' : { 'func' : lambda: 1/0,
+             'parm' : None,
+             'menu' : 'Generate Exception'           },
 
     }
     #####################################################
@@ -193,7 +200,14 @@ def vector(inputStr,mpSharedDict,mpSharedDictLock): # called from handleClient.
             rsp = func(params) # rsp[0] = rspStr. Vector to worker.
             return rsp[0]      # Return to srvr for forwarding to clnt.
         except Exception as e: # pylint: disable = W0718
-            return str(e)
+            # Output to logFile.txt via logger.
+            lg.exception('%s', str(e))
+            # Output to terminal.
+            excType, excObj, excTb = sys.exc_info() # pylint: disable=W0612
+            rsp  = ' Error Type  : {}\n'.format(excType.__name__)
+            rsp += ' File  Name  : {}\n'.format(excTb.tb_frame.f_code.co_filename)
+            rsp += ' Line  Number: {}'.format(excTb.tb_lineno)
+            return rsp
 
     if choice == 'm':
         tmpDic = {

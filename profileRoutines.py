@@ -55,7 +55,7 @@ def loadProf():
     except FileNotFoundError as e:
         logStr  = ' Could not open pickle/schedDict.pickle.\n'
         logStr += ' Generating it now ...\n'
-        lg.exception('%s \n $s', logStr, str(e))
+        lg.exception('%s \n %s', logStr, str(e))
         print( logStr )
         makeProf()
         with open('pickle/schedDict.pickle', 'rb') as f:
@@ -167,5 +167,10 @@ def setAP( parmLst ):
 #############################################################################
 
 if __name__ == '__main__':
-    rspString = makeProf()
-    print(rspString)
+
+    rsp = makeProf()
+    print( '\n Response String from makeProfile() = \n{}'.format(rsp[0]))
+
+    profileDict = loadProf()
+    print( '\n Response String from makeProfile() = \n')
+    pp.pprint(profileDict)

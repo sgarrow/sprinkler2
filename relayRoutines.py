@@ -60,6 +60,7 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
         gpioStr   = str(relay.pin)
         pinNum    = gpioDic[gpioStr]['pin']
         relayNum  = gpioDic[gpioStr]['relay']
+        relayDesc = gpioDic[gpioStr]['desc']
 
         rspLst = tr.getTimeDate(False)
         curDT  = rspLst[1]
@@ -88,8 +89,8 @@ def relayOCTR( parmLst ): # Relay Open/Close/Toggle/Read Driver Function.
             rv = relay.value
             if rv == 1:
                 rtnVal = 'closed'
-            rspStr += ' Relay {} ({:6} on pin {}) is {}.\n'.\
-                format(relayNum,gpioStr,pinNum,rtnVal)
+            rspStr += ' Relay {} ({:6} on pin {}, {:34}) is {}.\n'.\
+                format(relayNum,gpioStr,pinNum,relayDesc,rtnVal)
 
     return [rspStr,rtnVal]
 #############################################################################

@@ -20,9 +20,14 @@ profile0:
   active:      True
   relay1:
     About:     Back Yard Mstr Bed Side 
-    Days:      ['Saturday']
-    Times:     [1730,1830,1930]
+    Days:      ['Tuesday','Saturday']
+    Times:     [830,930,1030]
     durations: [2,2,2]
+  relay5:
+    About:     Hill Above Driveway - RR Ties' },
+    Days:      ['Tuesday','Saturday']
+    Times:     [835]
+    durations: [6]
   #relay2:
   #  About:     Back Yard Spa Side 
   #  Days:      [None]
